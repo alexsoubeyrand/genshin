@@ -8,14 +8,14 @@ public class Wish {
 
 	public static void main(String[] args) {
 //		Settings settings = Settings.createMihoyoSettings();
-		Settings settings = new Settings.Builder()//
+		Settings settings = Settings.build()//
 				.withProbability4Stars(0)//
 				.withProbability4StarsWeaponCharacter(0)//
 				.withProbability5Stars(0)//
 				.withProbability5StarsPermanentExclusive(0)//
 				.withGuaranty4Stars(3)//
 				.withGuaranty5Stars(5)//
-				.build();
+				.create();
 		Memory memory = Memory.createFreshMemory();
 		Generator generator = new Result.Generator(settings, memory);
 
@@ -32,7 +32,6 @@ public class Wish {
 	
 	// TODO Test Memory
 	// TODO Test Results
-	// TODO Test Settings (esp. sum probas = 1)
 	
 	// TODO Compute statistics
 	
