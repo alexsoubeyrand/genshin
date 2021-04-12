@@ -16,6 +16,15 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
+
+		<!-- VERSIONS -->
+		<maven-assembly.version>3.3.0</maven-assembly.version>
+		<maven-compiler.version>3.8.1</maven-compiler.version>
+		<maven-failsafe.version>3.0.0-M5</maven-failsafe.version>
+		<maven-jar.version>3.2.0</maven-jar.version>
+		<maven-surefire.version>3.0.0-M5</maven-surefire.version>
+		<process-exec.version>0.9</process-exec.version>
+		<spring-boot.version>2.4.4</spring-boot.version>
 	</properties>
 
 	<build>
@@ -23,7 +32,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.4.4</version>
+				<version>${spring-boot.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -35,12 +44,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven-compiler.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>${maven-jar.version}</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -51,7 +60,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>${maven-assembly.version}</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -67,6 +76,53 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven-failsafe.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.bazaarvoice.maven.plugins</groupId>
+				<artifactId>process-exec-maven-plugin</artifactId>
+				<version>${process-exec.version}</version>
+				<executions>
+					<execution>
+						<id>start-jar</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<waitAfterLaunch>10</waitAfterLaunch>
+							<arguments>
+								<argument>java</argument>
+								<argument>-jar</argument>
+								<argument>${project.artifactId}-${project.version}.jar</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-jar-process</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop-all</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -75,7 +131,7 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
-				<version>2.4.4</version>
+				<version>${spring-boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -102,6 +158,26 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<!-- Version from spring-boot-dependencies -->
+		</dependency>
+
+		<!-- TESTS -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<!-- Version from spring-boot-dependencies -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<!-- Version from spring-boot-dependencies -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<!-- Version from spring-boot-dependencies -->
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

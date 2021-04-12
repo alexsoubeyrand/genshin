@@ -18,7 +18,7 @@ import fr.sazaju.genshin.model.Pack;
 @RequestMapping(value = "/genshin/packs", produces = "application/hal+json")
 public class PackController {
 
-	@GetMapping("")
+	@GetMapping
 	@ResponseBody
 	public CollectionModel<EntityModel<Pack>> getPacks() {
 		CollectionModel<EntityModel<Pack>> packs = CollectionModel.of(Pack.getAllPacks()//

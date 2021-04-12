@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -32,9 +33,9 @@ public class Linker {
 		Pack pack = model.getContent();
 		String euros = "" + pack.euros;
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, methodOn(PackController.class).getPackByEuros(euros), //
-				Rel.FIRST_ORDER, methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
-				Rel.PACKS, methodOn(PackController.class).getPacks()//
+				Rel.SELF, () -> methodOn(PackController.class).getPackByEuros(euros), //
+				Rel.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
+				Rel.PACKS, () -> methodOn(PackController.class).getPacks()//
 		));
 	}
 
@@ -42,31 +43,31 @@ public class Linker {
 		Pack pack = model.getContent();
 		String euros = "" + pack.euros;
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
-				Rel.NEXT_ORDERS, methodOn(PackController.class).getPackByEuros(euros), //
-				Rel.PACKS, methodOn(PackController.class).getFirstOrderPacks()//
+				Rel.SELF, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
+				Rel.NEXT_ORDERS, () -> methodOn(PackController.class).getPackByEuros(euros), //
+				Rel.PACKS, () -> methodOn(PackController.class).getFirstOrderPacks()//
 		));
 	}
 
 	public CollectionModel<EntityModel<Pack>> decoratePackCollection(CollectionModel<EntityModel<Pack>> model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, methodOn(PackController.class).getPacks(), //
-				Rel.FIRST_ORDER, methodOn(PackController.class).getFirstOrderPacks() //
+				Rel.SELF, () -> methodOn(PackController.class).getPacks(), //
+				Rel.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPacks() //
 		));
 	}
 
 	public CollectionModel<EntityModel<Pack>> decorateFirstOrderPackCollection(
 			CollectionModel<EntityModel<Pack>> model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, methodOn(PackController.class).getFirstOrderPacks(), //
-				Rel.NEXT_ORDERS, methodOn(PackController.class).getPacks() //
+				Rel.SELF, () -> methodOn(PackController.class).getFirstOrderPacks(), //
+				Rel.NEXT_ORDERS, () -> methodOn(PackController.class).getPacks() //
 		));
 	}
 
-	private <T extends RepresentationModel<?>> T addFilteredLinks(T model, Map<LinkRelation, ?> relations) {
-		relations.forEach((relation, resource) -> {
+	private <T extends RepresentationModel<?>> T addFilteredLinks(T model, Map<LinkRelation, Supplier<?>> relations) {
+		relations.forEach((relation, resourceSupplier) -> {
 			if (relationFilter.test(relation)) {
-				model.add(linkTo(resource).withRel(relation));
+				model.add(linkTo(resourceSupplier.get()).withRel(relation));
 			}
 		});
 		return model;
