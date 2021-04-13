@@ -11,16 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fr.sazaju.genshin.service.hateoas.Client;
 import fr.sazaju.genshin.service.hateoas.CollectionResource;
-import fr.sazaju.genshin.service.hateoas.Hateoas;
+import fr.sazaju.genshin.service.hateoas.HateoasClient;
 import fr.sazaju.genshin.service.hateoas.Resource;
 import fr.sazaju.genshin.service.hateoas.Response;
 
 class PackIT {
 
-	private static final Client SERVICE = Hateoas.createClient("/genshin");
-	
+	private static final HateoasClient SERVICE = new HateoasClient();
+
 	public static final String EUROS = "euros";
 	public static final String CRISTALS = "cristals";
 
@@ -119,13 +118,13 @@ class PackIT {
 	@ParameterizedTest
 	@MethodSource("packsAndFirstOrderPacksResponses")
 	void testPacksHaveMihoyoPrices(Response response) {
-		CollectionResource resource = response.getResource().asCollection();
-		resource.getItem(0).assertThat(jsonPath(EUROS), equalTo(1.09f));
-		resource.getItem(1).assertThat(jsonPath(EUROS), equalTo(5.49f));
-		resource.getItem(2).assertThat(jsonPath(EUROS), equalTo(16.99f));
-		resource.getItem(3).assertThat(jsonPath(EUROS), equalTo(32.99f));
-		resource.getItem(4).assertThat(jsonPath(EUROS), equalTo(54.99f));
-		resource.getItem(5).assertThat(jsonPath(EUROS), equalTo(109.99f));
+		CollectionResource packs = response.getResource().asCollection();
+		packs.getItem(0).assertThat(jsonPath(EUROS), equalTo(1.09f));
+		packs.getItem(1).assertThat(jsonPath(EUROS), equalTo(5.49f));
+		packs.getItem(2).assertThat(jsonPath(EUROS), equalTo(16.99f));
+		packs.getItem(3).assertThat(jsonPath(EUROS), equalTo(32.99f));
+		packs.getItem(4).assertThat(jsonPath(EUROS), equalTo(54.99f));
+		packs.getItem(5).assertThat(jsonPath(EUROS), equalTo(109.99f));
 	}
 
 	@ParameterizedTest

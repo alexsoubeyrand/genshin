@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import fr.sazaju.genshin.service.Rel;
 
 @Controller
-@RequestMapping(value = "/genshin", produces = "application/hal+json")
+@RequestMapping(value = "/", produces = "application/hal+json")
 public class MainController {
-	@GetMapping("")
+	@GetMapping
 	@ResponseBody
 	public EntityModel<?> getServiceRoot() {
 		EntityModel<Object> model = EntityModel.of(Map.of());

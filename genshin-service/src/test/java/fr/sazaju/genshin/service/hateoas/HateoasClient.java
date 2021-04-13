@@ -1,11 +1,15 @@
 package fr.sazaju.genshin.service.hateoas;
 
-public class Client {
+public class HateoasClient {
 
 	private final String rootRelativePath;
 
-	public Client(String rootRelativePath) {
+	public HateoasClient(String rootRelativePath) {
 		this.rootRelativePath = rootRelativePath;
+	}
+	
+	public HateoasClient() {
+		this("");
 	}
 
 	public Caller resolvePath(String relativeUrl) {

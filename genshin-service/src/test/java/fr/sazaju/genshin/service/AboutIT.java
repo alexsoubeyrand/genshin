@@ -7,12 +7,11 @@ import static org.hamcrest.text.MatchesPattern.*;
 
 import org.junit.jupiter.api.Test;
 
-import fr.sazaju.genshin.service.hateoas.Client;
-import fr.sazaju.genshin.service.hateoas.Hateoas;
+import fr.sazaju.genshin.service.hateoas.HateoasClient;
 
 class AboutIT {
 
-	private static final Client SERVICE = Hateoas.createClient("/genshin");
+	private static final HateoasClient SERVICE = new HateoasClient();
 
 	@Test
 	void testRootReturnsAboutLink() {
