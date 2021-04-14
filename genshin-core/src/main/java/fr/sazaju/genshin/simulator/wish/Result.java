@@ -31,18 +31,18 @@ public class Result {
 		this.isExclusive = isExclusive;
 	}
 
-	public static Result compute(Settings settings, Memory memory, float randomValue) {
+	public static Result compute(Settings settings, Profile profile, float randomValue) {
 		int stars = (randomValue < settings.probability5Stars
-				|| memory.wishesLessThan5Stars == settings.guaranty5Stars - 1) ? 5 //
+				|| profile.wishesLessThan5Stars == settings.guaranty5Stars - 1) ? 5 //
 						: (randomValue < settings.probability4Stars + settings.probability5Stars
-								|| memory.wishesLessThan4Stars == settings.guaranty4Stars - 1) ? 4 //
+								|| profile.wishesLessThan4Stars == settings.guaranty4Stars - 1) ? 4 //
 										: 3;
 		Type type = stars == 3 ? Type.WEAPON //
 				: stars == 4 && randomValue > settings.probability5Stars
 						+ settings.probability4Stars * settings.probability4StarsWeaponCharacter ? Type.WEAPON//
 								: Type.CHARACTER;
 		boolean isExclusive = stars == 5
-				? memory.isExclusiveGuaranteedOnNext5Stars
+				? profile.isExclusiveGuaranteedOnNext5Stars
 						|| randomValue < settings.probability5Stars * settings.probability5StarsPermanentExclusive
 				: false;
 		return new Result(stars, type, isExclusive);
@@ -56,20 +56,20 @@ public class Result {
 	public static class Generator {
 
 		private final Settings settings;
-		private Memory memory;
+		private Profile profile;
 
-		public Generator(Settings settings, Memory memory) {
+		public Generator(Settings settings, Profile profile) {
 			this.settings = settings;
-			this.memory = memory;
+			this.profile = profile;
 		}
 
-		public Memory getCurrentMemory() {
-			return memory;
+		public Profile getCurrentMemory() {
+			return profile;
 		}
 
 		public Result run(float randomValue) {
-			Result result = Result.compute(settings, memory, randomValue);
-			this.memory = memory.update(result);
+			Result result = Result.compute(settings, profile, randomValue);
+			this.profile = profile.update(result);
 			return result;
 		}
 	}

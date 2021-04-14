@@ -26,16 +26,16 @@ public class Linker {
 	}
 
 	public static Linker selfLink() {
-		return new Linker(Predicate.isEqual(Rel.SELF));
+		return new Linker(Predicate.isEqual(Rel.Iana.SELF));
 	}
 
 	public EntityModel<Pack> decoratePack(EntityModel<Pack> model) {
 		Pack pack = model.getContent();
 		String euros = "" + pack.euros;
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, () -> methodOn(PackController.class).getPackByEuros(euros), //
-				Rel.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
-				Rel.PACKS, () -> methodOn(PackController.class).getPacks()//
+				Rel.Iana.SELF, () -> methodOn(PackController.class).getPackByEuros(euros), //
+				Rel.Packs.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
+				Rel.Packs.PACKS, () -> methodOn(PackController.class).getPacks()//
 		));
 	}
 
@@ -43,24 +43,44 @@ public class Linker {
 		Pack pack = model.getContent();
 		String euros = "" + pack.euros;
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
-				Rel.NEXT_ORDERS, () -> methodOn(PackController.class).getPackByEuros(euros), //
-				Rel.PACKS, () -> methodOn(PackController.class).getFirstOrderPacks()//
+				Rel.Iana.SELF, () -> methodOn(PackController.class).getFirstOrderPackByEuros(euros), //
+				Rel.Packs.NEXT_ORDERS, () -> methodOn(PackController.class).getPackByEuros(euros), //
+				Rel.Packs.PACKS, () -> methodOn(PackController.class).getFirstOrderPacks()//
 		));
 	}
 
 	public CollectionModel<EntityModel<Pack>> decoratePackCollection(CollectionModel<EntityModel<Pack>> model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, () -> methodOn(PackController.class).getPacks(), //
-				Rel.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPacks() //
+				Rel.Iana.SELF, () -> methodOn(PackController.class).getPacks(), //
+				Rel.Packs.FIRST_ORDER, () -> methodOn(PackController.class).getFirstOrderPacks() //
 		));
 	}
 
 	public CollectionModel<EntityModel<Pack>> decorateFirstOrderPackCollection(
 			CollectionModel<EntityModel<Pack>> model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.SELF, () -> methodOn(PackController.class).getFirstOrderPacks(), //
-				Rel.NEXT_ORDERS, () -> methodOn(PackController.class).getPacks() //
+				Rel.Iana.SELF, () -> methodOn(PackController.class).getFirstOrderPacks(), //
+				Rel.Packs.NEXT_ORDERS, () -> methodOn(PackController.class).getPacks() //
+		));
+	}
+
+	public <T extends RepresentationModel<?>> T decorateBannerCollection(T model) {
+		return addFilteredLinks(model, Map.of(//
+				Rel.Iana.SELF, () -> methodOn(BannerController.class).getBanners(), //
+				Rel.Banners.CHARACTERS, () -> methodOn(BannerController.class).getCharactersBanner() //
+		));
+	}
+
+	public <T extends RepresentationModel<?>> T decorateCharactersBanner(T model) {
+		return addFilteredLinks(model, Map.of(//
+				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBanner(), //
+				Rel.Banners.SETTINGS, () -> methodOn(BannerController.class).getCharactersBannerSettings() //
+		));
+	}
+
+	public <T extends RepresentationModel<?>> T decorateCharactersBannerSettings(T model) {
+		return addFilteredLinks(model, Map.of(//
+				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerSettings() //
 		));
 	}
 

@@ -16,8 +16,8 @@ public class Wish {
 				.withGuaranty4Stars(3)//
 				.withGuaranty5Stars(5)//
 				.create();
-		Memory memory = Memory.createFreshMemory();
-		Generator generator = new Result.Generator(settings, memory);
+		Profile profile = Profile.createFreshProfile();
+		Generator generator = new Result.Generator(settings, profile);
 
 		long randomSeed = 0;
 		Random randomGenerator = new Random(randomSeed);
@@ -30,7 +30,7 @@ public class Wish {
 		}
 	}
 	
-	// TODO Test Memory
+	// TODO Test Profile
 	// TODO Test Results
 	
 	// TODO Compute statistics

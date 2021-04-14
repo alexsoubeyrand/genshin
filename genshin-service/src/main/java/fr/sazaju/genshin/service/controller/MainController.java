@@ -20,9 +20,10 @@ public class MainController {
 	@ResponseBody
 	public EntityModel<?> getServiceRoot() {
 		EntityModel<Object> model = EntityModel.of(Map.of());
-		model.add(linkTo(methodOn(MainController.class).getServiceRoot()).withRel(Rel.SELF));
-		model.add(linkTo(methodOn(MainController.class).getAbout()).withRel(Rel.ABOUT));
-		model.add(linkTo(methodOn(PackController.class).getPacks()).withRel(Rel.PACKS));
+		model.add(linkTo(methodOn(MainController.class).getServiceRoot()).withRel(Rel.Iana.SELF));
+		model.add(linkTo(methodOn(MainController.class).getAbout()).withRel(Rel.Iana.ABOUT));
+		model.add(linkTo(methodOn(PackController.class).getPacks()).withRel(Rel.Packs.PACKS));
+		model.add(linkTo(methodOn(BannerController.class).getBanners()).withRel(Rel.Banners.BANNERS));
 		return model;
 	}
 
@@ -30,9 +31,9 @@ public class MainController {
 	@ResponseBody
 	public EntityModel<?> getAbout() {
 		EntityModel<Object> model = EntityModel.of(Map.of());
-		model.add(linkTo(methodOn(MainController.class).getAbout()).withRel(Rel.SELF));
-		model.add(Link.of("mailto:sazaju@gmail.com", Rel.AUTHOR));
-		model.add(Link.of("https://github.com/Sazaju/genshin", Rel.SOURCE));
+		model.add(linkTo(methodOn(MainController.class).getAbout()).withRel(Rel.Iana.SELF));
+		model.add(Link.of("mailto:sazaju@gmail.com", Rel.Iana.AUTHOR));
+		model.add(Link.of("https://github.com/Sazaju/genshin", Rel.Global.SOURCE));
 		return model;
 	}
 }

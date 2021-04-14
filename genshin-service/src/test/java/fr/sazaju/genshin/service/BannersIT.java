@@ -1,9 +1,10 @@
 package fr.sazaju.genshin.service;
 
 import static fr.sazaju.genshin.service.Links.Banners.*;
-import static fr.sazaju.genshin.service.WishesIT.Property.*;
+import static fr.sazaju.genshin.service.BannersIT.Property.*;
 import static fr.sazaju.genshin.service.hateoas.assertion.HateoasMatcher.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.Stream;
 
@@ -16,14 +17,14 @@ import fr.sazaju.genshin.service.hateoas.HateoasClient;
 import fr.sazaju.genshin.service.hateoas.Resource;
 import fr.sazaju.genshin.service.hateoas.assertion.ResourceExtractor;
 
-class WishesIT {
+class BannersIT {
 
 	// TODO test permanent & weapon banners
 	// TODO test self link everywhere
 
 	private static final String WISH = "wish";
 	private static final String CHARACTERS = "characters";
-	private static final String PROFILES = "profiles";
+	private static final String SETTINGS = "settings";
 	private static final String MIHOYO = "mihoyo";
 	private static final HateoasClient SERVICE = new HateoasClient();
 
@@ -43,42 +44,57 @@ class WishesIT {
 	}
 
 	@Test
-	void testCharacterBannerHasProfilesLink() {
+	void testCharacterBannerHasSettingsLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
 				.getResource()//
-				.assertThat(hasLink(PROFILES));
+				.assertThat(hasLink(SETTINGS));
 	}
-
+	
 	@Test
-	void testCharacterBannerProfilesHaveMihoyoLink() {
+	void testCharacterBannerSettingsHavePostedData() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(PROFILES)//
+				.callResourceLink(SETTINGS)//
+				// TODO POST data
+				.getResource()//
+				// TODO retrieve link
+				// TODO GET link
+				// TODO assert data corresponds
+				;
+		throw new RuntimeException("Not implemented yet");
+	}
+
+	@Test
+	void testCharacterBannerSettingsHaveMihoyoLink() {
+		SERVICE.callRoot()//
+				.callResourceLink(BANNERS)//
+				.callResourceLink(CHARACTERS)//
+				.callResourceLink(SETTINGS)//
 				.getResource()//
 				.assertThat(hasLink(MIHOYO));
 	}
 
 	@ParameterizedTest
 	@MethodSource("allProperties")
-	void testCharacterBannerWithMihoyoProfileHasExpectedProperty(String property) {
+	void testCharacterBannerWithMihoyoSettingsHasExpectedProperty(String property) {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(PROFILES)//
+				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource()//
 				.assertThat(hasItem(property));
 	}
 
 	@Test
-	void testCharacterBannerWithMihoyoProfileHaveMihoyoProperties() {
+	void testCharacterBannerWithMihoyoSettingsHaveMihoyoProperties() {
 		Resource profile = SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(PROFILES)//
+				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource();
 
@@ -92,11 +108,11 @@ class WishesIT {
 	}
 
 	@Test
-	void testCharacterBannerWithMihoyoProfileHasWishLink() {
+	void testCharacterBannerWithMihoyoSettingsHasWishLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(PROFILES)//
+				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource()//
 				.assertThat(hasLink(WISH));
@@ -108,7 +124,7 @@ class WishesIT {
 
 	@Disabled
 	@Test
-	void testCharacterWishWithMihoyoProfileHasCorrectResult() {
+	void testCharacterWishWithMihoyoSettingsHasCorrectResult() {
 		// TODO Parameterize
 		double random = 1.0;
 
@@ -124,7 +140,7 @@ class WishesIT {
 		Resource wish = SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(PROFILES)//
+				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource().getLink(WISH).href().call()// TODO Manage args
 				.getResource();

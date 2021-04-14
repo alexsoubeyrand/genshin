@@ -5,12 +5,12 @@ import static fr.sazaju.genshin.StringReference.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Memory {
+public class Profile {
 	public final int wishesLessThan4Stars;
 	public final int wishesLessThan5Stars;
 	public final boolean isExclusiveGuaranteedOnNext5Stars;
 
-	private Memory(//
+	private Profile(//
 			int wishesLessThan4Stars, //
 			int wishesLessThan5Stars, //
 			boolean isExclusiveGuaranteedOnNext5Stars) {
@@ -19,17 +19,17 @@ public class Memory {
 		this.isExclusiveGuaranteedOnNext5Stars = isExclusiveGuaranteedOnNext5Stars;
 	}
 
-	public static Memory createFreshMemory() {
-		return new Memory(0, 0, false);
+	public static Profile createFreshProfile() {
+		return new Profile(0, 0, false);
 	}
 
-	public Memory update(Result result) {
+	public Profile update(Result result) {
 		int wishesLessThan4Stars = result.stars == 3 ? this.wishesLessThan4Stars + 1 : 0;
 		int wishesLessThan5Stars = result.stars == 5 ? 0 : this.wishesLessThan5Stars + 1;
 		boolean isExclusiveGuaranteedOnNext5Stars = result.stars == 5 && result.isExclusive ? false//
 				: result.stars == 5 && !result.isExclusive ? true//
 						: this.isExclusiveGuaranteedOnNext5Stars;
-		return new Memory(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
+		return new Profile(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public class Memory {
 			return this;
 		}
 
-		Memory build() {
-			return new Memory(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
+		Profile build() {
+			return new Profile(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
 		}
 	}
 }
