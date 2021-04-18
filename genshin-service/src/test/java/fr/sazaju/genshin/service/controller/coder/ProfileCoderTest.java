@@ -65,12 +65,12 @@ class ProfileCoderTest implements CollectionCoderTest<Profile> {
 	}
 
 	public Stream<Arguments> allCodersAndProfilesData() {
-		return allCoders().flatMap(version -> //
+		return allCoders().flatMap(coder -> //
 		someWishesLessThan4Stars().flatMap(wishesLessThan4Stars -> //
 		someWishesLessThan5Stars().flatMap(wishesLessThan5Stars -> //
 		allIsExclusiveGuaranteedOnNext5Stars().flatMap(isExclusiveGuaranteedOnNext5Stars -> //
 		Stream.of(arguments(//
-				version, //
+				coder, //
 				wishesLessThan4Stars, //
 				wishesLessThan5Stars, //
 				isExclusiveGuaranteedOnNext5Stars//

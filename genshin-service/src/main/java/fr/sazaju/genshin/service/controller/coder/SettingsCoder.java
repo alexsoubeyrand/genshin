@@ -50,11 +50,11 @@ public enum SettingsCoder implements Coder<Settings, String> {
 			}, //
 			Option.GZIP));
 
-	private final int versionNum;
+	private final int version;
 	private final Coder<Settings, String> coder;
 
 	SettingsCoder(int version, Coder<Settings, byte[]> profileCoder) {
-		this.versionNum = version;
+		this.version = version;
 		this.coder = VersionCodingUtils.createVersionCoder(version, profileCoder);
 	}
 
@@ -69,7 +69,7 @@ public enum SettingsCoder implements Coder<Settings, String> {
 	}
 
 	public static Coder<Settings, String> fromSerial(String serial) {
-		return VersionCodingUtils.fromSerial(serial, Stream.of(values()), version -> version.versionNum);
+		return VersionCodingUtils.fromSerial(serial, Stream.of(values()), coder -> coder.version);
 	}
 
 	public static String generateShortestSerial(Settings profile) {
