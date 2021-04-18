@@ -88,6 +88,7 @@ class PackIT {
 
 	@ParameterizedTest
 	@MethodSource("packsAndFirstOrderPacksResponses")
+	// TODO Replace by IANA collection?
 	void testEachPackHasPacksLink(Response response) {
 		response.getResource().asCollection()//
 				.stream().forEach(item -> {

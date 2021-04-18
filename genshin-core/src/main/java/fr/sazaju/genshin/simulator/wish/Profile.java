@@ -10,7 +10,7 @@ public class Profile {
 	public final int wishesLessThan5Stars;
 	public final boolean isExclusiveGuaranteedOnNext5Stars;
 
-	private Profile(//
+	public Profile(//
 			int wishesLessThan4Stars, //
 			int wishesLessThan5Stars, //
 			boolean isExclusiveGuaranteedOnNext5Stars) {
@@ -23,11 +23,11 @@ public class Profile {
 		return new Profile(0, 0, false);
 	}
 
-	public Profile update(Result result) {
-		int wishesLessThan4Stars = result.stars == 3 ? this.wishesLessThan4Stars + 1 : 0;
-		int wishesLessThan5Stars = result.stars == 5 ? 0 : this.wishesLessThan5Stars + 1;
-		boolean isExclusiveGuaranteedOnNext5Stars = result.stars == 5 && result.isExclusive ? false//
-				: result.stars == 5 && !result.isExclusive ? true//
+	public Profile update(Wish wish) {
+		int wishesLessThan4Stars = wish.stars == 3 ? this.wishesLessThan4Stars + 1 : 0;
+		int wishesLessThan5Stars = wish.stars == 5 ? 0 : this.wishesLessThan5Stars + 1;
+		boolean isExclusiveGuaranteedOnNext5Stars = wish.stars == 5 && wish.isExclusive ? false//
+				: wish.stars == 5 && !wish.isExclusive ? true//
 						: this.isExclusiveGuaranteedOnNext5Stars;
 		return new Profile(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
 	}

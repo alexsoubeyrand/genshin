@@ -23,6 +23,10 @@ public class Rel {
 	public static class Banners {
 		public static final LinkRelation BANNERS = LinkRelation.of("banners");
 		public static final LinkRelation CHARACTERS = LinkRelation.of("characters");
+		public static final LinkRelation WISH = LinkRelation.of("wish");
 		public static final LinkRelation SETTINGS = LinkRelation.of("settings");
+		public static final LinkRelation PROFILE = LinkRelation.of("profile");
+		public static final LinkRelation PROFILE_START = LinkRelation.of("profile-start");
+		public static final LinkRelation PROFILE_END = LinkRelation.of("profile-end");
 	}
 }

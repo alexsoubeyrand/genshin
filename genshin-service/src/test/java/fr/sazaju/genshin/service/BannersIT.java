@@ -44,6 +44,27 @@ class BannersIT {
 	}
 
 	@Test
+	void testCharacterBannerHasWishLink() {
+		SERVICE.callRoot()//
+				.callResourceLink(BANNERS)//
+				.callResourceLink(CHARACTERS)//
+				.getResource()//
+				.assertThat(hasLink(WISH));
+	}
+
+	@Test
+	void testCharacterBannerWishHasLink() {
+		SERVICE.callRoot()//
+				.callResourceLink(BANNERS)//
+				.callResourceLink(CHARACTERS)//
+				.callResourceLink(WISH)//
+				.getResource()//
+				.assertThat(hasLink("xxx"));
+	}
+	
+	// FIXME
+
+	@Test
 	void testCharacterBannerHasSettingsLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
@@ -51,7 +72,13 @@ class BannersIT {
 				.getResource()//
 				.assertThat(hasLink(SETTINGS));
 	}
-	
+
+	/*
+	 * TODO Test relation types are URIs:
+	 * https://tools.ietf.org/html/rfc8288#section-2.1.2
+	 */
+	// TODO Use link headers instead of body?
+
 	@Test
 	void testCharacterBannerSettingsHavePostedData() {
 		SERVICE.callRoot()//
@@ -60,10 +87,10 @@ class BannersIT {
 				.callResourceLink(SETTINGS)//
 				// TODO POST data
 				.getResource()//
-				// TODO retrieve link
-				// TODO GET link
-				// TODO assert data corresponds
-				;
+		// TODO retrieve link
+		// TODO GET link
+		// TODO assert data corresponds
+		;
 		throw new RuntimeException("Not implemented yet");
 	}
 

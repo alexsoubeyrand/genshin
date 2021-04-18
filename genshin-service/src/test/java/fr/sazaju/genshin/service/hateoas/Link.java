@@ -7,6 +7,7 @@ public class Link {
 
 	Link(io.restassured.response.Response response, JsonPath jsonPath, String rel) {
 		this.response = response;
+		// TODO Support multiple rels: https://tools.ietf.org/html/rfc8288#section-3.3
 		this.jsonPath = jsonPath.append("_links").append(rel);
 	}
 

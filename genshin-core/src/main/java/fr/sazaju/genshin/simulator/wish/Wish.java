@@ -1,46 +1,76 @@
 package fr.sazaju.genshin.simulator.wish;
 
-import java.util.Random;
+import static fr.sazaju.genshin.StringReference.*;
 
-import fr.sazaju.genshin.simulator.wish.Result.Generator;
+import fr.sazaju.genshin.StringReference;
 
 public class Wish {
 
-	public static void main(String[] args) {
-//		Settings settings = Settings.createMihoyoSettings();
-		Settings settings = Settings.build()//
-				.withProbability4Stars(0)//
-				.withProbability4StarsWeaponCharacter(0)//
-				.withProbability5Stars(0)//
-				.withProbability5StarsPermanentExclusive(0)//
-				.withGuaranty4Stars(3)//
-				.withGuaranty5Stars(5)//
-				.create();
-		Profile profile = Profile.createFreshProfile();
-		Generator generator = new Result.Generator(settings, profile);
+	enum Type {
+		WEAPON(StringReference.WEAPON), CHARACTER(StringReference.CHARACTER);
 
-		long randomSeed = 0;
-		Random randomGenerator = new Random(randomSeed);
+		private final StringReference ref;
 
-		for (int i = 0; i < settings.guaranty5Stars * 2; i++) {
-			float randomValue = randomGenerator.nextFloat();
-			Result result = generator.run(randomValue);
+		Type(StringReference ref) {
+			this.ref = ref;
+		}
 
-			System.out.println(String.format("RNGs: %f => %s %s", randomValue, result, generator.getCurrentMemory()));
+		@Override
+		public String toString() {
+			return ref.toString();
 		}
 	}
-	
-	// TODO Test Profile
-	// TODO Test Results
-	
-	// TODO Compute statistics
-	
-	// TODO Access through web service
 
-	// TODO refine
-	static class Exchange {
-		int astrionsPer3StarWeapon;
-		int asteriesPer4StarWeapon;
-		int asteriesPerFatality;
+	public final int stars;
+	public final Type type;
+	public final boolean isExclusive;
+
+	public Wish(int stars, Type type, boolean isExclusive) {
+		this.stars = stars;
+		this.type = type;
+		this.isExclusive = isExclusive;
+	}
+
+	public static Wish compute(Settings settings, Profile profile, float randomValue) {
+		int stars = (randomValue < settings.probability5Stars
+				|| profile.wishesLessThan5Stars == settings.guaranty5Stars - 1) ? 5 //
+						: (randomValue < settings.probability4Stars + settings.probability5Stars
+								|| profile.wishesLessThan4Stars == settings.guaranty4Stars - 1) ? 4 //
+										: 3;
+		Type type = stars == 3 ? Type.WEAPON //
+				: stars == 4 && randomValue > settings.probability5Stars
+						+ settings.probability4Stars * settings.probability4StarsWeaponCharacter ? Type.WEAPON//
+								: Type.CHARACTER;
+		boolean isExclusive = stars == 5
+				? profile.isExclusiveGuaranteedOnNext5Stars
+						|| randomValue < settings.probability5Stars * settings.probability5StarsPermanentExclusive
+				: false;
+		return new Wish(stars, type, isExclusive);
+	}
+
+	@Override
+	public String toString() {
+		return (isExclusive ? EXCLUSIVE : PERMANENT) + " " + stars + STAR + " " + type;
+	}
+
+	public static class Generator {
+
+		private final Settings settings;
+		private Profile profile;
+
+		public Generator(Settings settings, Profile profile) {
+			this.settings = settings;
+			this.profile = profile;
+		}
+
+		public Profile getCurrentProfile() {
+			return profile;
+		}
+
+		public Wish run(float randomValue) {
+			Wish wish = Wish.compute(settings, profile, randomValue);
+			this.profile = profile.update(wish);
+			return wish;
+		}
 	}
 }
