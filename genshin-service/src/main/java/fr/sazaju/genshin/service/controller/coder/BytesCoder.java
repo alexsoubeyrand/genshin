@@ -40,9 +40,7 @@ public class BytesCoder<T> implements Coder<T, byte[]> {
 		InputStream apply(InputStream in) throws IOException;
 	}
 
-	private final int bytes_count;
-	private final Writer<T> writer;
-	private final Reader<T> reader;
+	private final Definition<T> definition;
 	private final List<Option> options;
 
 	public interface Writer<T> {
@@ -53,22 +51,36 @@ public class BytesCoder<T> implements Coder<T, byte[]> {
 		T read(DataInputStream input) throws IOException;
 	}
 
-	public BytesCoder(int bytes_count, Writer<T> writer, Reader<T> reader, Option... options) {
-		this.bytes_count = bytes_count;
-		this.writer = writer;
-		this.reader = reader;
+	public static class Definition<T> {
+		public final int bytes_count;
+		public final Writer<T> writer;
+		public final Reader<T> reader;
+
+		public Definition(int bytes_count, Writer<T> writer, Reader<T> reader) {
+			this.bytes_count = bytes_count;
+			this.writer = writer;
+			this.reader = reader;
+		}
+	}
+
+	public BytesCoder(Definition<T> definition, Option... options) {
+		this.definition = definition;
 		this.options = List.of(options);
+	}
+
+	public BytesCoder(int bytes_count, Writer<T> writer, Reader<T> reader, Option... options) {
+		this(new Definition<>(bytes_count, writer, reader), options);
 	}
 
 	@Override
 	public byte[] encode(T data) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes_count);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(definition.bytes_count);
 		OutputStream out = baos;
 		for (Option option : options) {
 			out = option.decorateOutputStream(out);
 		}
 		try (DataOutputStream dos = new DataOutputStream(out)) {
-			writer.write(data, dos);
+			definition.writer.write(data, dos);
 		}
 		return baos.toByteArray();
 	}
@@ -81,7 +93,7 @@ public class BytesCoder<T> implements Coder<T, byte[]> {
 			in = option.decorateInputStream(in);
 		}
 		try (DataInputStream dis = new DataInputStream(in)) {
-			return reader.read(dis);
+			return definition.reader.read(dis);
 		}
 	}
 }
