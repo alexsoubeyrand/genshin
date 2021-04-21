@@ -53,46 +53,40 @@ public class BannerController {
 				this::serializeProfile, profile, newProfile);
 	}
 
-	private float getDefaultRandom() {
-		return 1.0f;
-	}
-
-	private Profile getDefaultProfile() {
-		return Profile.createFreshProfile();
-	}
-
 	@GetMapping("/characters/settings")
 	@ResponseBody
 	public EntityModel<Settings> getCharactersBannerWishSettings() {
 		Settings settings = getDefaultSettings();
-		String defaultSerial = serializeSettings(settings);
-		return allLinks().decorateCharactersBannerWishSettings(EntityModel.of(settings), defaultSerial);
-	}
-
-	private Settings getDefaultSettings() {
-		return Settings.createMihoyoSettings();
+		return allLinks().decorateCharactersBannerWishSettings(//
+				EntityModel.of(settings), //
+				this::serializeSettings, Settings.createMihoyoSettings());
 	}
 
 	@GetMapping("/characters/settings/{serial}")
 	@ResponseBody
 	public EntityModel<Settings> getCharactersBannerWishSettings(@PathVariable String serial) {
 		Settings settings = deserializeSettings(serial);
-		return allLinks().decorateCharactersBannerWishSettings(EntityModel.of(settings), serial);
+		return allLinks().decorateCharactersBannerWishSettings(//
+				EntityModel.of(settings), //
+				this::serializeSettings, Settings.createMihoyoSettings());
 	}
 
 	@GetMapping("/characters/profile")
 	@ResponseBody
 	public EntityModel<Profile> getCharactersBannerWishProfile() {
-		Profile profile = getDefaultProfile();
-		String defaultSerial = serializeProfile(profile);
-		return allLinks().decorateCharactersBannerWishProfile(EntityModel.of(profile), defaultSerial);
+		Profile defaultProfile = getDefaultProfile();
+		return allLinks().decorateCharactersBannerWishProfile(//
+				EntityModel.of(defaultProfile), //
+				this::serializeProfile, defaultProfile);
 	}
 
 	@GetMapping("/characters/profile/{serial}")
 	@ResponseBody
 	public EntityModel<Profile> getCharactersBannerWishProfile(@PathVariable String serial) {
 		Profile profile = deserializeProfile(serial);
-		return allLinks().decorateCharactersBannerWishProfile(EntityModel.of(profile), serializeProfile(profile));
+		return allLinks().decorateCharactersBannerWishProfile(//
+				EntityModel.of(profile), //
+				this::serializeProfile, getDefaultProfile());
 	}
 
 	private String serializeProfile(Profile profile) {
@@ -117,5 +111,17 @@ public class BannerController {
 		} catch (IOException cause) {
 			throw new RuntimeException(cause);
 		}
+	}
+
+	private float getDefaultRandom() {
+		return 1.0f;
+	}
+
+	private Profile getDefaultProfile() {
+		return Profile.createFreshProfile();
+	}
+
+	private Settings getDefaultSettings() {
+		return Settings.createMihoyoSettings();
 	}
 }

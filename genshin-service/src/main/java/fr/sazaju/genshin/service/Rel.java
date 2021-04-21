@@ -12,6 +12,8 @@ public class Rel {
 
 	public static class Global {
 		public static final LinkRelation SOURCE = LinkRelation.of("source");
+		public static final LinkRelation DEFAULT = LinkRelation.of("default");
+		public static final LinkRelation MIHOYO = LinkRelation.of("mihoyo");
 	}
 
 	public static class Packs {

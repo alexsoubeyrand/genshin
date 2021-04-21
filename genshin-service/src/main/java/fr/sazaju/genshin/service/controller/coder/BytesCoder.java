@@ -11,7 +11,10 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class BytesCoder<T> implements Coder<T, byte[]> {
+import fr.sazaju.genshin.service.controller.coder.Definition.DataReader;
+import fr.sazaju.genshin.service.controller.coder.Definition.DataWriter;
+
+public class BytesCoder<D> implements Coder<D, byte[]> {
 	enum Option {
 		GZIP(GZIPOutputStream::new, GZIPInputStream::new);
 
@@ -40,60 +43,41 @@ public class BytesCoder<T> implements Coder<T, byte[]> {
 		InputStream apply(InputStream in) throws IOException;
 	}
 
-	private final Definition<T> definition;
+	private final Definition<D> definition;
 	private final List<Option> options;
 
-	public interface Writer<T> {
-		void write(T data, DataOutputStream output) throws IOException;
-	}
-
-	public interface Reader<T> {
-		T read(DataInputStream input) throws IOException;
-	}
-
-	public static class Definition<T> {
-		public final int bytes_count;
-		public final Writer<T> writer;
-		public final Reader<T> reader;
-
-		public Definition(int bytes_count, Writer<T> writer, Reader<T> reader) {
-			this.bytes_count = bytes_count;
-			this.writer = writer;
-			this.reader = reader;
-		}
-	}
-
-	public BytesCoder(Definition<T> definition, Option... options) {
+	public BytesCoder(Definition<D> definition, Option... options) {
 		this.definition = definition;
 		this.options = List.of(options);
 	}
 
-	public BytesCoder(int bytes_count, Writer<T> writer, Reader<T> reader, Option... options) {
+	public BytesCoder(int bytes_count, DataWriter<DataOutputStream, D> writer, DataReader<DataInputStream, D> reader,
+			Option... options) {
 		this(new Definition<>(bytes_count, writer, reader), options);
 	}
 
 	@Override
-	public byte[] encode(T data) throws IOException {
+	public byte[] encode(D data) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(definition.bytes_count);
 		OutputStream out = baos;
 		for (Option option : options) {
 			out = option.decorateOutputStream(out);
 		}
 		try (DataOutputStream dos = new DataOutputStream(out)) {
-			definition.writer.write(data, dos);
+			definition.dataWriter.writeData(data, dos);
 		}
 		return baos.toByteArray();
 	}
 
 	@Override
-	public T decode(byte[] bytes) throws IOException {
+	public D decode(byte[] bytes) throws IOException {
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		InputStream in = bais;
 		for (Option option : options) {
 			in = option.decorateInputStream(in);
 		}
 		try (DataInputStream dis = new DataInputStream(in)) {
-			return definition.reader.read(dis);
+			return definition.dataReader.readData(dis);
 		}
 	}
 }

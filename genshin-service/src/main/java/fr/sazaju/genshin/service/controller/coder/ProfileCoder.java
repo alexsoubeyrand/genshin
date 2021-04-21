@@ -5,12 +5,11 @@ import static fr.sazaju.genshin.service.controller.coder.VersionCoder.*;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.service.controller.coder.BytesCoder.Definition;
 import fr.sazaju.genshin.service.controller.coder.BytesCoder.Option;
 import fr.sazaju.genshin.simulator.wish.Profile;
 
 public enum ProfileCoder implements Coder<Profile, String> {
-	ALL_VALUES_SEQUENTIAL(1, new BytesCoder.Definition<>(//
+	ALL_VALUES_SEQUENTIAL(1, new Definition<>(//
 			Integer.BYTES + Integer.BYTES + Byte.BYTES, //
 			(profile, output) -> {
 				output.writeInt(profile.wishesLessThan4Stars);
@@ -29,7 +28,7 @@ public enum ProfileCoder implements Coder<Profile, String> {
 	private final Definition<Profile> definition;
 	private final VersionCoder<Profile> versionCoder;
 
-	ProfileCoder(int version, BytesCoder.Definition<Profile> definition, BytesCoder.Option... options) {
+	ProfileCoder(int version, Definition<Profile> definition, BytesCoder.Option... options) {
 		this.definition = definition;
 		BytesCoder<Profile> dataCoder = new BytesCoder<>(definition, options);
 		this.versionCoder = new VersionCoder<>(version, dataCoder);

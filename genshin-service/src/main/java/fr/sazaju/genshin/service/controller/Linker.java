@@ -99,15 +99,19 @@ public class Linker {
 		));
 	}
 
-	public <T extends RepresentationModel<?>> T decorateCharactersBannerWishSettings(T model, String serial) {
+	public EntityModel<Settings> decorateCharactersBannerWishSettings(EntityModel<Settings> model, Function<Settings, String> serializer, Settings mihoyoSettings) {
+		Settings settings = model.getContent();
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishSettings(serial) //
+				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishSettings(serializer.apply(settings)), //
+				Rel.Global.MIHOYO, () -> methodOn(BannerController.class).getCharactersBannerWishSettings(serializer.apply(mihoyoSettings)) //
 		));
 	}
 
-	public EntityModel<Profile> decorateCharactersBannerWishProfile(EntityModel<Profile> model, String serial) {
+	public EntityModel<Profile> decorateCharactersBannerWishProfile(EntityModel<Profile> model, Function<Profile, String> serializer, Profile defautProfile) {
+		Profile profile = model.getContent();
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishProfile(serial) //
+				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishProfile(serializer.apply(profile)), //
+				Rel.Global.DEFAULT, () -> methodOn(BannerController.class).getCharactersBannerWishProfile(serializer.apply(defautProfile)) //
 		));
 	}
 
