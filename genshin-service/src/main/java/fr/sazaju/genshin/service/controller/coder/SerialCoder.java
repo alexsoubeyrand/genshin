@@ -9,18 +9,18 @@ import java.util.Base64;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class VersionCoder<T> implements Coder<T, String> {
+public class SerialCoder<D> implements Coder<D, String> {
 
 	private final int version;
-	private final Coder<T, byte[]> dataCoder;
+	private final Coder<D, byte[]> dataCoder;
 
-	public VersionCoder(int version, Coder<T, byte[]> dataCoder) {
+	public SerialCoder(int version, Coder<D, byte[]> dataCoder) {
 		this.version = version;
 		this.dataCoder = dataCoder;
 	}
 
 	@Override
-	public String encode(T data) throws IOException {
+	public String encode(D data) throws IOException {
 		byte[] dataBytes = dataCoder.encode(data);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (DataOutputStream dos = new DataOutputStream(baos)) {
@@ -32,7 +32,7 @@ public class VersionCoder<T> implements Coder<T, String> {
 	}
 
 	@Override
-	public T decode(String serial) throws IOException {
+	public D decode(String serial) throws IOException {
 		byte[] bytes = Base64.getUrlDecoder().decode(serial);
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		try (DataInputStream dis = new DataInputStream(bais)) {
@@ -45,7 +45,7 @@ public class VersionCoder<T> implements Coder<T, String> {
 		}
 	}
 
-	public static <T> Predicate<? super T> fromSerialVersion(String serial, Function<T, VersionCoder<?>> coderExtractor) {
+	public static <T> Predicate<? super T> fromSerial(String serial, Function<T, SerialCoder<?>> coderExtractor) {
 		byte[] bytes = Base64.getUrlDecoder().decode(serial);
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		int version;

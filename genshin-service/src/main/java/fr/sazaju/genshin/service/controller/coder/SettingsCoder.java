@@ -1,44 +1,41 @@
 package fr.sazaju.genshin.service.controller.coder;
 
-import static fr.sazaju.genshin.service.controller.coder.VersionCoder.*;
+import static fr.sazaju.genshin.service.controller.coder.SettingsDefinition.*;
 
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.service.controller.coder.BytesCoder.Option;
+import fr.sazaju.genshin.service.controller.coder.SequentialCoder.Option;
 import fr.sazaju.genshin.simulator.wish.Settings;
 
 public enum SettingsCoder implements Coder<Settings, String> {
-	SEQUENTIAL(1, SettingsDefinition.SEQUENTIAL_VALUES), //
-	SEQUENTIAL_COMPRESSED(2, SEQUENTIAL.definition, Option.GZIP);
+	SEQUENTIAL(1, new SequentialCoder<>(V1)), //
+	SEQUENTIAL_COMPRESSED(2, new SequentialCoder<>(V1, Option.GZIP));
 
-	private final Definition<Settings> definition;
-	private final VersionCoder<Settings> versionCoder;
+	private final SerialCoder<Settings> serialCoder;
 
-	SettingsCoder(int version, Definition<Settings> definition, BytesCoder.Option... options) {
-		this.definition = definition;
-		BytesCoder<Settings> dataCoder = new BytesCoder<>(definition, options);
-		this.versionCoder = new VersionCoder<>(version, dataCoder);
+	private SettingsCoder(int version, Coder<Settings, byte[]> bytesCoder) {
+		this.serialCoder = new SerialCoder<>(version, bytesCoder);
 	}
 
 	@Override
-	public String encode(Settings profile) throws IOException {
-		return versionCoder.encode(profile);
+	public String encode(Settings settings) throws IOException {
+		return serialCoder.encode(settings);
 	}
 
 	@Override
 	public Settings decode(String serial) throws IOException {
-		return versionCoder.decode(serial);
+		return serialCoder.decode(serial);
 	}
 
 	public static SettingsCoder fromSerial(String serial) {
 		return Stream.of(values())//
-				.filter(fromSerialVersion(serial, settingsCoder -> settingsCoder.versionCoder))//
+				.filter(SerialCoder.fromSerial(serial, settingsCoder -> settingsCoder.serialCoder))//
 				.findFirst().orElseThrow();
 	}
 
-	public static String generateShortestSerial(Settings profile) {
-		return Coder.generateShortestSerial(profile, Stream.of(values()));
+	public static String generateShortestSerial(Settings settings) {
+		return Coder.generateShortestSerial(settings, Stream.of(values()));
 	}
 
 }
