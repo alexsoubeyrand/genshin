@@ -1,10 +1,9 @@
 package fr.sazaju.genshin.service;
 
-import static fr.sazaju.genshin.service.Links.Banners.*;
 import static fr.sazaju.genshin.service.BannersIT.Property.*;
+import static fr.sazaju.genshin.service.Links.Banners.*;
 import static fr.sazaju.genshin.service.hateoas.assertion.HateoasMatcher.*;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.Stream;
 
@@ -23,6 +22,7 @@ class BannersIT {
 	// TODO test self link everywhere
 
 	private static final String WISH = "wish";
+	private static final String WISHES = "wishes";
 	private static final String CHARACTERS = "characters";
 	private static final String SETTINGS = "settings";
 	private static final String MIHOYO = "mihoyo";
@@ -44,20 +44,20 @@ class BannersIT {
 	}
 
 	@Test
-	void testCharacterBannerHasWishLink() {
+	void testCharacterBannerHasWishesLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
 				.getResource()//
-				.assertThat(hasLink(WISH));
+				.assertThat(hasLink(WISHES));
 	}
 
 	@Test
-	void testCharacterBannerWishHasLink() {
+	void testCharactersBannerWishesHasLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(BANNERS)//
 				.callResourceLink(CHARACTERS)//
-				.callResourceLink(WISH)//
+				.callResourceLink(WISHES)//
 				.getResource()//
 				.assertThat(hasLink("xxx"));
 	}
@@ -132,17 +132,6 @@ class BannersIT {
 		profile.assertThat(jsonPath(RATE_5_STARS_PERMANENT_EXCLUSIVE), equalTo(0.5f));
 		profile.assertThat(jsonPath(PITY_4_STARS), equalTo(10));
 		profile.assertThat(jsonPath(PITY_5_STARS), equalTo(90));
-	}
-
-	@Test
-	void testCharacterBannerWithMihoyoSettingsHasWishLink() {
-		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
-				.callResourceLink(SETTINGS)//
-				.callResourceLink(MIHOYO)//
-				.getResource()//
-				.assertThat(hasLink(WISH));
 	}
 
 	// XXX /wishes/{type}/profiles/{profile}/wish

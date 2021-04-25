@@ -2,6 +2,7 @@ package fr.sazaju.genshin.service.controller;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -14,6 +15,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import fr.sazaju.genshin.model.Pack;
 import fr.sazaju.genshin.service.Rel;
+import fr.sazaju.genshin.service.controller.coder.SimulatorDefinition.Simulator;
 import fr.sazaju.genshin.simulator.wish.Profile;
 import fr.sazaju.genshin.simulator.wish.Settings;
 import fr.sazaju.genshin.simulator.wish.Wish;
@@ -68,50 +70,56 @@ public class Linker {
 		));
 	}
 
-	public <T extends RepresentationModel<?>> T decorateBannerCollection(T model) {
-		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getBanners(), //
-				Rel.Banners.CHARACTERS, () -> methodOn(BannerController.class).getCharactersBanner() //
-		));
-	}
-
 	public <T extends RepresentationModel<?>> T decorateCharactersBanner(T model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBanner(), //
-				Rel.Banners.WISH, () -> methodOn(BannerController.class).getCharactersBannerWish() //
+				Rel.Iana.SELF, () -> methodOn(CharactersBannerController.class).getCharactersBanner(), //
+				Rel.Banners.WISHES, () -> methodOn(CharactersBannerController.class).getCharactersBannerWishes() //
 		));
 	}
 
-	public EntityModel<Wish> decorateCharactersBannerWish(//
-			EntityModel<Wish> model, //
-			Function<Settings, String> settingsSerializer, Settings settings, //
-			Function<Profile, String> profileSerializer, Profile profileStart, Profile profileEnd) {
-		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWish(), //
-				Rel.Banners.SETTINGS,
-				() -> methodOn(BannerController.class)
-						.getCharactersBannerWishSettings(settingsSerializer.apply(settings)), //
-				Rel.Banners.PROFILE_START,
-				() -> methodOn(BannerController.class)
-						.getCharactersBannerWishProfile(profileSerializer.apply(profileStart)), //
-				Rel.Banners.PROFILE_END, () -> methodOn(BannerController.class)
-						.getCharactersBannerWishProfile(profileSerializer.apply(profileEnd)) //
-		));
+	public CollectionModel<Wish> decorateCharactersBannerWishes(//
+			CollectionModel<Wish> model, //
+			Function<Simulator, String> simulatorSerializer, Simulator simulator, Simulator nextSimulator, //
+			Function<Settings, String> settingsSerializer, Function<Profile, String> profileSerializer) {
+		Map<LinkRelation, Supplier<?>> relations = new HashMap<>();
+		relations.put(Rel.Iana.SELF, () -> methodOn(CharactersBannerController.class)
+				.getCharactersBannerWishes(simulatorSerializer.apply(simulator)));
+		relations.put(Rel.Banners.SETTINGS, () -> methodOn(CharactersBannerController.class)
+				.getCharactersBannerWishSettings(settingsSerializer.apply(simulator.settings)));
+		relations.put(Rel.Banners.PROFILE_START, () -> methodOn(CharactersBannerController.class)
+				.getCharactersBannerWishProfile(profileSerializer.apply(simulator.profile)));
+		relations.put(Rel.Banners.PROFILE_END, () -> methodOn(CharactersBannerController.class)
+				.getCharactersBannerWishProfile(profileSerializer.apply(nextSimulator.profile)));
+
+		if (nextSimulator.numberGeneratorDescriptor.wishesCount > 0) {
+			relations.put(Rel.Iana.NEXT, () -> methodOn(CharactersBannerController.class)
+					.getCharactersBannerWishes(simulatorSerializer.apply(nextSimulator)));
+		}
+
+		return addFilteredLinks(model, relations);
 	}
 
-	public EntityModel<Settings> decorateCharactersBannerWishSettings(EntityModel<Settings> model, Function<Settings, String> serializer, Settings mihoyoSettings) {
+	public EntityModel<Settings> decorateCharactersBannerWishSettings(EntityModel<Settings> model,
+			Function<Settings, String> serializer, Settings mihoyoSettings) {
 		Settings settings = model.getContent();
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishSettings(serializer.apply(settings)), //
-				Rel.Global.MIHOYO, () -> methodOn(BannerController.class).getCharactersBannerWishSettings(serializer.apply(mihoyoSettings)) //
+				Rel.Iana.SELF,
+				() -> methodOn(CharactersBannerController.class)
+						.getCharactersBannerWishSettings(serializer.apply(settings)), //
+				Rel.Global.MIHOYO, () -> methodOn(CharactersBannerController.class)
+						.getCharactersBannerWishSettings(serializer.apply(mihoyoSettings)) //
 		));
 	}
 
-	public EntityModel<Profile> decorateCharactersBannerWishProfile(EntityModel<Profile> model, Function<Profile, String> serializer, Profile defautProfile) {
+	public EntityModel<Profile> decorateCharactersBannerWishProfile(EntityModel<Profile> model,
+			Function<Profile, String> serializer, Profile defautProfile) {
 		Profile profile = model.getContent();
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(BannerController.class).getCharactersBannerWishProfile(serializer.apply(profile)), //
-				Rel.Global.DEFAULT, () -> methodOn(BannerController.class).getCharactersBannerWishProfile(serializer.apply(defautProfile)) //
+				Rel.Iana.SELF,
+				() -> methodOn(CharactersBannerController.class)
+						.getCharactersBannerWishProfile(serializer.apply(profile)), //
+				Rel.Global.DEFAULT, () -> methodOn(CharactersBannerController.class)
+						.getCharactersBannerWishProfile(serializer.apply(defautProfile)) //
 		));
 	}
 

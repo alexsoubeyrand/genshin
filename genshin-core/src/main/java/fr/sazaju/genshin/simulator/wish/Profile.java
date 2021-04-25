@@ -1,9 +1,6 @@
 package fr.sazaju.genshin.simulator.wish;
 
-import static fr.sazaju.genshin.StringReference.*;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import fr.sazaju.genshin.StringUtils;
 
 public class Profile {
 	public final int wishesLessThan4Stars;
@@ -34,11 +31,7 @@ public class Profile {
 
 	@Override
 	public String toString() {
-		Map<String, Object> map = new LinkedHashMap<>();
-		map.put("<4" + STAR + " count", wishesLessThan4Stars);
-		map.put("<5" + STAR + " count", wishesLessThan5Stars);
-		map.put("next exclusive", isExclusiveGuaranteedOnNext5Stars);
-		return map.toString();
+		return StringUtils.toStringFromFields(this);
 	}
 
 	static class Builder {

@@ -6,6 +6,7 @@ import org.springframework.hateoas.LinkRelation;
 public class Rel {
 	public static class Iana {
 		public static final LinkRelation SELF = IanaLinkRelations.SELF;
+		public static final LinkRelation NEXT = IanaLinkRelations.NEXT;
 		public static final LinkRelation ABOUT = IanaLinkRelations.ABOUT;
 		public static final LinkRelation AUTHOR = IanaLinkRelations.AUTHOR;
 	}
@@ -26,6 +27,7 @@ public class Rel {
 		public static final LinkRelation BANNERS = LinkRelation.of("banners");
 		public static final LinkRelation CHARACTERS = LinkRelation.of("characters");
 		public static final LinkRelation WISH = LinkRelation.of("wish");
+		public static final LinkRelation WISHES = LinkRelation.of("wishes");
 		public static final LinkRelation SETTINGS = LinkRelation.of("settings");
 		public static final LinkRelation PROFILE = LinkRelation.of("profile");
 		public static final LinkRelation PROFILE_START = LinkRelation.of("profile-start");

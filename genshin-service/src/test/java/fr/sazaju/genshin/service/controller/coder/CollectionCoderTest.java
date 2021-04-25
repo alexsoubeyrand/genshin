@@ -54,7 +54,7 @@ interface CollectionCoderTest<T> {
 			T data) throws IOException {
 
 		String serial = coder1.encode(data);
-		assertThrows(InvalidCoderVersionException.class, () -> coder2.decode(serial));
+		assertThrows(InvalidCoderIdException.class, () -> coder2.decode(serial));
 	}
 
 	Stream<Coder<T, String>> allCoders();

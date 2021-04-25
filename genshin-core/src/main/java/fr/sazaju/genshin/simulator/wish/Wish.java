@@ -67,7 +67,7 @@ public class Wish {
 			return profile;
 		}
 
-		public Wish run(float randomValue) {
+		public Wish nextWish(float randomValue) {
 			Wish wish = Wish.compute(settings, profile, randomValue);
 			this.profile = profile.update(wish);
 			return wish;

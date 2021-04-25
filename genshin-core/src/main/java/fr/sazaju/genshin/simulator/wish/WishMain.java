@@ -1,7 +1,6 @@
 package fr.sazaju.genshin.simulator.wish;
 
-import java.util.Random;
-
+import fr.sazaju.genshin.simulator.NumberGenerator;
 import fr.sazaju.genshin.simulator.wish.Wish.Generator;
 
 public class WishMain {
@@ -20,22 +19,21 @@ public class WishMain {
 		Generator generator = new Wish.Generator(settings, profile);
 
 		long randomSeed = 0;
-		Random randomGenerator = new Random(randomSeed);
+		java.util.Random randomGenerator = new java.util.Random(randomSeed);
+		NumberGenerator rng = NumberGenerator.createFixedNumberGenerator(randomGenerator.nextFloat());
 
 		for (int i = 0; i < settings.guaranty5Stars * 2; i++) {
-			float randomValue = randomGenerator.nextFloat();
-			Wish result = generator.run(randomValue);
+			float randomValue = rng.nextFloat();
+			Wish result = generator.nextWish(randomValue);
 
 			System.out.println(String.format("RNGs: %f => %s %s", randomValue, result, generator.getCurrentProfile()));
 		}
 	}
-	
+
 	// TODO Test Profile
 	// TODO Test Results
-	
+
 	// TODO Compute statistics
-	
-	// TODO Access through web service
 
 	// TODO refine
 	static class Exchange {

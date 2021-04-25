@@ -15,7 +15,7 @@ import fr.sazaju.genshin.simulator.wish.Settings;
 class SettingsCoderTest implements CollectionCoderTest<Settings> {
 
 	@ParameterizedTest
-	@MethodSource("allCodersAndProfilesData")
+	@MethodSource("allCodersAndSettingsData")
 	public void testEachVersionHasConsistentCoding(//
 			SettingsCoder coder, //
 			double probability4Stars, //
@@ -85,7 +85,7 @@ class SettingsCoderTest implements CollectionCoderTest<Settings> {
 		}));
 	}
 
-	public Stream<Arguments> allCodersAndProfilesData() {
+	public Stream<Arguments> allCodersAndSettingsData() {
 		return allCoders().flatMap(coder -> //
 		someProbabilityValues().flatMap(probability4Stars -> //
 		someProbabilityValues().flatMap(probability5Stars -> {

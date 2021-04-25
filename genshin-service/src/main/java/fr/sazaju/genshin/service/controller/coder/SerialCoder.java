@@ -11,11 +11,11 @@ import java.util.function.Predicate;
 
 public class SerialCoder<D> implements Coder<D, String> {
 
-	private final int version;
+	private final int id;
 	private final Coder<D, byte[]> dataCoder;
 
-	public SerialCoder(int version, Coder<D, byte[]> dataCoder) {
-		this.version = version;
+	public SerialCoder(int id, Coder<D, byte[]> dataCoder) {
+		this.id = id;
 		this.dataCoder = dataCoder;
 	}
 
@@ -24,7 +24,7 @@ public class SerialCoder<D> implements Coder<D, String> {
 		byte[] dataBytes = dataCoder.encode(data);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (DataOutputStream dos = new DataOutputStream(baos)) {
-			dos.writeInt(version);
+			dos.writeInt(id);
 			dos.write(dataBytes);
 		}
 		byte[] bytes = baos.toByteArray();
@@ -36,9 +36,9 @@ public class SerialCoder<D> implements Coder<D, String> {
 		byte[] bytes = Base64.getUrlDecoder().decode(serial);
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		try (DataInputStream dis = new DataInputStream(bais)) {
-			int readVersion = dis.readInt();
-			if (readVersion != version) {
-				throw new InvalidCoderVersionException(version, readVersion);
+			int readId = dis.readInt();
+			if (readId != id) {
+				throw new InvalidCoderIdException(id, readId);
 			}
 			byte[] dataBytes = dis.readAllBytes();
 			return dataCoder.decode(dataBytes);
@@ -48,12 +48,12 @@ public class SerialCoder<D> implements Coder<D, String> {
 	public static <T> Predicate<? super T> fromSerial(String serial, Function<T, SerialCoder<?>> coderExtractor) {
 		byte[] bytes = Base64.getUrlDecoder().decode(serial);
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		int version;
+		int id;
 		try (DataInputStream dis = new DataInputStream(bais)) {
-			version = dis.readInt();
+			id = dis.readInt();
 		} catch (IOException cause) {
-			throw new CannotFindCoderVersionException(cause);
+			throw new CannotFindCoderIdException(cause);
 		}
-		return target -> coderExtractor.apply(target).version == version;
+		return target -> coderExtractor.apply(target).id == id;
 	}
 }

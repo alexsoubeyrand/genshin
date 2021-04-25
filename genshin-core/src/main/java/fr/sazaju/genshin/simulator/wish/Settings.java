@@ -2,6 +2,8 @@ package fr.sazaju.genshin.simulator.wish;
 
 import static fr.sazaju.genshin.StringReference.*;
 
+import fr.sazaju.genshin.StringUtils;
+
 public class Settings {
 	public final double probability4Stars;
 	public final double probability5Stars;
@@ -26,6 +28,11 @@ public class Settings {
 
 		this.guaranty4Stars = guaranty4Stars;
 		this.guaranty5Stars = guaranty5Stars;
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.toStringFromFields(this);
 	}
 
 	public static Settings createMihoyoSettings() {
