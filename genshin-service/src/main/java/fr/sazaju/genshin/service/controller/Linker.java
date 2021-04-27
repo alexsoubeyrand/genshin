@@ -72,8 +72,8 @@ public class Linker {
 
 	public <T extends RepresentationModel<?>> T decorateCharactersBanner(T model) {
 		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF, () -> methodOn(CharactersBannerController.class).getCharactersBanner(), //
-				Rel.Banners.WISHES, () -> methodOn(CharactersBannerController.class).getCharactersBannerWishes() //
+				Rel.Iana.SELF, () -> methodOn(CharacterBannerController.class).getBanner(), //
+				Rel.Banners.WISHES, () -> methodOn(CharacterBannerController.class).getWishes() //
 		));
 	}
 
@@ -82,18 +82,18 @@ public class Linker {
 			Function<Simulator, String> simulatorSerializer, Simulator simulator, Simulator nextSimulator, //
 			Function<Settings, String> settingsSerializer, Function<Profile, String> profileSerializer) {
 		Map<LinkRelation, Supplier<?>> relations = new HashMap<>();
-		relations.put(Rel.Iana.SELF, () -> methodOn(CharactersBannerController.class)
-				.getCharactersBannerWishes(simulatorSerializer.apply(simulator)));
-		relations.put(Rel.Banners.SETTINGS, () -> methodOn(CharactersBannerController.class)
-				.getCharactersBannerWishSettings(settingsSerializer.apply(simulator.settings)));
-		relations.put(Rel.Banners.PROFILE_START, () -> methodOn(CharactersBannerController.class)
-				.getCharactersBannerWishProfile(profileSerializer.apply(simulator.profile)));
-		relations.put(Rel.Banners.PROFILE_END, () -> methodOn(CharactersBannerController.class)
-				.getCharactersBannerWishProfile(profileSerializer.apply(nextSimulator.profile)));
+		relations.put(Rel.Iana.SELF, () -> methodOn(CharacterBannerController.class)
+				.getWishes(simulatorSerializer.apply(simulator)));
+		relations.put(Rel.Banners.SETTINGS, () -> methodOn(CharacterBannerController.class)
+				.getSettings(settingsSerializer.apply(simulator.settings)));
+		relations.put(Rel.Banners.PROFILE_START, () -> methodOn(CharacterBannerController.class)
+				.getProfile(profileSerializer.apply(simulator.profile)));
+		relations.put(Rel.Banners.PROFILE_END, () -> methodOn(CharacterBannerController.class)
+				.getProfile(profileSerializer.apply(nextSimulator.profile)));
 
 		if (nextSimulator.numberGeneratorDescriptor.wishesCount > 0) {
-			relations.put(Rel.Iana.NEXT, () -> methodOn(CharactersBannerController.class)
-					.getCharactersBannerWishes(simulatorSerializer.apply(nextSimulator)));
+			relations.put(Rel.Iana.NEXT, () -> methodOn(CharacterBannerController.class)
+					.getWishes(simulatorSerializer.apply(nextSimulator)));
 		}
 
 		return addFilteredLinks(model, relations);
@@ -104,10 +104,10 @@ public class Linker {
 		Settings settings = model.getContent();
 		return addFilteredLinks(model, Map.of(//
 				Rel.Iana.SELF,
-				() -> methodOn(CharactersBannerController.class)
-						.getCharactersBannerWishSettings(serializer.apply(settings)), //
-				Rel.Global.MIHOYO, () -> methodOn(CharactersBannerController.class)
-						.getCharactersBannerWishSettings(serializer.apply(mihoyoSettings)) //
+				() -> methodOn(CharacterBannerController.class)
+						.getSettings(serializer.apply(settings)), //
+				Rel.Global.MIHOYO, () -> methodOn(CharacterBannerController.class)
+						.getSettings(serializer.apply(mihoyoSettings)) //
 		));
 	}
 
@@ -116,10 +116,10 @@ public class Linker {
 		Profile profile = model.getContent();
 		return addFilteredLinks(model, Map.of(//
 				Rel.Iana.SELF,
-				() -> methodOn(CharactersBannerController.class)
-						.getCharactersBannerWishProfile(serializer.apply(profile)), //
-				Rel.Global.DEFAULT, () -> methodOn(CharactersBannerController.class)
-						.getCharactersBannerWishProfile(serializer.apply(defautProfile)) //
+				() -> methodOn(CharacterBannerController.class)
+						.getProfile(serializer.apply(profile)), //
+				Rel.Global.DEFAULT, () -> methodOn(CharacterBannerController.class)
+						.getProfile(serializer.apply(defautProfile)) //
 		));
 	}
 

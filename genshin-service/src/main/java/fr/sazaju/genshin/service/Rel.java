@@ -1,7 +1,13 @@
 package fr.sazaju.genshin.service;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import java.util.function.Function;
+
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.LinkRelation;
+
+import fr.sazaju.genshin.service.controller.RelsController;
 
 public class Rel {
 	public static class Iana {
@@ -12,25 +18,28 @@ public class Rel {
 	}
 
 	public static class Global {
-		public static final LinkRelation SOURCE = LinkRelation.of("source");
-		public static final LinkRelation DEFAULT = LinkRelation.of("default");
-		public static final LinkRelation MIHOYO = LinkRelation.of("mihoyo");
+		public static final LinkRelation SOURCE = customRelation(RelsController::source);
+		public static final LinkRelation DEFAULT = customRelation(RelsController::defaultt);
+		public static final LinkRelation MIHOYO = customRelation(RelsController::mihoyo);
 	}
 
 	public static class Packs {
-		public static final LinkRelation PACKS = LinkRelation.of("packs");
-		public static final LinkRelation FIRST_ORDER = LinkRelation.of("firstOrder");
-		public static final LinkRelation NEXT_ORDERS = LinkRelation.of("nextOrders");
+		public static final LinkRelation PACKS = customRelation(RelsController::packs);
+		public static final LinkRelation FIRST_ORDER = customRelation(RelsController::firstOrder);
+		public static final LinkRelation NEXT_ORDERS = customRelation(RelsController::nextOrders);
 	}
 
 	public static class Banners {
-		public static final LinkRelation BANNERS = LinkRelation.of("banners");
-		public static final LinkRelation CHARACTERS = LinkRelation.of("characters");
-		public static final LinkRelation WISH = LinkRelation.of("wish");
-		public static final LinkRelation WISHES = LinkRelation.of("wishes");
-		public static final LinkRelation SETTINGS = LinkRelation.of("settings");
-		public static final LinkRelation PROFILE = LinkRelation.of("profile");
-		public static final LinkRelation PROFILE_START = LinkRelation.of("profile-start");
-		public static final LinkRelation PROFILE_END = LinkRelation.of("profile-end");
+		public static final LinkRelation CHARACTER_BANNER = customRelation(RelsController::characterBanner);
+		public static final LinkRelation WISH = customRelation(RelsController::wish);
+		public static final LinkRelation WISHES = customRelation(RelsController::wishes);
+		public static final LinkRelation SETTINGS = customRelation(RelsController::settings);
+		public static final LinkRelation PROFILE = customRelation(RelsController::profile);
+		public static final LinkRelation PROFILE_START = customRelation(RelsController::profileStart);
+		public static final LinkRelation PROFILE_END = customRelation(RelsController::profileEnd);
+	}
+
+	private static LinkRelation customRelation(Function<RelsController, ?> relMethod) {
+		return LinkRelation.of(linkTo(relMethod.apply(methodOn(RelsController.class))).toUri().toString());
 	}
 }

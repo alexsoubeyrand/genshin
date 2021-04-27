@@ -28,27 +28,23 @@ import fr.sazaju.genshin.simulator.wish.Wish;
 import fr.sazaju.genshin.simulator.wish.Wish.Generator;
 
 @Controller
-@RequestMapping(value = "/banners/characters", produces = "application/hal+json")
-public class CharactersBannerController {
+@RequestMapping(value = "/banners/character", produces = "application/hal+json")
+public class CharacterBannerController {
 
 	@GetMapping
 	@ResponseBody
-	public CollectionModel<?> getCharactersBanner() {
+	public CollectionModel<?> getBanner() {
 		return allLinks().decorateCharactersBanner(CollectionModel.of(List.of()));
 	}
 
 	@GetMapping("/wishes")
 	@ResponseBody
-	public CollectionModel<Wish> getCharactersBannerWishes() {
+	public CollectionModel<Wish> getWishes() {
 		Simulator simulator = getDefaultSimulator();
-		return getCharactersBannerWishes(//
+		return getWishes(//
 				simulator.settings, //
 				simulator.profile, //
 				simulator.numberGeneratorDescriptor);
-	}
-
-	private Simulator getDefaultSimulator() {
-		return new Simulator(getDefaultSettings(), getDefaultProfile(), new RandomNGDescriptor(0, 100));
 	}
 
 	// TODO Add links to change settings
@@ -56,16 +52,16 @@ public class CharactersBannerController {
 	// TODO Add links to change random
 	@GetMapping("/wishes/{serial}")
 	@ResponseBody
-	public CollectionModel<Wish> getCharactersBannerWishes(@PathVariable String serial) {
+	public CollectionModel<Wish> getWishes(@PathVariable String serial) {
 		Simulator simulator = deserializeSimulator(serial);
-		return getCharactersBannerWishes(//
+		return getWishes(//
 				simulator.settings, //
 				simulator.profile, //
 				simulator.numberGeneratorDescriptor);
 	}
 
-	private <T extends NumberGenerator> CollectionModel<Wish> getCharactersBannerWishes(Settings settings,
-			Profile profile, NumberGeneratorDescriptor<T> descriptor) {
+	private <T extends NumberGenerator> CollectionModel<Wish> getWishes(Settings settings, Profile profile,
+			NumberGeneratorDescriptor<T> descriptor) {
 		T numberGenerator = descriptor.createNumberGenerator();
 		int runsCount = Math.min(10, descriptor.wishesCount);// Limit to 10 runs at once (multi)
 
@@ -88,7 +84,7 @@ public class CharactersBannerController {
 
 	@GetMapping("/settings")
 	@ResponseBody
-	public EntityModel<Settings> getCharactersBannerWishSettings() {
+	public EntityModel<Settings> getSettings() {
 		Settings settings = getDefaultSettings();
 		return allLinks().decorateCharactersBannerWishSettings(//
 				EntityModel.of(settings), //
@@ -97,7 +93,7 @@ public class CharactersBannerController {
 
 	@GetMapping("/settings/{serial}")
 	@ResponseBody
-	public EntityModel<Settings> getCharactersBannerWishSettings(@PathVariable String serial) {
+	public EntityModel<Settings> getSettings(@PathVariable String serial) {
 		Settings settings = deserializeSettings(serial);
 		return allLinks().decorateCharactersBannerWishSettings(//
 				EntityModel.of(settings), //
@@ -106,7 +102,7 @@ public class CharactersBannerController {
 
 	@GetMapping("/profile")
 	@ResponseBody
-	public EntityModel<Profile> getCharactersBannerWishProfile() {
+	public EntityModel<Profile> getProfile() {
 		Profile defaultProfile = getDefaultProfile();
 		return allLinks().decorateCharactersBannerWishProfile(//
 				EntityModel.of(defaultProfile), //
@@ -115,7 +111,7 @@ public class CharactersBannerController {
 
 	@GetMapping("/profile/{serial}")
 	@ResponseBody
-	public EntityModel<Profile> getCharactersBannerWishProfile(@PathVariable String serial) {
+	public EntityModel<Profile> getProfile(@PathVariable String serial) {
 		Profile profile = deserializeProfile(serial);
 		return allLinks().decorateCharactersBannerWishProfile(//
 				EntityModel.of(profile), //
@@ -164,5 +160,9 @@ public class CharactersBannerController {
 
 	private Settings getDefaultSettings() {
 		return Settings.createMihoyoSettings();
+	}
+
+	private Simulator getDefaultSimulator() {
+		return new Simulator(getDefaultSettings(), getDefaultProfile(), new RandomNGDescriptor(0, 100));
 	}
 }

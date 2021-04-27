@@ -33,9 +33,9 @@ public class Wish {
 
 	public static Wish compute(Settings settings, Profile profile, float randomValue) {
 		int stars = (randomValue < settings.probability5Stars
-				|| profile.wishesLessThan5Stars == settings.guaranty5Stars - 1) ? 5 //
+				|| profile.consecutiveWishesBelow5Stars == settings.guaranty5Stars - 1) ? 5 //
 						: (randomValue < settings.probability4Stars + settings.probability5Stars
-								|| profile.wishesLessThan4Stars == settings.guaranty4Stars - 1) ? 4 //
+								|| profile.consecutiveWishesBelowStars == settings.guaranty4Stars - 1) ? 4 //
 										: 3;
 		Type type = stars == 3 ? Type.WEAPON //
 				: stars == 4 && randomValue > settings.probability5Stars

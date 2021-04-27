@@ -2,10 +2,8 @@ package fr.sazaju.genshin.service.controller;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Controller;
@@ -25,7 +23,7 @@ public class MainController {
 		model.add(linkTo(methodOn(MainController.class).getServiceRoot()).withRel(Rel.Iana.SELF));
 		model.add(linkTo(methodOn(MainController.class).getAbout()).withRel(Rel.Iana.ABOUT));
 		model.add(linkTo(methodOn(PackController.class).getPacks()).withRel(Rel.Packs.PACKS));
-		model.add(linkTo(methodOn(MainController.class).getBanners()).withRel(Rel.Banners.BANNERS));
+		model.add(linkTo(methodOn(CharacterBannerController.class).getBanner()).withRel(Rel.Banners.CHARACTER_BANNER));
 		return model;
 	}
 
@@ -39,13 +37,4 @@ public class MainController {
 		return model;
 	}
 
-	@GetMapping("/banners")
-	@ResponseBody
-	public CollectionModel<?> getBanners() {
-		CollectionModel<Object> model = CollectionModel.of(List.of());
-		model.add(linkTo(methodOn(MainController.class).getBanners()).withRel(Rel.Iana.SELF));
-		model.add(linkTo(methodOn(CharactersBannerController.class).getCharactersBanner())
-				.withRel(Rel.Banners.CHARACTERS));
-		return model;
-	}
 }
