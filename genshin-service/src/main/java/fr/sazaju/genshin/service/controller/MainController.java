@@ -7,12 +7,14 @@ import java.util.Map;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import fr.sazaju.genshin.service.Rel;
 
+@CrossOrigin
 @Controller
 @RequestMapping(value = "/", produces = "application/hal+json")
 public class MainController {
