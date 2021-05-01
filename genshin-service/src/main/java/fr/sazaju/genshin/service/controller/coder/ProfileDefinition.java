@@ -7,7 +7,7 @@ import fr.sazaju.genshin.simulator.wish.Profile;
 public class ProfileDefinition {
 
 	private static final Property<Profile, Integer> consecutiveWishesBelow4Stars = //
-			Property.onClass(Integer.class, profile -> profile.consecutiveWishesBelowStars);
+			Property.onClass(Integer.class, profile -> profile.consecutiveWishesBelow4Stars);
 	private static final Property<Profile, Integer> consecutiveWishesBelow5Stars = //
 			Property.onClass(Integer.class, profile -> profile.consecutiveWishesBelow5Stars);
 	private static final Property<Profile, Boolean> isExclusiveGuaranteedOnNext5Stars = //

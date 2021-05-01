@@ -35,7 +35,7 @@ public class Wish {
 		int stars = (randomValue < settings.probability5Stars
 				|| profile.consecutiveWishesBelow5Stars == settings.guaranty5Stars - 1) ? 5 //
 						: (randomValue < settings.probability4Stars + settings.probability5Stars
-								|| profile.consecutiveWishesBelowStars == settings.guaranty4Stars - 1) ? 4 //
+								|| profile.consecutiveWishesBelow4Stars == settings.guaranty4Stars - 1) ? 4 //
 										: 3;
 		Type type = stars == 3 ? Type.WEAPON //
 				: stars == 4 && randomValue > settings.probability5Stars

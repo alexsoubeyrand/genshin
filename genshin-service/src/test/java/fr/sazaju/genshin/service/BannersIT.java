@@ -23,31 +23,23 @@ class BannersIT {
 
 	private static final String WISH = "wish";
 	private static final String WISHES = "wishes";
-	private static final String CHARACTERS = "characters";
+	private static final String CHARACTER_BANNER = "characters-banner";
 	private static final String SETTINGS = "settings";
 	private static final String MIHOYO = "mihoyo";
 	private static final HateoasClient SERVICE = new HateoasClient();
 
+	// TODO Resolve URIs in link rels
 	@Test
-	void testRootHasBannersLink() {
+	void testRootHasCharacterBannerLink() {
 		SERVICE.callRoot()//
 				.getResource()//
-				.assertThat(hasLink(BANNERS));
-	}
-
-	@Test
-	void testBannersHaveCharacterEventLink() {
-		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.getResource()//
-				.assertThat(hasLink(CHARACTERS));
+				.assertThat(hasLink(CHARACTER_BANNER));
 	}
 
 	@Test
 	void testCharacterBannerHasWishesLink() {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.getResource()//
 				.assertThat(hasLink(WISHES));
 	}
@@ -55,8 +47,7 @@ class BannersIT {
 	@Test
 	void testCharactersBannerWishesHasLink() {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(WISHES)//
 				.getResource()//
 				.assertThat(hasLink("xxx"));
@@ -67,8 +58,7 @@ class BannersIT {
 	@Test
 	void testCharacterBannerHasSettingsLink() {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.getResource()//
 				.assertThat(hasLink(SETTINGS));
 	}
@@ -82,8 +72,7 @@ class BannersIT {
 	@Test
 	void testCharacterBannerSettingsHavePostedData() {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(SETTINGS)//
 				// TODO POST data
 				.getResource()//
@@ -97,8 +86,7 @@ class BannersIT {
 	@Test
 	void testCharacterBannerSettingsHaveMihoyoLink() {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(SETTINGS)//
 				.getResource()//
 				.assertThat(hasLink(MIHOYO));
@@ -108,8 +96,7 @@ class BannersIT {
 	@MethodSource("allProperties")
 	void testCharacterBannerWithMihoyoSettingsHasExpectedProperty(String property) {
 		SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource()//
@@ -119,8 +106,7 @@ class BannersIT {
 	@Test
 	void testCharacterBannerWithMihoyoSettingsHaveMihoyoProperties() {
 		Resource profile = SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource();
@@ -154,8 +140,7 @@ class BannersIT {
 		boolean expectedExclusive = false;
 
 		Resource wish = SERVICE.callRoot()//
-				.callResourceLink(BANNERS)//
-				.callResourceLink(CHARACTERS)//
+				.callResourceLink(CHARACTER_BANNER)//
 				.callResourceLink(SETTINGS)//
 				.callResourceLink(MIHOYO)//
 				.getResource().getLink(WISH).href().call()// TODO Manage args

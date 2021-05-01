@@ -3,7 +3,7 @@ package fr.sazaju.genshin.simulator.wish;
 import fr.sazaju.genshin.StringUtils;
 
 public class Profile {
-	public final int consecutiveWishesBelowStars;
+	public final int consecutiveWishesBelow4Stars;
 	public final int consecutiveWishesBelow5Stars;
 	public final boolean isExclusiveGuaranteedOnNext5Stars;
 
@@ -11,7 +11,7 @@ public class Profile {
 			int consecutiveWishesBelow4Stars, //
 			int consecutiveWishesBelow5Stars, //
 			boolean isExclusiveGuaranteedOnNext5Stars) {
-		this.consecutiveWishesBelowStars = consecutiveWishesBelow4Stars;
+		this.consecutiveWishesBelow4Stars = consecutiveWishesBelow4Stars;
 		this.consecutiveWishesBelow5Stars = consecutiveWishesBelow5Stars;
 		this.isExclusiveGuaranteedOnNext5Stars = isExclusiveGuaranteedOnNext5Stars;
 	}
@@ -21,7 +21,7 @@ public class Profile {
 	}
 
 	public Profile update(Wish wish) {
-		int below4Stars = wish.stars == 3 ? this.consecutiveWishesBelowStars + 1 : 0;
+		int below4Stars = wish.stars == 3 ? this.consecutiveWishesBelow4Stars + 1 : 0;
 		int below5Stars = wish.stars == 5 ? 0 : this.consecutiveWishesBelow5Stars + 1;
 		boolean exclusiveGuaranteed = wish.stars == 5 && wish.isExclusive ? false//
 				: wish.stars == 5 && !wish.isExclusive ? true//

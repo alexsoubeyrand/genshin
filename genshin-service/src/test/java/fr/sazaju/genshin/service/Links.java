@@ -15,6 +15,5 @@ public class Links {
 	}
 	
 	public static class Banners {
-		public static final String BANNERS = "banners";
 	}
 }

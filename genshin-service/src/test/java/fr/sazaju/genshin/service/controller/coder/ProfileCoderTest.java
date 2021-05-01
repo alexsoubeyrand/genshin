@@ -24,7 +24,7 @@ class ProfileCoderTest implements CollectionCoderTest<Profile> {
 
 		Profile source = new Profile(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
 		Profile rebuilt = coder.decode(coder.encode(source));
-		assertEquals(wishesLessThan4Stars, rebuilt.consecutiveWishesBelowStars);
+		assertEquals(wishesLessThan4Stars, rebuilt.consecutiveWishesBelow4Stars);
 		assertEquals(wishesLessThan5Stars, rebuilt.consecutiveWishesBelow5Stars);
 		assertEquals(isExclusiveGuaranteedOnNext5Stars, rebuilt.isExclusiveGuaranteedOnNext5Stars);
 	}
