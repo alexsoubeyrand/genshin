@@ -51,6 +51,18 @@ public class RelsController {
 		throw new NotImplementedException();
 	}
 
+	@GetMapping("/next-run")
+	@ResponseBody
+	public Object nextRun() {
+		throw new NotImplementedException();
+	}
+
+	@GetMapping("/next-multi")
+	@ResponseBody
+	public Object nextMulti() {
+		throw new NotImplementedException();
+	}
+
 	@GetMapping("/wish")
 	@ResponseBody
 	public Object wish() {
@@ -84,6 +96,18 @@ public class RelsController {
 	@GetMapping("/profile-end")
 	@ResponseBody
 	public Object profileEnd() {
+		throw new NotImplementedException();
+	}
+
+	@GetMapping("/configuration")
+	@ResponseBody
+	public Object configuration() {
+		throw new NotImplementedException();
+	}
+
+	@GetMapping("/next-configuration")
+	@ResponseBody
+	public Object nextConfiguration() {
 		throw new NotImplementedException();
 	}
 }

@@ -9,6 +9,15 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 public interface NumberGenerator {
+
+	float nextFloat();
+
+	interface SplittableNumberGenerator<S> extends NumberGenerator {
+
+		S getNextSeed();
+
+	}
+
 	public static NumberGenerator createFixedNumberGenerator(float value) {
 		if (value < 0 || value > 1) {
 			throw new IllegalArgumentException("Value not in [0;1]: " + value);
@@ -102,13 +111,5 @@ public interface NumberGenerator {
 				}
 			}
 		};
-	}
-
-	public float nextFloat();
-
-	interface SplittableNumberGenerator<S> extends NumberGenerator {
-
-		S getNextSeed();
-
 	}
 }

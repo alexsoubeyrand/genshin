@@ -10,33 +10,33 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fr.sazaju.genshin.simulator.wish.Profile;
+import fr.sazaju.genshin.simulator.wish.State;
 
-class ProfileCoderTest implements CollectionCoderTest<Profile> {
+class StateCoderTest implements CollectionCoderTest<State> {
 
 	@ParameterizedTest
-	@MethodSource("allCodersAndProfilesData")
+	@MethodSource("allCodersAndStatesData")
 	public void testEachVersionHasConsistentCoding(//
-			ProfileCoder coder, //
+			StateCoder coder, //
 			int wishesLessThan4Stars, //
 			int wishesLessThan5Stars, //
 			boolean isExclusiveGuaranteedOnNext5Stars) throws IOException {
 
-		Profile source = new Profile(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
-		Profile rebuilt = coder.decode(coder.encode(source));
+		State source = new State(wishesLessThan4Stars, wishesLessThan5Stars, isExclusiveGuaranteedOnNext5Stars);
+		State rebuilt = coder.decode(coder.encode(source));
 		assertEquals(wishesLessThan4Stars, rebuilt.consecutiveWishesBelow4Stars);
 		assertEquals(wishesLessThan5Stars, rebuilt.consecutiveWishesBelow5Stars);
 		assertEquals(isExclusiveGuaranteedOnNext5Stars, rebuilt.isExclusiveGuaranteedOnNext5Stars);
 	}
 
 	@Override
-	public Coder<Profile, String> searchSerialCoder(String serial) {
-		return ProfileCoder.fromSerial(serial);
+	public Coder<State, String> searchSerialCoder(String serial) {
+		return StateCoder.fromSerial(serial);
 	}
 
 	@Override
-	public Stream<Coder<Profile, String>> allCoders() {
-		return Stream.of(ProfileCoder.values());
+	public Stream<Coder<State, String>> allCoders() {
+		return Stream.of(StateCoder.values());
 	}
 
 	public Stream<Integer> someWishesLessThan4Stars() {
@@ -52,11 +52,11 @@ class ProfileCoderTest implements CollectionCoderTest<Profile> {
 	}
 
 	@Override
-	public Stream<Profile> allData() {
+	public Stream<State> allData() {
 		return someWishesLessThan4Stars().flatMap(wishesLessThan4Stars -> //
 		someWishesLessThan5Stars().flatMap(wishesLessThan5Stars -> //
 		allIsExclusiveGuaranteedOnNext5Stars().flatMap(isExclusiveGuaranteedOnNext5Stars -> {//
-			return Stream.of(new Profile(//
+			return Stream.of(new State(//
 					wishesLessThan4Stars, //
 					wishesLessThan5Stars, //
 					isExclusiveGuaranteedOnNext5Stars//
@@ -64,7 +64,7 @@ class ProfileCoderTest implements CollectionCoderTest<Profile> {
 		})));
 	}
 
-	public Stream<Arguments> allCodersAndProfilesData() {
+	public Stream<Arguments> allCodersAndStatesData() {
 		return allCoders().flatMap(coder -> //
 		someWishesLessThan4Stars().flatMap(wishesLessThan4Stars -> //
 		someWishesLessThan5Stars().flatMap(wishesLessThan5Stars -> //

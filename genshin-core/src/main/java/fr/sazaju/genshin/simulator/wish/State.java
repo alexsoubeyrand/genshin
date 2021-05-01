@@ -2,12 +2,12 @@ package fr.sazaju.genshin.simulator.wish;
 
 import fr.sazaju.genshin.StringUtils;
 
-public class Profile {
+public class State {
 	public final int consecutiveWishesBelow4Stars;
 	public final int consecutiveWishesBelow5Stars;
 	public final boolean isExclusiveGuaranteedOnNext5Stars;
 
-	public Profile(//
+	public State(//
 			int consecutiveWishesBelow4Stars, //
 			int consecutiveWishesBelow5Stars, //
 			boolean isExclusiveGuaranteedOnNext5Stars) {
@@ -16,17 +16,17 @@ public class Profile {
 		this.isExclusiveGuaranteedOnNext5Stars = isExclusiveGuaranteedOnNext5Stars;
 	}
 
-	public static Profile createFreshProfile() {
-		return new Profile(0, 0, false);
+	public static State createFresh() {
+		return new State(0, 0, false);
 	}
 
-	public Profile update(Wish wish) {
+	public State update(Wish wish) {
 		int below4Stars = wish.stars == 3 ? this.consecutiveWishesBelow4Stars + 1 : 0;
 		int below5Stars = wish.stars == 5 ? 0 : this.consecutiveWishesBelow5Stars + 1;
 		boolean exclusiveGuaranteed = wish.stars == 5 && wish.isExclusive ? false//
 				: wish.stars == 5 && !wish.isExclusive ? true//
 						: this.isExclusiveGuaranteedOnNext5Stars;
-		return new Profile(below4Stars, below5Stars, exclusiveGuaranteed);
+		return new State(below4Stars, below5Stars, exclusiveGuaranteed);
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class Profile {
 			return this;
 		}
 
-		Profile build() {
-			return new Profile(consecutiveWishesBelow4Stars, consecutiveWishesBelow5Stars, isExclusiveGuaranteedOnNext5Stars);
+		State build() {
+			return new State(consecutiveWishesBelow4Stars, consecutiveWishesBelow5Stars, isExclusiveGuaranteedOnNext5Stars);
 		}
 	}
 }

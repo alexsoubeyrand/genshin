@@ -2,26 +2,40 @@
 <html lang="fr">
 	<head>
 		<meta charset="utf-8">
+		
 		<title>Simulateur Genshin</title>
+		
+		<!-- Libraries -->
 		<script src="js/jquery-3.6.0.min.js"></script>
+		
+		<!-- Global formatting -->
+		<link rel="stylesheet" href="css/global.css">
 		
 		<!-- Wishes -->
 		<link rel="stylesheet" href="css/wishes.css">
-		<script src="js/wishes.js"></script>
+		<script src="js/wishes.js?v=3"></script>
 	</head>
 	<body>
 		<h1>Simulateur Genshin</h1>
-		<p>En cours de développement...</p>
-		<button id="firstWishes">Recommencer</button>
-		<button id="nextWishes">Suivant</button>
-		<button id="resetWishes">RAZ</button>
-		<table id="wishesTable">
-			<tr>
-				<th>Étoiles</th>
-				<th>Type</th>
-				<th>Exclusif ?</th>
-			</tr>
-			<!-- Rows managed dynamically -->
-		</table>
+		<div id="wishes">
+			<p>En cours de développement...</p>
+			<button id="single" title="Exécute un unique tirage">x1</button>
+			<button id="multi" title="Exécute 10 tirages d'un coup">x10</button>
+			<button id="reduce" title="Réduit tous les tirages effectués à une seule ligne">Réduire</button>
+			<button id="reset" title="Oublie tout et recommence">RAZ</button>
+			<table id="wishesTable">
+				<tr>
+					<th>Étoiles</th>
+					<th>Type</th>
+					<th>Exclusif ?</th>
+				</tr>
+				<!-- Rows managed dynamically -->
+			</table>
+		</div>
+		<div id="loadingScreen">
+			<div id="loadingContent">
+				<p>Loading..</p>
+			</div>
+		</div>
 	</body>
 </html>

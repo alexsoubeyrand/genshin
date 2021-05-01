@@ -31,12 +31,16 @@ public class Rel {
 
 	public static class Banners {
 		public static final LinkRelation CHARACTER_BANNER = customRelation(RelsController::characterBanner);
+		public static final LinkRelation NEXT_RUN = customRelation(RelsController::nextRun);
+		public static final LinkRelation NEXT_MULTI = customRelation(RelsController::nextMulti);
 		public static final LinkRelation WISH = customRelation(RelsController::wish);
 		public static final LinkRelation WISHES = customRelation(RelsController::wishes);
 		public static final LinkRelation SETTINGS = customRelation(RelsController::settings);
 		public static final LinkRelation PROFILE = customRelation(RelsController::profile);
 		public static final LinkRelation PROFILE_START = customRelation(RelsController::profileStart);
 		public static final LinkRelation PROFILE_END = customRelation(RelsController::profileEnd);
+		public static final LinkRelation CONFIGURATION = customRelation(RelsController::configuration);
+		public static final LinkRelation NEXT_CONFIGURATION = customRelation(RelsController::nextConfiguration);
 	}
 
 	private static LinkRelation customRelation(Function<RelsController, ?> relMethod) {

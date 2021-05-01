@@ -2,6 +2,8 @@ package fr.sazaju.genshin.simulator.wish;
 
 import static fr.sazaju.genshin.StringReference.*;
 
+import java.util.stream.Stream;
+
 import fr.sazaju.genshin.StringReference;
 
 public class Wish {
@@ -31,18 +33,18 @@ public class Wish {
 		this.isExclusive = isExclusive;
 	}
 
-	public static Wish compute(Settings settings, Profile profile, float randomValue) {
+	public static Wish compute(Settings settings, State state, float randomValue) {
 		int stars = (randomValue < settings.probability5Stars
-				|| profile.consecutiveWishesBelow5Stars == settings.guaranty5Stars - 1) ? 5 //
+				|| state.consecutiveWishesBelow5Stars == settings.guaranty5Stars - 1) ? 5 //
 						: (randomValue < settings.probability4Stars + settings.probability5Stars
-								|| profile.consecutiveWishesBelow4Stars == settings.guaranty4Stars - 1) ? 4 //
+								|| state.consecutiveWishesBelow4Stars == settings.guaranty4Stars - 1) ? 4 //
 										: 3;
 		Type type = stars == 3 ? Type.WEAPON //
 				: stars == 4 && randomValue > settings.probability5Stars
 						+ settings.probability4Stars * settings.probability4StarsWeaponCharacter ? Type.WEAPON//
 								: Type.CHARACTER;
 		boolean isExclusive = stars == 5
-				? profile.isExclusiveGuaranteedOnNext5Stars
+				? state.isExclusiveGuaranteedOnNext5Stars
 						|| randomValue < settings.probability5Stars * settings.probability5StarsPermanentExclusive
 				: false;
 		return new Wish(stars, type, isExclusive);
@@ -53,24 +55,29 @@ public class Wish {
 		return (isExclusive ? EXCLUSIVE : PERMANENT) + " " + stars + STAR + " " + type;
 	}
 
-	public static class Generator {
+	public static class Run {
+		public final State previousState;
+		public final Float randomValue;
+		public final Wish wish;
+		public final State nextState;
 
-		private final Settings settings;
-		private Profile profile;
+		Run(State previousState, Float randomValue, Wish wish, State nextState) {
+			this.previousState = previousState;
+			this.randomValue = randomValue;
+			this.wish = wish;
+			this.nextState = nextState;
+		};
+	}
 
-		public Generator(Settings settings, Profile profile) {
-			this.settings = settings;
-			this.profile = profile;
-		}
+	public static Stream<Run> createStream(Settings settings, State startingState, Stream<Float> randomStream) {
+		State[] state = { startingState };
+		return randomStream.map(randomValue -> {
+			State previousState = state[0];
+			Wish wish = Wish.compute(settings, previousState, randomValue);
+			State nextState = previousState.update(wish);
 
-		public Profile getCurrentProfile() {
-			return profile;
-		}
-
-		public Wish nextWish(float randomValue) {
-			Wish wish = Wish.compute(settings, profile, randomValue);
-			this.profile = profile.update(wish);
-			return wish;
-		}
+			state[0] = nextState;
+			return new Run(previousState, randomValue, wish, nextState);
+		});
 	}
 }

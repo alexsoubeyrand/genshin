@@ -1,7 +1,8 @@
 package fr.sazaju.genshin.simulator.wish;
 
+import java.util.stream.Stream;
+
 import fr.sazaju.genshin.simulator.NumberGenerator;
-import fr.sazaju.genshin.simulator.wish.Wish.Generator;
 
 public class WishMain {
 
@@ -15,22 +16,20 @@ public class WishMain {
 				.withGuaranty4Stars(3)//
 				.withGuaranty5Stars(5)//
 				.create();
-		Profile profile = Profile.createFreshProfile();
-		Generator generator = new Wish.Generator(settings, profile);
+
+		State startingState = State.createFresh();
 
 		long randomSeed = 0;
 		java.util.Random randomGenerator = new java.util.Random(randomSeed);
 		NumberGenerator rng = NumberGenerator.createFixedNumberGenerator(randomGenerator.nextFloat());
 
-		for (int i = 0; i < settings.guaranty5Stars * 2; i++) {
-			float randomValue = rng.nextFloat();
-			Wish result = generator.nextWish(randomValue);
-
-			System.out.println(String.format("RNGs: %f => %s %s", randomValue, result, generator.getCurrentProfile()));
-		}
+		Wish.createStream(settings, startingState, Stream.generate(() -> rng.nextFloat()))//
+				.limit(settings.guaranty5Stars * 2).forEach(run -> {
+					System.out.println(String.format("RNGs: %f => %s %s", run.randomValue, run.wish, run.nextState));
+				});
 	}
 
-	// TODO Test Profile
+	// TODO Test State
 	// TODO Test Results
 
 	// TODO Compute statistics

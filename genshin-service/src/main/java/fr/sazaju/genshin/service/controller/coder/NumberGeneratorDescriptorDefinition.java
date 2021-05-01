@@ -10,28 +10,16 @@ import fr.sazaju.genshin.simulator.NumberGenerator.SplittableNumberGenerator;
 
 public class NumberGeneratorDescriptorDefinition {
 
-	public static abstract class NumberGeneratorDescriptor<G extends NumberGenerator> {
-		public final int wishesCount;
-
-		public NumberGeneratorDescriptor(int wishesCount) {
-			this.wishesCount = wishesCount;
-		}
-
+	public static interface NumberGeneratorDescriptor<G extends NumberGenerator> {
 		public abstract G createNumberGenerator();
 
-		public abstract NumberGeneratorDescriptor<G> prepareNextDescriptor(G generator, int wishesCount);
-
-		@Override
-		public String toString() {
-			return StringUtils.toStringFromFields(this);
-		}
+		public abstract NumberGeneratorDescriptor<G> prepareNextDescriptor(G generator);
 	}
 
-	public static class FixedNGDescriptor extends NumberGeneratorDescriptor<NumberGenerator> {
+	public static class FixedNGDescriptor implements NumberGeneratorDescriptor<NumberGenerator> {
 		public final float fixedValue;
 
-		public FixedNGDescriptor(float value, int wishesCount) {
-			super(wishesCount);
+		public FixedNGDescriptor(float value) {
 			this.fixedValue = value;
 		}
 
@@ -41,18 +29,21 @@ public class NumberGeneratorDescriptorDefinition {
 		}
 
 		@Override
-		public NumberGeneratorDescriptor<NumberGenerator> prepareNextDescriptor(NumberGenerator generator,
-				int wishesCount) {
-			return new FixedNGDescriptor(fixedValue, wishesCount);
+		public NumberGeneratorDescriptor<NumberGenerator> prepareNextDescriptor(NumberGenerator generator) {
+			return new FixedNGDescriptor(fixedValue);
+		}
+
+		@Override
+		public String toString() {
+			return StringUtils.toStringFromFields(this);
 		}
 	}
 
-	public static class ListNGDescriptor extends NumberGeneratorDescriptor<SplittableNumberGenerator<Integer>> {
+	public static class ListNGDescriptor implements NumberGeneratorDescriptor<SplittableNumberGenerator<Integer>> {
 		public final List<Float> values;
 		public final int offset;
 
-		public ListNGDescriptor(List<Float> values, int offset, int wishesCount) {
-			super(wishesCount);
+		public ListNGDescriptor(List<Float> values, int offset) {
 			this.values = values;
 			this.offset = offset;
 		}
@@ -64,17 +55,21 @@ public class NumberGeneratorDescriptorDefinition {
 
 		@Override
 		public NumberGeneratorDescriptor<SplittableNumberGenerator<Integer>> prepareNextDescriptor(
-				SplittableNumberGenerator<Integer> generator, int wishesCount) {
-			return new ListNGDescriptor(values, generator.getNextSeed(), wishesCount);
+				SplittableNumberGenerator<Integer> generator) {
+			return new ListNGDescriptor(values, generator.getNextSeed());
+		}
+
+		@Override
+		public String toString() {
+			return StringUtils.toStringFromFields(this);
 		}
 	}
 
-	public static class RandomNGDescriptor extends NumberGeneratorDescriptor<SplittableNumberGenerator<Long>> {
+	public static class RandomNGDescriptor implements NumberGeneratorDescriptor<SplittableNumberGenerator<Long>> {
 
 		public final long seed;
 
-		public RandomNGDescriptor(long seed, int wishesCount) {
-			super(wishesCount);
+		public RandomNGDescriptor(long seed) {
 			this.seed = seed;
 		}
 
@@ -85,14 +80,16 @@ public class NumberGeneratorDescriptorDefinition {
 
 		@Override
 		public NumberGeneratorDescriptor<SplittableNumberGenerator<Long>> prepareNextDescriptor(
-				SplittableNumberGenerator<Long> generator, int wishesCount) {
-			return new RandomNGDescriptor(generator.getNextSeed(), wishesCount);
+				SplittableNumberGenerator<Long> generator) {
+			return new RandomNGDescriptor(generator.getNextSeed());
 		}
 
+		@Override
+		public String toString() {
+			return StringUtils.toStringFromFields(this);
+		}
 	}
 
-	private static final Property<NumberGeneratorDescriptor<?>, Integer> wishesCount = //
-			Property.onClass(Integer.class, settings -> settings.wishesCount);
 	private static final Property<FixedNGDescriptor, Float> fixedValue = //
 			Property.onClass(Float.class, settings -> settings.fixedValue);
 	private static final Property<ListNGDescriptor, List<Float>> values = //
@@ -105,25 +102,22 @@ public class NumberGeneratorDescriptorDefinition {
 	public static final Definition<NumberGeneratorDescriptor<?>> V1 = //
 			Definition.<NumberGeneratorDescriptor<?>>onGenericClass()//
 					.when(FixedNGDescriptor.class, Definition.onProperties(//
-							List.of(wishesCount, fixedValue), //
+							List.of(fixedValue), //
 							(input) -> new FixedNGDescriptor(//
-									input.readValue(fixedValue), //
-									input.readValue(wishesCount)//
+									input.readValue(fixedValue) //
 							)//
 					))//
 					.elseWhen(ListNGDescriptor.class, Definition.onProperties(//
-							List.of(wishesCount, offset, values), //
+							List.of(offset, values), //
 							(input) -> new ListNGDescriptor(//
 									input.readValue(values), //
-									input.readValue(offset), //
-									input.readValue(wishesCount)//
+									input.readValue(offset) //
 							)//
 					))//
 					.elseWhen(RandomNGDescriptor.class, Definition.onProperties(//
-							List.of(wishesCount, seed), //
+							List.of(seed), //
 							(input) -> new RandomNGDescriptor(//
-									input.readValue(seed), //
-									input.readValue(wishesCount)//
+									input.readValue(seed) //
 							)//
 					))//
 					.elseThrow(descriptor -> new RuntimeException("Not managed case: " + descriptor.getClass()));
