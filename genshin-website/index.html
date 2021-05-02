@@ -12,22 +12,34 @@
 		<link rel="stylesheet" href="css/global.css">
 		
 		<!-- Wishes -->
-		<link rel="stylesheet" href="css/wishes.css">
-		<script src="js/wishes.js?v=3"></script>
+		<link rel="stylesheet" href="css/wishes.css?v6">
+		<script src="js/wishes.js?v6"></script>
 	</head>
 	<body>
 		<h1>Simulateur Genshin</h1>
 		<div id="wishes">
+			<aside class="wip-warning">
+				<strong>Version Alpha</strong>
+				<p>
+					Cette page est dans un état de développement préliminaire.
+					Le code peut changer de manière incompatible très rapidement.
+					Des erreurs peuvent donc survenir fréquemment.
+					Utilisez cette page à vos risques et périls.
+				</p>
+				<p>
+					Si vous rencontrez des problèmes, utilisez le bouton ci-dessous pour tout effacer et repartir d'un état propre :
+				</p>
+				<button class="wip-clean" title="Oublie tout et recommence">Repartir de zéro</button>
+			</aside>
 			<p>En cours de développement...</p>
 			<button id="single" title="Exécute un unique tirage">x1</button>
 			<button id="multi" title="Exécute 10 tirages d'un coup">x10</button>
 			<button id="reduce" title="Réduit tous les tirages effectués à une seule ligne">Réduire</button>
 			<button id="reset" title="Oublie tout et recommence">RAZ</button>
-			<table id="wishesTable">
+			<table>
 				<tr>
-					<th>Étoiles</th>
-					<th>Type</th>
-					<th>Exclusif ?</th>
+					<th>#</th>
+					<th>Résultats</th>
 				</tr>
 				<!-- Rows managed dynamically -->
 			</table>

@@ -1,7 +1,6 @@
 package fr.sazaju.genshin.service;
 
 import static fr.sazaju.genshin.service.BannersIT.Property.*;
-import static fr.sazaju.genshin.service.Links.Banners.*;
 import static fr.sazaju.genshin.service.hateoas.assertion.HateoasMatcher.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -21,14 +20,20 @@ class BannersIT {
 	// TODO test permanent & weapon banners
 	// TODO test self link everywhere
 
-	private static final String WISH = "wish";
-	private static final String WISHES = "wishes";
-	private static final String CHARACTER_BANNER = "characters-banner";
-	private static final String SETTINGS = "settings";
-	private static final String MIHOYO = "mihoyo";
+	private static String customRel(String rel) {
+		return "http://localhost:8080/rels/" + rel;
+	}
+
+	private static final String WISH = customRel("wish");
+	private static final String CHARACTER_BANNER = customRel("character-banner");
+	private static final String SETTINGS = customRel("settings");
+	private static final String MIHOYO = customRel("mihoyo");
+	private static final String CONFIGURATION = customRel("configuration");
+	private static final String NEXT_RUN = customRel("next-run");
+	private static final String NEXT_MULTI = customRel("next-multi");
+	
 	private static final HateoasClient SERVICE = new HateoasClient();
 
-	// TODO Resolve URIs in link rels
 	@Test
 	void testRootHasCharacterBannerLink() {
 		SERVICE.callRoot()//
@@ -37,37 +42,38 @@ class BannersIT {
 	}
 
 	@Test
-	void testCharacterBannerHasWishesLink() {
+	void testCharacterBannerHasConfigurationLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(CHARACTER_BANNER)//
 				.getResource()//
-				.assertThat(hasLink(WISHES));
+				.assertThat(hasLink(CONFIGURATION));
 	}
 
+	// TODO Test configuration patch
+
 	@Test
-	void testCharactersBannerWishesHasLink() {
+	void testCharactersBannerConfigurationHasNextRunLink() {
 		SERVICE.callRoot()//
 				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(WISHES)//
+				.callResourceLink(CONFIGURATION)//
 				.getResource()//
-				.assertThat(hasLink("xxx"));
+				.assertThat(hasLink(NEXT_RUN));
 	}
-	
+
+	// TODO Test run content and links
+
+	@Test
+	void testCharactersBannerConfigurationHasNextMultiLink() {
+		SERVICE.callRoot()//
+				.callResourceLink(CHARACTER_BANNER)//
+				.callResourceLink(CONFIGURATION)//
+				.getResource()//
+				.assertThat(hasLink(NEXT_MULTI));
+	}
+
+	// TODO Test multi content and links
+
 	// FIXME
-
-	@Test
-	void testCharacterBannerHasSettingsLink() {
-		SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.getResource()//
-				.assertThat(hasLink(SETTINGS));
-	}
-
-	/*
-	 * TODO Test relation types are URIs:
-	 * https://tools.ietf.org/html/rfc8288#section-2.1.2
-	 */
-	// TODO Use link headers instead of body?
 
 	@Test
 	void testCharacterBannerSettingsHavePostedData() {

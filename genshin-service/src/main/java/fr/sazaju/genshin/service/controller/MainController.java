@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import fr.sazaju.genshin.service.Rel;
 
 @Controller
+//@EnableHypermediaSupport(type = HypermediaType.HAL)
 @RequestMapping(value = "/", produces = "application/hal+json")
 public class MainController {
 	@GetMapping

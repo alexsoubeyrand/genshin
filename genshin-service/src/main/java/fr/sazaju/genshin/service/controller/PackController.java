@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import fr.sazaju.genshin.model.Pack;
 
 @Controller
+//@EnableHypermediaSupport(type = HypermediaType.HAL)
 @RequestMapping(value = "/packs", produces = "application/hal+json")
 public class PackController {
 

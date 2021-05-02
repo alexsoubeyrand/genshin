@@ -1,5 +1,7 @@
 package fr.sazaju.genshin.service.hateoas.assertion;
 
+import java.util.stream.Stream;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
@@ -30,7 +32,7 @@ public abstract class HateoasMatcher<T> extends BaseMatcher<T> {
 	}
 
 	public static <T> HateoasMatcher<T> hasLink(String rel) {
-		return hasJsonItem("_links." + rel);
+		return hasJsonItem("_links.'" + rel + "'");
 	}
 
 	public static <T> HateoasMatcher<T> hasSelfLink() {

@@ -2,15 +2,20 @@ package fr.sazaju.genshin.service.controller;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import org.springframework.hateoas.Affordance;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import fr.sazaju.genshin.model.Pack;
 import fr.sazaju.genshin.service.Rel;
@@ -77,13 +82,17 @@ public class Linker {
 	public EntityModel<Configuration> decorateCharactersBannerWishConfiguration(EntityModel<Configuration> model,
 			Function<Configuration, String> serializer) {
 		Configuration configuration = model.getContent();
-		return addFilteredLinks(model, Map.of(//
-				Rel.Iana.SELF,
-				() -> methodOn(CharacterBannerController.class).getConfiguration(serializer.apply(configuration)), //
-				Rel.Banners.NEXT_RUN,
-				() -> methodOn(CharacterBannerController.class).getRun(serializer.apply(configuration)), //
-				Rel.Banners.NEXT_MULTI,
-				() -> methodOn(CharacterBannerController.class).getMulti(serializer.apply(configuration))));
+		CharacterBannerController controller = methodOn(CharacterBannerController.class);
+		return addFilteredLinks(model, //
+				Map.of(//
+						Rel.Iana.SELF, () -> controller.getConfiguration(serializer.apply(configuration)), //
+						Rel.Banners.NEXT_RUN, () -> controller.getRun(serializer.apply(configuration)), //
+						Rel.Banners.NEXT_MULTI, () -> controller.getMulti(serializer.apply(configuration))//
+				), //
+				List.of(//
+						() -> controller.patchConfiguration(serializer.apply(configuration), null)
+				)//
+		);
 	}
 
 	public EntityModel<Wish> decorateCharactersBannerWish(//
@@ -127,9 +136,22 @@ public class Linker {
 	}
 
 	private <T extends RepresentationModel<?>> T addFilteredLinks(T model, Map<LinkRelation, Supplier<?>> relations) {
-		relations.forEach((relation, resourceSupplier) -> {
+		return addFilteredLinks(model, relations, List.of());
+	}
+
+	private <T extends RepresentationModel<?>> T addFilteredLinks(T model, Map<LinkRelation, Supplier<?>> relations,
+			List<Supplier<?>> selfAffordances) {
+		relations.forEach((relation, resourceMethodSupplier) -> {
 			if (relationFilter.test(relation)) {
-				model.add(linkTo(resourceSupplier.get()).withRel(relation));
+				Link link = linkTo(resourceMethodSupplier.get()).withRel(relation);
+				if (relation == Rel.Iana.SELF) {
+					List<Affordance> affordances = selfAffordances.stream()//
+							.map(Supplier::get)//
+							.map(WebMvcLinkBuilder::afford)//
+							.collect(Collectors.toList());
+					link = link.andAffordances(affordances);
+				}
+				model.add(link);
 			}
 		});
 		return model;

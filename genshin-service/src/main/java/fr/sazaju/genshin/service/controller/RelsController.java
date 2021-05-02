@@ -1,12 +1,15 @@
 package fr.sazaju.genshin.service.controller;
 
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/rels"/* TODO , produces = "application/hal+json" */)
+//@EnableHypermediaSupport(type = HypermediaType.HAL_FORMS)
+@RequestMapping(value = "/rels", produces = "application/prs.hal-forms+json")
 public class RelsController {
 
 	@GetMapping("/source")

@@ -1,3 +1,28 @@
+/********************/
+/* WORK IN PROGRESS */
+/********************/
+
+aside.wip-warning {
+	border: 3px solid red;
+	background-color: salmon;
+	color: black;
+	padding: 1em;
+}
+
+aside.wip-warning button.wip-clean {
+	/*
+	border: 3px solid yellow;
+	 */
+	background-color: white;
+	color: red;
+	font-weight: bold;
+	padding: 1em;
+}
+
+/******************/
+/* LOADING SCREEN */
+/******************/
+
 #loadingScreen {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */

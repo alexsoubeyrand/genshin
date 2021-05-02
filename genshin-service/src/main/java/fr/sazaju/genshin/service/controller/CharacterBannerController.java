@@ -11,7 +11,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -19,13 +21,19 @@ import fr.sazaju.genshin.service.controller.coder.ConfigurationCoder;
 import fr.sazaju.genshin.service.controller.coder.ConfigurationDefinition.Configuration;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.NumberGeneratorDescriptor;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.RandomNGDescriptor;
+import fr.sazaju.genshin.service.model.ConfPatch;
 import fr.sazaju.genshin.simulator.NumberGenerator;
 import fr.sazaju.genshin.simulator.wish.Settings;
 import fr.sazaju.genshin.simulator.wish.State;
 import fr.sazaju.genshin.simulator.wish.Wish;
 
 @Controller
-@RequestMapping(value = "/banners/character", produces = "application/hal+json")
+// TODO Check HAL specifications: https://stateless.group/hal_specification.html
+// TODO Check media types RFC: https://tools.ietf.org/html/rfc6838
+//@EnableHypermediaSupport(type = HypermediaType.HAL)
+//@EnableHypermediaSupport(type = HypermediaType.HAL_FORMS)
+//@RequestMapping(value = "/banners/character", produces = "application/hal+json")
+@RequestMapping(value = "/banners/character", produces = "application/prs.hal-forms+json")
 public class CharacterBannerController {
 
 	@GetMapping
@@ -50,6 +58,16 @@ public class CharacterBannerController {
 	@ResponseBody
 	public EntityModel<Configuration> getConfiguration(@PathVariable String serial) {
 		Configuration configuration = deserializeConfiguration(serial);
+		return allLinks().decorateCharactersBannerWishConfiguration(//
+				EntityModel.of(configuration), //
+				this::serializeConfiguration);
+	}
+
+	@PatchMapping("/configuration/{serial}")
+	@ResponseBody
+	public EntityModel<Configuration> patchConfiguration(@PathVariable String serial, @RequestBody ConfPatch patch) {
+		Configuration configuration = deserializeConfiguration(serial);
+		System.out.println("PATCH: " + patch);// TODO Apply patch
 		return allLinks().decorateCharactersBannerWishConfiguration(//
 				EntityModel.of(configuration), //
 				this::serializeConfiguration);
