@@ -24,7 +24,7 @@
 		<maven-jar.version>3.2.0</maven-jar.version>
 		<maven-surefire.version>3.0.0-M5</maven-surefire.version>
 		<process-exec.version>0.9</process-exec.version>
-		<spring-boot.version>2.4.4</spring-boot.version>
+		<spring-boot.version>2.4.5</spring-boot.version>
 	</properties>
 
 	<build>
@@ -139,11 +139,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>fr.sazaju-hitokage</groupId>
-			<artifactId>genshin-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
