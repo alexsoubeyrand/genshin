@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
-	private static final Set<HttpStatus> exposedStatus = Set.of(HttpStatus.NOT_FOUND);
+	private static final Set<HttpStatus> exposedStatus = Set.of(HttpStatus.NOT_FOUND, HttpStatus.BAD_REQUEST);
 
 	@ExceptionHandler
 	protected ResponseEntity<Object> handleAnnotatedException(Exception ex, WebRequest request) throws Exception {

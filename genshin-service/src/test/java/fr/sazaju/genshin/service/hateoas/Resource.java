@@ -2,6 +2,9 @@ package fr.sazaju.genshin.service.hateoas;
 
 import org.hamcrest.Matcher;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import fr.sazaju.genshin.service.hateoas.Href.Method;
 import fr.sazaju.genshin.service.hateoas.assertion.HateoasMatcher;
 import fr.sazaju.genshin.service.hateoas.assertion.ResourceExtractor;
 
@@ -34,11 +37,27 @@ public class Resource {
 	}
 
 	public Response callLink(String rel) {
-		return getLink(rel).href().call();
+		return callLink(rel, Method.GET);
+	}
+
+	public Response callLink(String rel, Method method) {
+		return getLink(rel).href().call(method);
+	}
+
+	public Response callLink(String rel, Method method, Object body) throws JsonProcessingException {
+		return getLink(rel).href().call(method, body);
 	}
 
 	public Response callSelfLink() {
-		return callLink("self");
+		return callSelfLink(Method.GET);
+	}
+
+	public Response callSelfLink(Method method) {
+		return callLink("self", method);
+	}
+
+	public Response callSelfLink(Method method, Object body) throws JsonProcessingException {
+		return callLink("self", method, body);
 	}
 
 	public CollectionResource asCollection() {

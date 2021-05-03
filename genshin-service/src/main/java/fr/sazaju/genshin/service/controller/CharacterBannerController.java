@@ -67,7 +67,7 @@ public class CharacterBannerController {
 	@ResponseBody
 	public EntityModel<Configuration> patchConfiguration(@PathVariable String serial, @RequestBody ConfPatch patch) {
 		Configuration configuration = deserializeConfiguration(serial);
-		System.out.println("PATCH: " + patch);// TODO Apply patch
+		configuration = patch.apply(configuration);
 		return allLinks().decorateCharactersBannerWishConfiguration(//
 				EntityModel.of(configuration), //
 				this::serializeConfiguration);

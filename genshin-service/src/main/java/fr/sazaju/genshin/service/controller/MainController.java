@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import fr.sazaju.genshin.service.Rel;
 
 @Controller
-//@EnableHypermediaSupport(type = HypermediaType.HAL)
-@RequestMapping(value = "/", produces = "application/hal+json")
+@RequestMapping(value = "/", produces = "application/prs.hal-forms+json")
 public class MainController {
 	@GetMapping
 	@ResponseBody

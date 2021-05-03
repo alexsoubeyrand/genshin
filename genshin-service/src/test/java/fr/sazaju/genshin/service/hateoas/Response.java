@@ -1,5 +1,9 @@
 package fr.sazaju.genshin.service.hateoas;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import fr.sazaju.genshin.service.hateoas.Href.Method;
+
 public class Response {
 
 	private final String url;
@@ -11,7 +15,27 @@ public class Response {
 	}
 
 	public Response callResourceLink(String rel) {
-		return getResource().callLink(rel);
+		return callResourceLink(rel, Method.GET);
+	}
+
+	public Response callResourceLink(String rel, Method method) {
+		return getResource().callLink(rel, method);
+	}
+
+	public Response callResourceLink(String rel, Method method, Object body) throws JsonProcessingException {
+		return getResource().callLink(rel, method, body);
+	}
+
+	public Response callResourceSelfLink() {
+		return callResourceSelfLink(Method.GET);
+	}
+
+	public Response callResourceSelfLink(Method method) {
+		return getResource().callSelfLink(method);
+	}
+
+	public Response callResourceSelfLink(Method method, Object body) throws JsonProcessingException {
+		return getResource().callSelfLink(method, body);
 	}
 
 	public Resource getResource() {

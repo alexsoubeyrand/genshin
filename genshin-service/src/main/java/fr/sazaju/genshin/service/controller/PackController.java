@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import fr.sazaju.genshin.model.Pack;
 
 @Controller
-//@EnableHypermediaSupport(type = HypermediaType.HAL)
-@RequestMapping(value = "/packs", produces = "application/hal+json")
+@RequestMapping(value = "/packs", produces = "application/prs.hal-forms+json")
 public class PackController {
 
 	@GetMapping
