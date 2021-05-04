@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import fr.sazaju.genshin.service.hateoas.HateoasClient;
 import fr.sazaju.genshin.service.hateoas.Href.Method;
-import fr.sazaju.genshin.service.hateoas.Resource;
 
 class CharacterBannersIT {
 
@@ -30,10 +28,7 @@ class CharacterBannersIT {
 		return "http://localhost:8080/rels/" + rel;
 	}
 
-	private static final String WISH = customRel("wish");
 	private static final String CHARACTER_BANNER = customRel("character-banner");
-	private static final String SETTINGS = customRel("settings");
-	private static final String MIHOYO = customRel("mihoyo");
 	private static final String CONFIGURATION = customRel("configuration");
 	private static final String NEXT_RUN = customRel("next-run");
 	private static final String NEXT_MULTI = customRel("next-multi");
@@ -197,15 +192,15 @@ class CharacterBannersIT {
 
 	static Stream<Arguments> testConfigurationForRandomRunReturnsCorrectResult() throws JsonProcessingException {
 		return Stream.of(//
-				arguments(confWithProbabilities(0, 0, 0, 0), run3StarsNonExclusiveWeapon()), //
-				arguments(confWithProbabilities(1, 0, 0, 0), run4StarsNonExclusiveWeapon()), //
-				arguments(confWithProbabilities(1, 1, 0, 0), run4StarsNonExclusiveCharacter()), //
-				arguments(confWithProbabilities(0, 0, 1, 0), run5StarsNonExclusiveCharacter()), //
-				arguments(confWithProbabilities(0, 0, 1, 1), run5StarsExclusiveCharacter()), //
-				arguments(confWithGuaranty(true, 0, false, 0), run4StarsNonExclusiveWeapon()), //
-				arguments(confWithGuaranty(true, 1, false, 0), run4StarsNonExclusiveCharacter()), //
-				arguments(confWithGuaranty(false, 0, true, 0), run5StarsNonExclusiveCharacter()), //
-				arguments(confWithGuaranty(false, 0, true, 1), run5StarsExclusiveCharacter()) //
+				arguments(confWithProbabilities(0, 0, 0, 0), run3StarsNonExclusiveWeapon), //
+				arguments(confWithProbabilities(1, 0, 0, 0), run4StarsNonExclusiveWeapon), //
+				arguments(confWithProbabilities(1, 1, 0, 0), run4StarsNonExclusiveCharacter), //
+				arguments(confWithProbabilities(0, 0, 1, 0), run5StarsNonExclusiveCharacter), //
+				arguments(confWithProbabilities(0, 0, 1, 1), run5StarsExclusiveCharacter), //
+				arguments(confWithGuaranty(true, 0, false, 0), run4StarsNonExclusiveWeapon), //
+				arguments(confWithGuaranty(true, 1, false, 0), run4StarsNonExclusiveCharacter), //
+				arguments(confWithGuaranty(false, 0, true, 0), run5StarsNonExclusiveCharacter), //
+				arguments(confWithGuaranty(false, 0, true, 1), run5StarsExclusiveCharacter) //
 		);
 	}
 
@@ -251,143 +246,30 @@ class CharacterBannersIT {
 				.getResource()//
 				// TODO Cover different cases
 				.assertThat(jsonPath("_embedded.wishList"), equalTo(List.of(//
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon(), //
-						run3StarsNonExclusiveWeapon()//
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon, //
+						run3StarsNonExclusiveWeapon//
 				)));
 	}
 
-	// TODO Test multi content and links
-
-	// FIXME
-
-	@Test
-	void testCharacterBannerSettingsHavePostedData() {
-		SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(SETTINGS)//
-				// TODO POST data
-				.getResource()//
-		// TODO retrieve link
-		// TODO GET link
-		// TODO assert data corresponds
-		;
-		throw new RuntimeException("Not implemented yet");
+	// TODO Test multi content
+	// TODO Test run links
+	// TODO Test multi links
+	
+	private static Map<String, Object> run(int stars, String type, boolean isExclusive) {
+		return Map.of("stars", stars, "type", type, "isExclusive", isExclusive);
 	}
 
-	@Test
-	void testCharacterBannerSettingsHaveMihoyoLink() {
-		SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(SETTINGS)//
-				.getResource()//
-				.assertThat(hasLink(MIHOYO));
-	}
-
-	@ParameterizedTest
-	@MethodSource("allProperties")
-	void testCharacterBannerWithMihoyoSettingsHasExpectedProperty(String property) {
-		SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(SETTINGS)//
-				.callResourceLink(MIHOYO)//
-				.getResource()//
-				.assertThat(hasItem(property));
-	}
-
-	@Test
-	void testCharacterBannerWithMihoyoSettingsHaveMihoyoProperties() {
-		Resource profile = SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(SETTINGS)//
-				.callResourceLink(MIHOYO)//
-				.getResource();
-
-		profile.assertThat(jsonPath("probability4Stars"), equalTo(0.051f));
-		profile.assertThat(jsonPath("probability4StarsWeaponCharacter"), equalTo(0.5f));
-		profile.assertThat(jsonPath("probability5Stars"), equalTo(0.006f));
-		profile.assertThat(jsonPath("probability5StarsPermanentExclusive"), equalTo(0.5f));
-		profile.assertThat(jsonPath("guaranty4Stars"), equalTo(10));
-		profile.assertThat(jsonPath("guaranty5Stars"), equalTo(90));
-	}
-
-	// XXX /wishes/{type}/profiles/{profile}/wish
-	// type := permanent | weaponEvent | characterEvent
-	// profile := data/{data} | keys/{profileKey}
-
-	@Disabled
-	@Test
-	void testCharacterWishWithMihoyoSettingsHasCorrectResult() {
-		// TODO Parameterize
-		double random = 1.0;
-
-		// TODO Parameterize
-		int counterBelow4Stars = 0;
-		int counterBelow5Stars = 0;
-		boolean guarantyExclusiveOnNext5Stars = false;
-
-		int expectedStars = 3;
-		String expectedType = "weapon";
-		boolean expectedExclusive = false;
-
-		Resource wish = SERVICE.callRoot()//
-				.callResourceLink(CHARACTER_BANNER)//
-				.callResourceLink(SETTINGS)//
-				.callResourceLink(MIHOYO)//
-				.getResource().getLink(WISH).href().get()// TODO Manage args
-				.getResource();
-
-		wish.assertThat(jsonPath("stars"), equalTo(expectedStars));
-		wish.assertThat(jsonPath("type"), equalTo(expectedType));
-		wish.assertThat(jsonPath("isExclusive"), equalTo(expectedExclusive));
-	}
-
-	// TODO Test series of wishes
-
-	private static Map<String, Object> run3StarsNonExclusiveWeapon() {
-		return Map.of(//
-				"stars", 3, //
-				"type", "WEAPON", //
-				"isExclusive", false//
-		);
-	}
-
-	private static Map<String, Object> run4StarsNonExclusiveWeapon() {
-		return Map.of(//
-				"stars", 4, //
-				"type", "WEAPON", //
-				"isExclusive", false//
-		);
-	}
-
-	private static Map<String, Object> run4StarsNonExclusiveCharacter() {
-		return Map.of(//
-				"stars", 4, //
-				"type", "CHARACTER", //
-				"isExclusive", false//
-		);
-	}
-
-	private static Map<String, Object> run5StarsNonExclusiveCharacter() {
-		return Map.of(//
-				"stars", 5, //
-				"type", "CHARACTER", //
-				"isExclusive", false//
-		);
-	}
-
-	private static Map<String, Object> run5StarsExclusiveCharacter() {
-		return Map.of(//
-				"stars", 5, //
-				"type", "CHARACTER", //
-				"isExclusive", true//
-		);
-	}
+	private static Map<String, Object> run3StarsNonExclusiveWeapon = run(3, "WEAPON", false);
+	private static Map<String, Object> run4StarsNonExclusiveWeapon = run(4, "WEAPON", false);
+	private static Map<String, Object> run4StarsNonExclusiveCharacter = run(4, "CHARACTER", false);
+	private static Map<String, Object> run5StarsNonExclusiveCharacter = run(5, "CHARACTER", false);
+	private static Map<String, Object> run5StarsExclusiveCharacter = run(5, "CHARACTER", true);
 }
