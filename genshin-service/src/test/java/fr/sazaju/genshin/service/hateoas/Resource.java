@@ -1,6 +1,7 @@
 package fr.sazaju.genshin.service.hateoas;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -69,11 +70,14 @@ public class Resource {
 	}
 
 	public <T> void assertThat(ResourceExtractor<T> extractor, Matcher<T> matcher) {
-		response.then().body(jsonPath.append(extractor.getRelativeJsonPath()).toString(), matcher);
+		String path = jsonPath.append(extractor.getRelativeJsonPath()).toString();
+		T objectActual = response.jsonPath().get(path);
+		T adaptedActual = extractor.adapt(objectActual);
+		MatcherAssert.assertThat(adaptedActual, matcher);
 	}
 
 	public <T> void assertThat(Matcher<T> matcher) {
-		response.then().body(matcher);
+		MatcherAssert.assertThat(response.jsonPath().get(), matcher);
 	}
 
 	public <T> void assertThat(ResourceExtractor<T> extractor, HateoasMatcher<T> matcher) {

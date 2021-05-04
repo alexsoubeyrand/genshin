@@ -1,7 +1,9 @@
 package fr.sazaju.genshin.simulator.wish;
 
 import static fr.sazaju.genshin.StringReference.*;
+import static java.util.Comparator.*;
 
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.StringReference;
@@ -34,20 +36,45 @@ public class Wish {
 	}
 
 	public static Wish compute(Settings settings, State state, float randomValue) {
-		int stars = (randomValue < settings.probability5Stars
-				|| state.consecutiveWishesBelow5Stars == settings.guaranty5Stars - 1) ? 5 //
-						: (randomValue < settings.probability4Stars + settings.probability5Stars
-								|| state.consecutiveWishesBelow4Stars == settings.guaranty4Stars - 1) ? 4 //
-										: 3;
-		Type type = stars == 3 ? Type.WEAPON //
-				: stars == 4 && randomValue > settings.probability5Stars
-						+ settings.probability4Stars * settings.probability4StarsWeaponCharacter ? Type.WEAPON//
-								: Type.CHARACTER;
-		boolean isExclusive = stars == 5
-				? state.isExclusiveGuaranteedOnNext5Stars
-						|| randomValue < settings.probability5Stars * settings.probability5StarsPermanentExclusive
-				: false;
+		Wish guaranteedWish = computeGuaranteedWish(settings, state, randomValue);
+		Wish randomWish = computeRandomWish(settings, state, randomValue);
+		Comparator<Wish> stars = comparing(wish -> wish.stars);
+		Comparator<Wish> exclusivity = comparing(wish -> wish.isExclusive);
+		Comparator<Wish> comparator = stars.thenComparing(exclusivity);
+		return comparator.compare(randomWish, guaranteedWish) < 0 ? guaranteedWish : randomWish;
+	}
+
+	private static Wish computeRandomWish(Settings settings, State state, float randomValue) {
+		int stars = randomValue < settings.probability5Stars ? 5 //
+				: randomValue < settings.probability4Stars + settings.probability5Stars ? 4 //
+						: 3;
+
+		Type type = stars == 3 || stars == 4 && randomValue > settings.probability5Stars
+				+ settings.probability4Stars * settings.probability4StarsWeaponCharacter ? Type.WEAPON //
+						: Type.CHARACTER;
+
+		boolean isExclusive = stars == 5 && (state.isExclusiveGuaranteedOnNext5Stars
+				|| randomValue < settings.probability5Stars * settings.probability5StarsPermanentExclusive);
+
 		return new Wish(stars, type, isExclusive);
+	}
+
+	private static Wish computeGuaranteedWish(Settings settings, State state, float randomValue) {
+		if (state.consecutiveWishesBelow5Stars + 1 >= settings.guaranty5Stars) {
+			if (state.isExclusiveGuaranteedOnNext5Stars || randomValue < settings.probability5StarsPermanentExclusive) {
+				return new Wish(5, Type.CHARACTER, true);
+			} else {
+				return new Wish(5, Type.CHARACTER, false);
+			}
+		} else if (state.consecutiveWishesBelow4Stars + 1 >= settings.guaranty4Stars) {
+			if (randomValue < settings.probability4StarsWeaponCharacter) {
+				return new Wish(4, Type.CHARACTER, false);
+			} else {
+				return new Wish(4, Type.WEAPON, false);
+			}
+		} else {
+			return new Wish(3, Type.WEAPON, false);
+		}
 	}
 
 	@Override
