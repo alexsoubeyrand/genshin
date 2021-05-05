@@ -2,47 +2,117 @@
 <html lang="fr">
 	<head>
 		<meta charset="utf-8">
-		
 		<title>Simulateur Genshin</title>
-		
-		<!-- Libraries -->
 		<script src="js/jquery-3.6.0.min.js"></script>
-		
-		<!-- Global formatting -->
-		<link rel="stylesheet" href="css/global.css">
-		
-		<!-- Wishes -->
-		<link rel="stylesheet" href="css/wishes.css?v6">
-		<script src="js/wishes.js?v6"></script>
+		<script type="module" src="js/main.js?v0"></script>
+		<link rel="stylesheet" href="css/style.css?v2">
 	</head>
 	<body>
 		<h1>Simulateur Genshin</h1>
 		<div id="wishes">
-			<aside class="wip-warning">
-				<strong>Version Alpha</strong>
-				<p>
-					Cette page est dans un état de développement préliminaire.
-					Le code peut changer de manière incompatible très rapidement.
-					Des erreurs peuvent donc survenir fréquemment.
-					Utilisez cette page à vos risques et périls.
-				</p>
-				<p>
-					Si vous rencontrez des problèmes, utilisez le bouton ci-dessous pour tout effacer et repartir d'un état propre :
-				</p>
-				<button class="wip-clean" title="Oublie tout et recommence">Repartir de zéro</button>
-			</aside>
-			<p>En cours de développement...</p>
-			<button id="single" title="Exécute un unique tirage">x1</button>
-			<button id="multi" title="Exécute 10 tirages d'un coup">x10</button>
-			<button id="reduce" title="Réduit tous les tirages effectués à une seule ligne">Réduire</button>
-			<button id="reset" title="Oublie tout et recommence">RAZ</button>
-			<table>
-				<tr>
-					<th>#</th>
-					<th>Résultats</th>
-				</tr>
-				<!-- Rows managed dynamically -->
-			</table>
+			<div id="configuration">
+				<aside class="wip-warning">
+					<strong>Version Alpha</strong>
+					<p>
+						Cette page est dans un état de développement préliminaire.
+						Le code peut changer de manière incompatible très rapidement.
+						Des erreurs peuvent donc survenir fréquemment.
+						Utilisez cette page à vos risques et périls.
+					</p>
+					<p>
+						Si vous rencontrez des problèmes, utilisez le bouton ci-dessous pour tout effacer et repartir d'un état propre :
+					</p>
+					<button class="wip-clean" title="Oublie tout et recommence">Repartir de zéro</button>
+				</aside>
+				<!-- TODO Generate form from HAL-FORM description -->
+				<form>
+					<table>
+						<tr><td colspan="2"><h1>Settings</h1></td></tr>
+						<tr>
+							<td><label for="probability4Stars">probability4Stars:</label></td>
+							<td><input id="probability4Stars" name="probability4Stars" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="probability4StarsWeaponCharacter">probability4StarsWeaponCharacter:</label></td>
+							<td><input id="probability4StarsWeaponCharacter" name="probability4StarsWeaponCharacter" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="probability5Stars">probability5Stars:</label></td>
+							<td><input id="probability5Stars" name="probability5Stars" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="probability5StarsPermanentExclusive">probability5StarsPermanentExclusive:</label></td>
+							<td><input id="probability5StarsPermanentExclusive" name="probability5StarsPermanentExclusive" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="guaranty4Stars">guaranty4Stars:</label></td>
+							<td><input id="guaranty4Stars" name="guaranty4Stars" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="guaranty5Stars">guaranty5Stars:</label></td>
+							<td><input id="guaranty5Stars" name="guaranty5Stars" type="text"></td>
+						</tr>
+						<tr><td colspan="2"><h1>State</h1></td></tr>
+						<tr>
+							<td><label for="consecutiveWishesBelow4Stars">consecutiveWishesBelow4Stars:</label></td>
+							<td><input id="consecutiveWishesBelow4Stars" name="consecutiveWishesBelow4Stars" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="consecutiveWishesBelow5Stars">consecutiveWishesBelow5Stars:</label></td>
+							<td><input id="consecutiveWishesBelow5Stars" name="consecutiveWishesBelow5Stars" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="isExclusiveGuaranteedOnNext5Stars">isExclusiveGuaranteedOnNext5Stars:</label></td>
+							<td><input id="isExclusiveGuaranteedOnNext5Stars" name="isExclusiveGuaranteedOnNext5Stars" type="text"></td>
+						</tr>
+						<tr><td colspan="2"><h1>Random <input id="randomType" name="randomType" type="text" value="TODO"/></h1></td></tr>
+						<tr>
+							<td><label for="randomList">randomList:</label></td>
+							<td><input id="randomList" name="randomList" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="randomListOffset">randomListOffset:</label></td>
+							<td><input id="randomListOffset" name="randomListOffset" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="randomSeed">randomSeed:</label></td>
+							<td><input id="randomSeed" name="randomSeed" type="text"></td>
+						</tr>
+						<tr>
+							<td><label for="randomValue">randomValue:</label></td>
+							<td><input id="randomValue" name="randomValue" type="text"></td>
+						</tr>
+					</table>
+					<button id="simulate">Simuler</button>
+				</form>
+			</div>
+			<div id="simulator">
+				<aside class="wip-warning">
+					<strong>Version Alpha</strong>
+					<p>
+						Cette page est dans un état de développement préliminaire.
+						Le code peut changer de manière incompatible très rapidement.
+						Des erreurs peuvent donc survenir fréquemment.
+						Utilisez cette page à vos risques et périls.
+					</p>
+					<p>
+						Si vous rencontrez des problèmes, utilisez le bouton ci-dessous pour tout effacer et repartir d'un état propre :
+					</p>
+					<button class="wip-clean" title="Oublie tout et recommence">Repartir de zéro</button>
+				</aside>
+				<p>En cours de développement...</p>
+				<button id="single" title="Exécute un unique tirage">x1</button>
+				<button id="multi" title="Exécute 10 tirages d'un coup">x10</button>
+				<button id="reduce" title="Réduit tous les tirages effectués à une seule ligne">Réduire</button>
+				<button id="reset" title="Oublie tout et recommence">RAZ</button>
+				<table>
+					<tr>
+						<th>#</th>
+						<th>Résultats</th>
+					</tr>
+					<!-- Rows managed dynamically -->
+				</table>
+			</div>
 		</div>
 		<div id="loadingScreen">
 			<div id="loadingContent">

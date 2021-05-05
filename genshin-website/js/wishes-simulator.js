@@ -1,97 +1,38 @@
+import * as Memory from './memory.js';
+import * as Loading from './loading.js';
+import * as Debug from './debug.js';// TODO Remove
+import * as Configuration from './wishes-configuration.js';
+
 $(document).ready(() => { // Start ready()
 
 let init = new Promise((res, rej) => {res()});
 
-function sleep(milliseconds) {
-	const wakeUpDate = Date.now() + milliseconds;
-	do {/*nothing*/} while (Date.now() < wakeUpDate);
-}
-
-// TODO Not effective, must rethink that stuff with asynchronous calls
-let loadingScreen = $("#loadingScreen");
-loadingScreen.show = () => {
-	loadingScreen.css("display", "block");
-}
-loadingScreen.hide = () => {
-	loadingScreen.css("display", "none");
-}
-
-function loadMemory(memoryKey, stateInit) {
-	// Register a full clean for WIP cleaning buttons
-	let process = new Promise((res, rej) => {res()})
-	process = process.then(() => {
-		$('.wip-clean').click(event => {
-			localStorage.removeItem(memoryKey);
-			location.reload();
-		})
-	});
-	
-	// Retrieve state or build it
-	process = process.then(() => {
-		let savedState = localStorage.getItem(memoryKey);
-		if (!savedState) {
-			console.log("Init");
-			return stateInit({});
-		} else {
-			return JSON.parse(savedState);
-		}
-	});
-	
-	// Create & enrich memory
-	let memory;
-	process = process.then(state => {
-		memory = {
-			state: state,
-		};
-		memory.save = () => {
-			localStorage.setItem(memoryKey, JSON.stringify(memory.state));
-			console.log("Saved: ", memory.state);
-		}
-		memory.clear = () => {
-			console.log("Clear");
-			memory.state = {};
-			return stateInit(memory.state);
-		}
-		return memory
-	});
-	
-	return process;
-}
-
-const requestFailureAction = ( xhr, status, error ) => {
-	console.log("KO");
-	console.log("Error: " + error);
-	console.log("Status: " + status);
-	console.dir(xhr);
-	alert("Requête échouée");
-};
-
-let setNextUris = (memoryState, json) => {
+const setNextUris = (memoryState, json) => {
 	memoryState.nextSingleUri = json._links["http://localhost:8080/rels/next-run"].href;
 	memoryState.nextMultiUri = json._links["http://localhost:8080/rels/next-multi"].href;
 };
-let stateInit = newState => {
-	loadingScreen.show();
-	newState.defaultConfUri = "http://localhost:8080/banners/character/configuration";
-	return $.get(newState.defaultConfUri)
-	.fail(requestFailureAction)
+const stateInit = newState => {
+	Loading.screen.show();
+		console.log("Request: ", Configuration.getCurrentConfUri())
+	return $.get(Configuration.getCurrentConfUri())
+	.fail(Debug.displayFailedRequest)
 	.done(json => {
 		setNextUris(newState, json);
 		newState.wishCounter = 0;
 		newState.wishList = [];
-		loadingScreen.hide();
+		Loading.screen.hide();
 	})
 	.then(() => newState);
 };
 let memory;
 
-init = init.then(() => loadMemory("character-wishes-memory", stateInit));
+init = init.then(() => Memory.load("character-wishes-memory", stateInit));
 init = init.then((mem) => {memory = mem});
-init = init.then(() => {memory.updateNextUris = json => setNextUris(memory.state, json)});
+init = init.then(() => memory.updateNextUris = json => setNextUris(memory.state, json));
 init = init.then(() => console.log("Loaded: ", memory.state));
 // init.then(() => memory.clear()).then(() => memory.save());
 
-const wishesTable = $("#wishes table");
+const wishesTable = $("#wishes").children("#simulator").children("table");
 wishesTable.clean = () => {
 	wishesTable.find("tr").each((index, item) => {
 		if (index === 0) return; // Keep headers row
@@ -127,11 +68,11 @@ wishesTable.appendWish = item => {
 };
 init = init.then(() => memory.state.wishList.forEach(wishesTable.appendWish));
 
-const singleButton = $("#single");
+const singleButton = $("#wishes").children("#simulator").children("#single");
 singleButton.click(event => {
-	loadingScreen.show();
+	Loading.screen.show();
 	$.get(memory.state.nextSingleUri)
-	.fail(requestFailureAction)
+	.fail(Debug.displayFailedRequest)
 	.done(json => {
 		memory.state.wishCounter++
 		const item = {
@@ -144,15 +85,15 @@ singleButton.click(event => {
 		memory.state.wishList.push(item);
 		memory.updateNextUris(json);
 		memory.save();
-		loadingScreen.hide();
+		Loading.screen.hide();
 	});
 });
 
-const multiButton = $("#multi");
+const multiButton = $("#wishes").children("#simulator").children("#multi");
 multiButton.click(event => {
-	loadingScreen.show();
+	Loading.screen.show();
 	$.get(memory.state.nextMultiUri)
-	.fail(requestFailureAction)
+	.fail(Debug.displayFailedRequest)
 	.done(json => {
 		json._embedded.wishList.forEach(item => {
 			memory.state.wishCounter++
@@ -162,13 +103,13 @@ multiButton.click(event => {
 		});
 		memory.updateNextUris(json);
 		memory.save();
-		loadingScreen.hide();
+		Loading.screen.hide();
 	});
 });
 
-const reduceButton = $("#reduce");
+const reduceButton = $("#wishes").children("#simulator").children("#reduce");
 reduceButton.click(event => {
-	loadingScreen.show();
+	Loading.screen.show();
 	wishesTable.clean();
 	const item = {
 		isReduced: true,
@@ -177,18 +118,19 @@ reduceButton.click(event => {
 	wishesTable.appendWish(item);
 	memory.state.wishList = [item];
 	memory.save();
-	loadingScreen.hide();
+	Loading.screen.hide();
 });
 
-const resetButton = $("#reset");
+const resetButton = $("#wishes").children("#simulator").children("#reset");
 resetButton.click(event => {
-	loadingScreen.show();
+	Loading.screen.show();
 	wishesTable.clean();
 	memory.clear()
 	.then(() => {
 		memory.save();
-		loadingScreen.hide();
+		Loading.screen.hide();
 	});
 });
+init = init.then(() => Configuration.registerResetCallback(() => resetButton.click()));
 
 }); // End ready()

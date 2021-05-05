@@ -1,36 +1,36 @@
-#wishes table, #wishes th, #wishes td {
+#wishes #simulator table, #wishes #simulator th, #wishes #simulator td {
 	border: 1px solid black;
 }
-#wishes th, #wishes td {
+#wishes #simulator th, #wishes #simulator td {
 	padding: 0.3em;
 }
-#wishes th, #wishes td.counter {
+#wishes #simulator th, #wishes #simulator td.counter {
 	text-align: center;
 }
-#wishes tr.reduced td {
+#wishes #simulator tr.reduced td {
 	background-color: lightgrey;
 }
-#wishes tr.weapon3stars td {
+#wishes #simulator tr.weapon3stars td {
 	background: linear-gradient(to top, #518aab, #596a89);
 	color: white;
 }
-#wishes tr.weapon4stars td {
+#wishes #simulator tr.weapon4stars td {
 	background: linear-gradient(to top, #a07cb2, #5d5a84);
 	color: white;
 }
-#wishes tr.weapon5stars td {
+#wishes #simulator tr.weapon5stars td {
 	background: linear-gradient(to top, #ba7828, #845b38);
 	color: white;
 }
-#wishes tr.character4stars td {
+#wishes #simulator tr.character4stars td {
 	background: linear-gradient(to top, #a07cb2, #5d5a84);
 	color: white;
 }
-#wishes tr.character5stars td {
+#wishes #simulator tr.character5stars td {
 	background: linear-gradient(to top, #ba7828, #845b38);
 	color: white;
 }
-#wishes tr.exclusive td {
+#wishes #simulator tr.exclusive td {
 	color: gold;
 	font-weight: bold;
 }

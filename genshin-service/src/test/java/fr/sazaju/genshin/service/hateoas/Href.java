@@ -12,7 +12,7 @@ public class Href {
 	Href(io.restassured.response.Response response, JsonPath jsonPath) {
 		this.response = response;
 		this.jsonPath = jsonPath.append("href");
-		this.illegalArgumentException = new IllegalArgumentException(String.format("No item %s found", jsonPath));
+		this.illegalArgumentException = new IllegalArgumentException(String.format("No item %s found in: %s", jsonPath, response.body().asString()));
 	}
 
 	public Response call(Method method) {
