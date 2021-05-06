@@ -1,6 +1,6 @@
-import * as Memory from './memory.js';
-import * as Loading from './loading.js';
-import * as Debug from './debug.js';// TODO Remove
+import * as Memory from '../libs/memory.js';
+import * as Loading from '../libs/loading.js';
+import * as Debug from '../libs/debug.js';// TODO Remove
 
 let getCurrentConfUri = () => "http://localhost:8080/banners/character/configuration";
 let resetCallbacks = [];
@@ -35,7 +35,7 @@ init = init.then(() => memory.storeServiceConf = json => storeServiceConf(memory
 init = init.then(() => console.log("Loaded: ", memory.state));
 // init.then(() => memory.clear()).then(() => memory.save());
 
-const form = $("#wishes").children("#configuration").children("form");
+const form = $("#character-banner").children("#configuration").children("form");
 form.updateFromMemory = () => {
 	const settings = memory.state.configuration.settings;
 	form.find("#probability4Stars").val(settings.probability4Stars);

@@ -1,0 +1,36 @@
+#character-banner #simulator table, #character-banner #simulator th, #character-banner #simulator td {
+	border: 1px solid black;
+}
+#character-banner #simulator th, #character-banner #simulator td {
+	padding: 0.3em;
+}
+#character-banner #simulator th, #character-banner #simulator td.counter {
+	text-align: center;
+}
+#character-banner #simulator tr.reduced td {
+	background-color: lightgrey;
+}
+#character-banner #simulator tr.weapon3stars td {
+	background: linear-gradient(to top, #518aab, #596a89);
+	color: white;
+}
+#character-banner #simulator tr.weapon4stars td {
+	background: linear-gradient(to top, #a07cb2, #5d5a84);
+	color: white;
+}
+#character-banner #simulator tr.weapon5stars td {
+	background: linear-gradient(to top, #ba7828, #845b38);
+	color: white;
+}
+#character-banner #simulator tr.character4stars td {
+	background: linear-gradient(to top, #a07cb2, #5d5a84);
+	color: white;
+}
+#character-banner #simulator tr.character5stars td {
+	background: linear-gradient(to top, #ba7828, #845b38);
+	color: white;
+}
+#character-banner #simulator tr.exclusive td {
+	color: gold;
+	font-weight: bold;
+}

@@ -1,2 +1,2 @@
-import * as WishesConfiguration from './wishes-configuration.js';
-import * as WishesSimulator from './wishes-simulator.js';
+import * as WishesConfiguration from './character-banner/configuration.js';
+import * as WishesSimulator from './character-banner/simulator.js';
