@@ -2,7 +2,10 @@ package fr.sazaju.genshin.simulator.wish;
 
 import java.util.stream.Stream;
 
+import fr.sazaju.genshin.StringUtils;
 import fr.sazaju.genshin.simulator.NumberGenerator;
+import fr.sazaju.genshin.simulator.wish.Wish.Run;
+import fr.sazaju.genshin.simulator.wish.Wish.Stats;
 
 public class WishMain {
 
@@ -23,10 +26,11 @@ public class WishMain {
 		java.util.Random randomGenerator = new java.util.Random(randomSeed);
 		NumberGenerator rng = NumberGenerator.createFixedNumberGenerator(randomGenerator.nextFloat());
 
-		Wish.createStream(settings, startingState, Stream.generate(() -> rng.nextFloat()))//
-				.limit(settings.guaranty5Stars * 2).forEach(run -> {
-					System.out.println(String.format("RNGs: %f => %s %s", run.randomValue, run.wish, run.nextState));
-				});
+		Stream<Run> runsStream = Wish.createStream(settings, startingState, Stream.generate(() -> rng.nextFloat()));
+		Stats stats = Wish.computeStats(runsStream, 1000000);
+		
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(StringUtils.toStringFromFieldsRecursive(stats).replaceAll("[, {}]+", "\n").replaceAll("\n+", "\n").replaceAll("^\n", ""));
 	}
 
 	// TODO Test State

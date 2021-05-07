@@ -6,15 +6,19 @@ function load(memoryKey, stateInit) {
 			localStorage.removeItem(memoryKey);
 			location.reload();
 		})
+		$('.wip-memory-log').click(event => {
+			console.log(memoryKey, JSON.parse(localStorage.getItem(memoryKey)));
+		})
 	});
 	
 	// Retrieve state or build it
 	process = process.then(() => {
 		let savedState = localStorage.getItem(memoryKey);
 		if (!savedState) {
-			console.log("Init");
+			console.log("Init", memoryKey);
 			return stateInit({});
 		} else {
+			console.log("Load", memoryKey);
 			return JSON.parse(savedState);
 		}
 	});
@@ -26,11 +30,11 @@ function load(memoryKey, stateInit) {
 			state: state,
 		};
 		memory.save = () => {
+			console.log("Save", memoryKey);
 			localStorage.setItem(memoryKey, JSON.stringify(memory.state));
-			console.log("Saved: ", memory.state);
 		}
 		memory.clear = () => {
-			console.log("Clear");
+			console.log("Clear", memoryKey);
 			memory.state = {};
 			return stateInit(memory.state);
 		}

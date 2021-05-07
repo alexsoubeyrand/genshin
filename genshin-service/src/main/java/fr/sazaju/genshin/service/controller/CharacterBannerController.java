@@ -26,6 +26,8 @@ import fr.sazaju.genshin.simulator.NumberGenerator;
 import fr.sazaju.genshin.simulator.wish.Settings;
 import fr.sazaju.genshin.simulator.wish.State;
 import fr.sazaju.genshin.simulator.wish.Wish;
+import fr.sazaju.genshin.simulator.wish.Wish.Run;
+import fr.sazaju.genshin.simulator.wish.Wish.Stats;
 
 @Controller
 // TODO Check HAL specifications: https://stateless.group/hal_specification.html
@@ -76,27 +78,40 @@ public class CharacterBannerController {
 	@GetMapping("/run/{serial}")
 	@ResponseBody
 	public EntityModel<Wish> getRun(@PathVariable String serial) {
-		Configuration startingConfiguration = deserializeSimulator(serial);
+		Configuration startingConfiguration = deserializeConfiguration(serial);
 		Result<Wish> run = getRunHelper(//
 				startingConfiguration.settings, //
 				startingConfiguration.state, //
 				startingConfiguration.numberGeneratorDescriptor);
 		return allLinks().decorateCharactersBannerWish(//
 				EntityModel.of(run.result), //
-				this::serializeSimulator, startingConfiguration, run.nextConfiguration);
+				this::serializeConfiguration, startingConfiguration, run.nextConfiguration);
 	}
 
 	@GetMapping("/multi/{serial}")
 	@ResponseBody
 	public CollectionModel<Wish> getMulti(@PathVariable String serial) {
-		Configuration startingConfiguration = deserializeSimulator(serial);
+		Configuration startingConfiguration = deserializeConfiguration(serial);
 		Result<List<Wish>> runs = getMultiHelper(//
 				startingConfiguration.settings, //
 				startingConfiguration.state, //
 				startingConfiguration.numberGeneratorDescriptor);
 		return allLinks().decorateCharactersBannerMulti(//
 				CollectionModel.of(runs.result), //
-				this::serializeSimulator, startingConfiguration, runs.nextConfiguration);
+				this::serializeConfiguration, startingConfiguration, runs.nextConfiguration);
+	}
+
+	@GetMapping("/stats/{serial}")
+	@ResponseBody
+	public EntityModel<Wish.Stats> getStats(@PathVariable String serial) {
+		Configuration configuration = deserializeConfiguration(serial);
+		NumberGenerator numberGenerator = configuration.numberGeneratorDescriptor.createNumberGenerator();
+		Stream<Run> runsStream = Wish.createStream(configuration.settings, configuration.state,
+				Stream.generate(() -> numberGenerator.nextFloat()));
+		Stats stats = Wish.computeStats(runsStream, 1000000);
+		return allLinks().decorateCharactersBannerStats(//
+				EntityModel.of(stats), //
+				this::serializeConfiguration, configuration);
 	}
 
 	private <T extends NumberGenerator> Result<Wish> getRunHelper(Settings settings, State startingState,
@@ -134,18 +149,6 @@ public class CharacterBannerController {
 	}
 
 	private Configuration deserializeConfiguration(String serial) {
-		try {
-			return ConfigurationCoder.fromSerial(serial).decode(serial);
-		} catch (IOException cause) {
-			throw new RuntimeException(cause);
-		}
-	}
-
-	private String serializeSimulator(Configuration simulator) {
-		return ConfigurationCoder.generateShortestSerial(simulator);
-	}
-
-	private Configuration deserializeSimulator(String serial) {
 		try {
 			return ConfigurationCoder.fromSerial(serial).decode(serial);
 		} catch (IOException cause) {

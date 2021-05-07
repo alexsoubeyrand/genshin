@@ -13,7 +13,6 @@ const setNextUris = (memoryState, json) => {
 };
 const stateInit = newState => {
 	Loading.screen.show();
-		console.log("Request: ", Configuration.getCurrentConfUri())
 	return $.get(Configuration.getCurrentConfUri())
 	.fail(Debug.displayFailedRequest)
 	.done(json => {
@@ -26,15 +25,14 @@ const stateInit = newState => {
 };
 let memory;
 
-init = init.then(() => Memory.load("character-wishes-memory", stateInit));
+init = init.then(() => Memory.load("character-banner-simulator", stateInit));
 init = init.then((mem) => {memory = mem});
 init = init.then(() => memory.updateNextUris = json => setNextUris(memory.state, json));
-init = init.then(() => console.log("Loaded: ", memory.state));
 // init.then(() => memory.clear()).then(() => memory.save());
 
-const simulator = $("#character-banner").children("#simulator");
+const simulator = $("#character-banner").find("#simulator");
 
-const wishesTable = simulator.children("table");
+const wishesTable = simulator.find("table");
 wishesTable.clean = () => {
 	wishesTable.find("tr").each((index, item) => {
 		if (index === 0) return; // Keep headers row
@@ -70,7 +68,7 @@ wishesTable.appendWish = item => {
 };
 init = init.then(() => memory.state.wishList.forEach(wishesTable.appendWish));
 
-const singleButton = simulator.children("#single");
+const singleButton = simulator.find("#single");
 singleButton.click(event => {
 	Loading.screen.show();
 	$.get(memory.state.nextSingleUri)
@@ -91,7 +89,7 @@ singleButton.click(event => {
 	});
 });
 
-const multiButton = simulator.children("#multi");
+const multiButton = simulator.find("#multi");
 multiButton.click(event => {
 	Loading.screen.show();
 	$.get(memory.state.nextMultiUri)
@@ -109,7 +107,7 @@ multiButton.click(event => {
 	});
 });
 
-const reduceButton = simulator.children("#reduce");
+const reduceButton = simulator.find("#reduce");
 reduceButton.click(event => {
 	Loading.screen.show();
 	wishesTable.clean();
@@ -123,7 +121,7 @@ reduceButton.click(event => {
 	Loading.screen.hide();
 });
 
-const resetButton = simulator.children("#reset");
+const resetButton = simulator.find("#reset");
 resetButton.click(event => {
 	Loading.screen.show();
 	wishesTable.clean();

@@ -31,6 +31,7 @@ public class Rel {
 
 	public static class Banners {
 		public static final LinkRelation CHARACTER_BANNER = customRelation(RelsController::characterBanner);
+		public static final LinkRelation STATS = customRelation(RelsController::stats);
 		public static final LinkRelation NEXT_RUN = customRelation(RelsController::nextRun);
 		public static final LinkRelation NEXT_MULTI = customRelation(RelsController::nextMulti);
 		public static final LinkRelation WISH = customRelation(RelsController::wish);

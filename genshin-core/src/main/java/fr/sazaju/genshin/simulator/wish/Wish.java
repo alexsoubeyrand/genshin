@@ -4,6 +4,7 @@ import static fr.sazaju.genshin.StringReference.*;
 import static java.util.Comparator.*;
 
 import java.util.Comparator;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.StringReference;
@@ -106,5 +107,103 @@ public class Wish {
 			state[0] = nextState;
 			return new Run(previousState, randomValue, wish, nextState);
 		});
+	}
+
+	public static class Stats {
+		class Data {
+			public final int counter;
+			public final float rate;
+			public final int averageRunsToObtain;
+
+			public Data(int counterData, int counterTotal) {
+				this.counter = counterData;
+				this.rate = (float) (((double) counterData) / counterRuns);
+				this.averageRunsToObtain = counterData == 0 ? 0 : counterRuns / counterData;
+			}
+		}
+
+		public final int counterRuns;
+		public final Data runs3Stars;
+		public final Data runs4Stars;
+		public final Data runs4StarsWeapons;
+		public final Data runs4StarsCharacters;
+		public final Data runs5Stars;
+		public final Data runs5StarsPermanents;
+		public final Data runs5StarsExclusives;
+
+		public Stats(//
+				int counter3Stars, //
+				int counter4StarsWeapons, //
+				int counter4StarsCharacters, //
+				int counter5StarsPermanents, //
+				int counter5StarsExclusives//
+		) {
+			this.counterRuns = counter3Stars + counter4StarsWeapons + counter4StarsCharacters + counter5StarsPermanents
+					+ counter5StarsExclusives;
+			
+			this.runs3Stars = new Data(counter3Stars, counterRuns);
+			this.runs4StarsWeapons = new Data(counter4StarsWeapons, counterRuns);
+			this.runs4StarsCharacters = new Data(counter4StarsCharacters, counterRuns);
+			this.runs5StarsPermanents = new Data(counter5StarsPermanents, counterRuns);
+			this.runs5StarsExclusives = new Data(counter5StarsExclusives, counterRuns);
+			this.runs4Stars = new Data(counter4StarsWeapons + counter4StarsCharacters, counterRuns);
+			this.runs5Stars = new Data(counter5StarsPermanents + counter5StarsExclusives, counterRuns);
+		}
+
+		private static class Collector {
+			int counter3Stars;
+			int counter4StarsWeapons;
+			int counter4StarsCharacters;
+			int counter5StarsPermanents;
+			int counter5StarsExclusives;
+
+			public void collect(Wish wish) {
+				if (wish.stars == 3) {
+					counter3Stars++;
+				} else if (wish.stars == 4) {
+					if (wish.type == Type.WEAPON) {
+						counter4StarsWeapons++;
+					} else if (wish.type == Type.CHARACTER) {
+						counter4StarsCharacters++;
+					} else {
+						throw new RuntimeException("Unmanaged type: " + wish.type);
+					}
+				} else if (wish.stars == 5) {
+					if (wish.isExclusive) {
+						counter5StarsExclusives++;
+					} else {
+						counter5StarsPermanents++;
+					}
+				} else {
+					throw new RuntimeException("Unmanaged stars: " + wish.stars);
+				}
+			}
+
+			public void merge(Collector collector) {
+				this.counter3Stars += collector.counter3Stars;
+				this.counter4StarsWeapons += collector.counter4StarsWeapons;
+				this.counter4StarsCharacters += collector.counter4StarsCharacters;
+				this.counter5StarsPermanents += collector.counter5StarsPermanents;
+				this.counter5StarsExclusives += collector.counter5StarsExclusives;
+			}
+
+			public Stats enrichStats() {
+				return new Stats(//
+						counter3Stars, //
+						counter4StarsWeapons, //
+						counter4StarsCharacters, //
+						counter5StarsPermanents, //
+						counter5StarsExclusives//
+				);
+			}
+		}
+	}
+
+	public static Stats computeStats(Stream<Run> runsStream, int runsCount) {
+		return runsStream//
+				.limit(runsCount)//
+				.map(run -> run.wish)//
+				.collect(Stats.Collector::new, Stats.Collector::collect, Stats.Collector::merge)//
+				.enrichStats();
 	}
 }

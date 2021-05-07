@@ -9,10 +9,7 @@ aside.wip-warning {
 	padding: 1em;
 }
 
-aside.wip-warning button.wip-clean {
-	/*
-	border: 3px solid yellow;
-	 */
+aside.wip-warning button {
 	background-color: white;
 	color: red;
 	font-weight: bold;

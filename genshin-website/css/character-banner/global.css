@@ -1,0 +1,19 @@
+#character-banner .column {
+	float: left;
+	width: 50%;
+}
+#character-banner #configuration, #character-banner #stats, #character-banner #simulator {
+	text-align: center;
+}
+#character-banner #configuration *, #character-banner #stats *, #character-banner #simulator * {
+	margin: 0 auto;
+}
+#character-banner #configuration td {
+}
+#character-banner #simulator {
+}
+#character-banner #stats {
+	margin-top: 1em;
+}
+#character-banner #stats * {
+}

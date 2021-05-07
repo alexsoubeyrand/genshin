@@ -66,6 +66,12 @@ public class RelsController {
 		throw new NotImplementedException();
 	}
 
+	@GetMapping("/stats")
+	@ResponseBody
+	public Object stats() {
+		throw new NotImplementedException();
+	}
+
 	@GetMapping("/wish")
 	@ResponseBody
 	public Object wish() {

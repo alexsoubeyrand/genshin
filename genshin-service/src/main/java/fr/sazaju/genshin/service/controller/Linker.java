@@ -87,10 +87,11 @@ public class Linker {
 				Map.of(//
 						Rel.Iana.SELF, () -> controller.getConfiguration(serializer.apply(configuration)), //
 						Rel.Banners.NEXT_RUN, () -> controller.getRun(serializer.apply(configuration)), //
-						Rel.Banners.NEXT_MULTI, () -> controller.getMulti(serializer.apply(configuration))//
+						Rel.Banners.NEXT_MULTI, () -> controller.getMulti(serializer.apply(configuration)), //
+						Rel.Banners.STATS, () -> controller.getStats(serializer.apply(configuration))//
 				), //
 				List.of(//
-						() -> controller.patchConfiguration(serializer.apply(configuration), null)
+						() -> controller.patchConfiguration(serializer.apply(configuration), null)//
 				)//
 		);
 	}
@@ -112,7 +113,8 @@ public class Linker {
 				() -> methodOn(CharacterBannerController.class)
 						.getRun(configurationSerializer.apply(nextConfiguration)), //
 				Rel.Banners.NEXT_MULTI, () -> methodOn(CharacterBannerController.class)
-						.getMulti(configurationSerializer.apply(nextConfiguration))));
+						.getMulti(configurationSerializer.apply(nextConfiguration))//
+		));
 	}
 
 	public CollectionModel<Wish> decorateCharactersBannerMulti(//
@@ -132,7 +134,19 @@ public class Linker {
 				() -> methodOn(CharacterBannerController.class)
 						.getRun(configurationSerializer.apply(nextConfiguration)), //
 				Rel.Banners.NEXT_MULTI, () -> methodOn(CharacterBannerController.class)
-						.getMulti(configurationSerializer.apply(nextConfiguration))));
+						.getMulti(configurationSerializer.apply(nextConfiguration))//
+		));
+	}
+
+	public EntityModel<Wish.Stats> decorateCharactersBannerStats(//
+			EntityModel<Wish.Stats> model, //
+			Function<Configuration, String> configurationSerializer, Configuration configuration) {
+		return addFilteredLinks(model, Map.of(//
+				Rel.Iana.SELF,
+				() -> methodOn(CharacterBannerController.class).getStats(configurationSerializer.apply(configuration)), //
+				Rel.Banners.CONFIGURATION, () -> methodOn(CharacterBannerController.class)
+						.getConfiguration(configurationSerializer.apply(configuration))//
+		));
 	}
 
 	private <T extends RepresentationModel<?>> T addFilteredLinks(T model, Map<LinkRelation, Supplier<?>> relations) {
