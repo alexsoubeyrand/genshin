@@ -30,6 +30,7 @@ import fr.sazaju.genshin.service.hateoas.Resource;
 class CharacterBannersIT {
 
 	// TODO test permanent & weapon banners
+	// TODO Test stats
 
 	private static final HateoasClient SERVICE = new HateoasClient();
 

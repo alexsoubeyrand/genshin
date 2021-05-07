@@ -4,7 +4,6 @@ import static fr.sazaju.genshin.StringReference.*;
 import static java.util.Comparator.*;
 
 import java.util.Comparator;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.StringReference;
@@ -138,9 +137,10 @@ public class Wish {
 				int counter5StarsPermanents, //
 				int counter5StarsExclusives//
 		) {
-			this.counterRuns = counter3Stars + counter4StarsWeapons + counter4StarsCharacters + counter5StarsPermanents
-					+ counter5StarsExclusives;
-			
+			this.counterRuns = counter3Stars //
+					+ counter4StarsWeapons + counter4StarsCharacters //
+					+ counter5StarsPermanents + counter5StarsExclusives;
+
 			this.runs3Stars = new Data(counter3Stars, counterRuns);
 			this.runs4StarsWeapons = new Data(counter4StarsWeapons, counterRuns);
 			this.runs4StarsCharacters = new Data(counter4StarsCharacters, counterRuns);
@@ -187,7 +187,7 @@ public class Wish {
 				this.counter5StarsExclusives += collector.counter5StarsExclusives;
 			}
 
-			public Stats enrichStats() {
+			public Stats computeStats() {
 				return new Stats(//
 						counter3Stars, //
 						counter4StarsWeapons, //
@@ -204,6 +204,6 @@ public class Wish {
 				.limit(runsCount)//
 				.map(run -> run.wish)//
 				.collect(Stats.Collector::new, Stats.Collector::collect, Stats.Collector::merge)//
-				.enrichStats();
+				.computeStats();
 	}
 }
