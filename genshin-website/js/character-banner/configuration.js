@@ -14,8 +14,21 @@ let init = new Promise((res, rej) => {res()});
 const storeServiceConf = (state, json) => {
 	state.currentConfUri = json._links.self.href;
 	state.currentStatsUri = json._links["http://localhost:8080/rels/stats"].href;
+	
 	delete json._links;
 	delete json._templates;
+	
+	const random = json.numberGeneratorDescriptor;
+	if (random.hasOwnProperty('seed')) {
+		random.type = "random";
+	} else if (random.hasOwnProperty('fixedValue')) {
+		random.type = "fixed";
+	} else if (random.hasOwnProperty('values')) {
+		random.type = "list";
+	} else {
+		throw "Unrecognised type: "+JSON.stringify(random);
+	}
+	
 	state.configuration = json;
 };
 const stateInit = newState => {
@@ -38,6 +51,43 @@ init = init.then(() => memory.storeServiceConf = json => storeServiceConf(memory
 // init.then(() => memory.clear()).then(() => memory.save());
 
 const form = $("#character-banner").find("#configuration").find("form");
+
+const randomSelector = form.find("#randomType");
+randomSelector.save = () => {
+	const type = randomSelector.val();
+	memory.state.randomType = type;
+	memory.save();
+};
+randomSelector.refresh = () => {
+	const type = randomSelector.val();
+	form.find("tr[class^='random-']").each((index, item) => {
+		if (item.className === "random-"+type) {
+			item.style.display = null;
+		} else {
+			item.style.display = "none";
+		}
+	});
+};
+randomSelector.getIgnoreInputs = () => {
+	const type = randomSelector.val();
+	let inputs = [];
+	form.find("tr[class^='random-']").each((index, item) => {
+		if (item.className !== "random-"+type) {
+			inputs.push($(item).find("input"));
+		}
+	});
+	return inputs;
+};
+randomSelector.change(event => {
+	randomSelector.save();
+	randomSelector.refresh();
+});
+randomSelector.setType = (type) => {
+	randomSelector.val(type);
+	randomSelector.save();
+	randomSelector.refresh();
+};
+
 form.updateFromMemory = () => {
 	const settings = memory.state.configuration.settings;
 	form.find("#probability4Stars").val(settings.probability4Stars);
@@ -51,20 +101,19 @@ form.updateFromMemory = () => {
 	form.find("#consecutiveWishesBelow5Stars").val(state.consecutiveWishesBelow5Stars);
 	form.find("#isExclusiveGuaranteedOnNext5Stars").prop("checked", state.isExclusiveGuaranteedOnNext5Stars);
 	const random = memory.state.configuration.numberGeneratorDescriptor;
-	if (random.hasOwnProperty('seed')) {
+	// TODO Update from type in memory
+	if (random.type === "random") {
 		form.find("#randomSeed").val(random.seed);
-		// TODO activate seed-based random
-	} else if (random.hasOwnProperty('fixedValue')) {
+	} else if (random.type === "fixed") {
 		form.find("#randomValue").val(random.fixedValue);
-		// TODO activate value-based random
-	} else if (random.hasOwnProperty('values')) {
-		form.find("#randomList").val(random.values);
+	} else if (random.type === "list") {
+		form.find("#randomList").val(random.values.join(","));
 		form.find("#randomListOffset").val(random.offset);
-		// TODO activate list-based random
 	} else {
+		random.type = "random";
 		form.find("#randomSeed").val(0);
-		// TODO activate seed-based random
 	}
+	randomSelector.setType(random.type);
 	form.find(":input").each((index, item) => {
 		const value = $(item).val();
 		if (value) {
@@ -88,12 +137,18 @@ form.createPatch = () => {
 	form.find("input[type=checkbox]").each((index, item) => {
 		patch[item.name] = $(item).prop("checked");
 	});
+	randomSelector.getIgnoreInputs().forEach((item) => {
+		delete patch[item.attr("name")];
+	});
+	if (patch["randomList"]) {
+		patch["randomList"] = JSON.parse("["+patch["randomList"]+"]");
+	}
 	return patch;
 };
 init = init.then(() => form.updateFromMemory());
 
-const simulateButton = form.find("#simulate");
-simulateButton.click(event => {
+const applyButton = form.find("#apply");
+applyButton.click(event => {
 	event.preventDefault();
 	Loading.screen.show();
 	$.ajax({
@@ -109,10 +164,19 @@ simulateButton.click(event => {
 			form.updateFromMemory();
 			resetCallbacks.forEach(callback => callback());
 			Loading.screen.hide();
-			// TODO Display simulator
 		}
 	});
 });
+form.find(":input").each((index, input) => {
+	const enterKeyCode = 13;
+	$(input).keypress(event => {
+		if (event.keyCode === enterKeyCode) {
+			event.preventDefault();
+			applyButton.click();
+		}
+	});
+});
+
 
 }); // End ready()
 

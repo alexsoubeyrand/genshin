@@ -1,15 +1,58 @@
+/********/
+/* TABS */
+/********/
+
+#tab-list {
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+#tab-list button {
+	display: block;
+	border: 1px solid blue;
+	box-sizing: border-box;
+	width: 33.3%;
+	float: left;
+	padding: 1em;
+	margin: 0;
+	font-size: large;
+	background-color: DarkTurquoise;
+}
+#tab-list button.selected {
+	background-color: Cyan;
+}
+#tabs {
+	clear: both;
+	padding-top: 1em;
+}
+
 /********************/
 /* WORK IN PROGRESS */
 /********************/
 
-aside.wip-warning {
+aside.wip-alpha {
 	border: 3px solid red;
 	background-color: salmon;
 	color: black;
 	padding: 1em;
 }
 
-aside.wip-warning button {
+aside.wip-alpha button {
+	background-color: white;
+	color: red;
+	font-weight: bold;
+	padding: 1em;
+}
+
+aside.wip-beta {
+	border: 3px solid orange;
+	background-color: moccasin;
+	color: black;
+	padding: 1em;
+}
+
+aside.wip-beta button {
 	background-color: white;
 	color: red;
 	font-weight: bold;
@@ -38,4 +81,12 @@ aside.wip-warning button {
   padding: 20px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/*****************/
+/* MISCELLANEOUS */
+/*****************/
+
+h1 {
+	text-align: center;
 }
