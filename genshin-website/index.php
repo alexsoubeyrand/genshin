@@ -25,9 +25,9 @@
 			</script>
 		</nav>
 		<div id="tabs">
-			<div id="home"><?php include "./home.html"; ?></div>
-			<div id="contact"><?php include "./contact.html"; ?></div>
-			<div id="character-banner"><?php include "./character-banner.html"; ?></div>
+			<div id="home"><?php include "./html/home.html"; ?></div>
+			<div id="contact"><?php include "./html/contact.html"; ?></div>
+			<div id="character-banner"><?php include "./html/character-banner.html"; ?></div>
 		</div>
 		<div id="loadingScreen">
 			<div id="loadingContent">

@@ -1,5 +1,6 @@
 package fr.sazaju.genshin.service;
 
+import static fr.sazaju.genshin.service.Links.Banners.*;
 import static fr.sazaju.genshin.service.hateoas.assertion.HateoasMatcher.*;
 import static fr.sazaju.genshin.service.hateoas.assertion.ResourceExtractor.*;
 import static java.util.stream.Collectors.*;
@@ -34,10 +35,6 @@ class CharacterBannersIT {
 
 	private static final HateoasClient SERVICE = new HateoasClient();
 
-	private static final String CHARACTER_BANNER = customRel("character-banner");
-	private static final String CONFIGURATION = customRel("configuration");
-	private static final String NEXT_RUN = customRel("next-run");
-	private static final String NEXT_MULTI = customRel("next-multi");
 
 	@Test
 	void testRootHasCharacterBannerLink() {
@@ -445,7 +442,5 @@ class CharacterBannersIT {
 				"guaranty5Stars", guaranty5Stars ? 1 : Integer.MAX_VALUE);
 	}
 
-	private static String customRel(String rel) {
-		return "http://localhost:8080/rels/" + rel;
-	}
+	
 }
