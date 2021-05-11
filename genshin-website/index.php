@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<?php
 			$conf = parse_ini_file("conf.ini", true);
-			function readConf($sectionKey, $valueKey, $defaultValue) {
+			$readConf = function($sectionKey, $valueKey, $defaultValue) use ($conf) {
 				if (array_key_exists($sectionKey, $conf)) {
 					$section = $conf[$sectionKey];
 					if (array_key_exists($valueKey, $section)) {
@@ -14,7 +14,7 @@
 				return $defaultValue;
 			}
 		?>
-		<meta name="service-path" content="<?php echo readConf("service", "path", "http://localhost:8080"); ?>">
+		<meta name="service-path" content="<?php echo $readConf("service", "path", "http://localhost:8080"); ?>">
 		<title>Outils Genshin Impact</title>
 		<script src="js/libs/jquery-3.6.0.min.js"></script><!-- TODO Import as module where needed -->
 		<script type="module" src="js/main.js"></script>
