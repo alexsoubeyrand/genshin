@@ -15,6 +15,7 @@ $.ajax({
 	success: json => {
 		if (json.servicePath) {
 			servicePath = json.servicePath;
+			console.log("servicePath:", servicePath);
 		}
 	}
 });
