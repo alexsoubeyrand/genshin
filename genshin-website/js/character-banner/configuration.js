@@ -1,9 +1,10 @@
+import * as Url from '../libs/url.js';
 import * as Memory from '../libs/memory.js';
 import * as Loading from '../libs/loading.js';
 import * as Debug from '../libs/debug.js';// TODO Remove
 
-let getCurrentConfUri = () => "http://localhost:8080/banners/character/configuration";
-let getCurrentStatsUri = () => "http://localhost:8080/banners/character/stats";
+let getCurrentConfUri = () => Url.absoluteServiceUri("/banners/character/configuration");
+let getCurrentStatsUri = () => Url.absoluteServiceUri("/banners/character/stats");
 let resetCallbacks = [];
 const registerResetCallback = callback => resetCallbacks.push(callback);
 
@@ -12,8 +13,8 @@ $(document).ready(() => { // Start ready()
 let init = new Promise((res, rej) => {res()});
 
 const storeServiceConf = (state, json) => {
-	state.currentConfUri = json._links.self.href;
-	state.currentStatsUri = json._links["http://localhost:8080/rels/stats"].href;
+	state.currentConfUri = Url.relativeServiceUri(json._links.self.href);
+	state.currentStatsUri = Url.relativeServiceUri(json._links[Url.absoluteServiceUri("/rels/stats")].href);
 	
 	delete json._links;
 	delete json._templates;
@@ -45,8 +46,8 @@ let memory;
 
 init = init.then(() => Memory.load("character-banner-conf", stateInit));
 init = init.then((mem) => {memory = mem});
-init = init.then(() => getCurrentConfUri = () => memory.state.currentConfUri);
-init = init.then(() => getCurrentStatsUri = () => memory.state.currentStatsUri);
+init = init.then(() => getCurrentConfUri = () => Url.absoluteServiceUri(memory.state.currentConfUri));
+init = init.then(() => getCurrentStatsUri = () => Url.absoluteServiceUri(memory.state.currentStatsUri));
 init = init.then(() => memory.storeServiceConf = json => storeServiceConf(memory.state, json));
 // init.then(() => memory.clear()).then(() => memory.save());
 

@@ -2,7 +2,7 @@ function sleep(milliseconds) {
 	const wakeUpDate = Date.now() + milliseconds;
 	do {/*nothing*/} while (Date.now() < wakeUpDate);
 }
-const displayFailedRequest = ( xhr, status, error ) => {
+const displayFailedRequest = (xhr, status, error) => {
 	console.log("KO");
 	console.log("Error: " + error);
 	console.log("Status: " + status);

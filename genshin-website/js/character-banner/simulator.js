@@ -1,3 +1,4 @@
+import * as Url from '../libs/url.js';
 import * as Memory from '../libs/memory.js';
 import * as Loading from '../libs/loading.js';
 import * as Debug from '../libs/debug.js';// TODO Remove
@@ -8,8 +9,8 @@ $(document).ready(() => { // Start ready()
 let init = new Promise((res, rej) => {res()});
 
 const setNextUris = (memoryState, json) => {
-	memoryState.nextSingleUri = json._links["http://localhost:8080/rels/next-run"].href;
-	memoryState.nextMultiUri = json._links["http://localhost:8080/rels/next-multi"].href;
+	memoryState.nextSingleUri = Url.relativeServiceUri(json._links[Url.absoluteServiceUri("/rels/next-run")].href);
+	memoryState.nextMultiUri = Url.relativeServiceUri(json._links[Url.absoluteServiceUri("/rels/next-multi")].href);
 };
 const stateInit = newState => {
 	Loading.screen.show();
@@ -71,7 +72,7 @@ init = init.then(() => memory.state.wishList.forEach(wishesTable.appendWish));
 const singleButton = simulator.find("#single");
 singleButton.click(event => {
 	Loading.screen.show();
-	$.get(memory.state.nextSingleUri)
+	$.get(Url.absoluteServiceUri(memory.state.nextSingleUri))
 	.fail(Debug.displayFailedRequest)
 	.done(json => {
 		memory.state.wishCounter++
@@ -92,7 +93,7 @@ singleButton.click(event => {
 const multiButton = simulator.find("#multi");
 multiButton.click(event => {
 	Loading.screen.show();
-	$.get(memory.state.nextMultiUri)
+	$.get(Url.absoluteServiceUri(memory.state.nextMultiUri))
 	.fail(Debug.displayFailedRequest)
 	.done(json => {
 		json._embedded.wishList.forEach(item => {
