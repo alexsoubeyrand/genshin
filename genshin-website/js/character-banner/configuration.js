@@ -178,6 +178,65 @@ form.find(":input").each((index, input) => {
 	});
 });
 
+form.find("#mihoyo-settings").click(event => {
+	event.preventDefault();
+	Loading.screen.show();
+	$.ajax({
+		type: 'PATCH',
+		url: getCurrentConfUri(),
+		contentType: 'application/json',
+		data: '{"settingsKey":"MIHOYO"}',
+		processData: false,
+		error: Debug.displayFailedRequest, 
+		success: json => {
+			memory.storeServiceConf(json);
+			memory.save();
+			form.updateFromMemory();
+			resetCallbacks.forEach(callback => callback());
+			Loading.screen.hide();
+		}
+	});
+});
+
+form.find("#unlucky-settings").click(event => {
+	event.preventDefault();
+	Loading.screen.show();
+	$.ajax({
+		type: 'PATCH',
+		url: getCurrentConfUri(),
+		contentType: 'application/json',
+		data: '{"settingsKey":"UNLUCKY"}',
+		processData: false,
+		error: Debug.displayFailedRequest, 
+		success: json => {
+			memory.storeServiceConf(json);
+			memory.save();
+			form.updateFromMemory();
+			resetCallbacks.forEach(callback => callback());
+			Loading.screen.hide();
+		}
+	});
+});
+
+form.find("#fresh-state").click(event => {
+	event.preventDefault();
+	Loading.screen.show();
+	$.ajax({
+		type: 'PATCH',
+		url: getCurrentConfUri(),
+		contentType: 'application/json',
+		data: '{"stateKey":"FRESH"}',
+		processData: false,
+		error: Debug.displayFailedRequest, 
+		success: json => {
+			memory.storeServiceConf(json);
+			memory.save();
+			form.updateFromMemory();
+			resetCallbacks.forEach(callback => callback());
+			Loading.screen.hide();
+		}
+	});
+});
 
 }); // End ready()
 

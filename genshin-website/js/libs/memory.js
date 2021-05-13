@@ -2,11 +2,11 @@ function load(memoryKey, stateInit) {
 	// Register a full clean for WIP cleaning buttons
 	let process = new Promise((res, rej) => {res()})
 	process = process.then(() => {
-		$('.wip-clean').click(event => {
+		$('#wip-clean').click(event => {
 			localStorage.removeItem(memoryKey);
 			location.reload();
 		})
-		$('.wip-memory-log').click(event => {
+		$('#wip-memory-log').click(event => {
 			console.log(memoryKey, JSON.parse(localStorage.getItem(memoryKey)));
 		})
 	});

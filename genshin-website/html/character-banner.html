@@ -5,7 +5,8 @@
 			<table>
 				<tr><td colspan="2">
 					<h2>Paramètres</h2>
-					<button id="mihoyo" title="Remettre les paramètres Mihoyo">Mihoyo</button>
+					<button id="mihoyo-settings" title="Remettre les paramètres Mihoyo">Mihoyo</button>
+					<button id="unlucky-settings" title="Mettre les pires paramètres">Malchance</button>
 				</td></tr>
 				<tr>
 					<td><label for="probability4Stars">Probabilité 4☆ :</label></td>
@@ -33,15 +34,15 @@
 				</tr>
 				<tr><td colspan="2">
 					<h2>Départ</h2>
-					<button id="fresh" title="Remettre à zéro">RAZ</button>
+					<button id="fresh-state" title="Remettre à zéro">RAZ</button>
 				</td></tr>
 				<tr>
 					<td><label for="consecutiveWishesBelow4Stars">&lt;4☆ consécutifs :</label></td>
-					<td><input id="consecutiveWishesBelow4Stars" name="consecutiveWishesBelow4Stars" type="text" title="Nombre de tirages successifs sans tirer de 4☆ ou plus"></td>
+					<td><input id="consecutiveWishesBelow4Stars" name="consecutiveWishesBelow4Stars" type="number" title="Nombre de tirages successifs sans tirer de 4☆ ou plus"></td>
 				</tr>
 				<tr>
 					<td><label for="consecutiveWishesBelow5Stars">&lt;5☆ consécutifs :</label></td>
-					<td><input id="consecutiveWishesBelow5Stars" name="consecutiveWishesBelow5Stars" type="text" title="Nombre de tirages successifs sans tirer de 5☆"></td>
+					<td><input id="consecutiveWishesBelow5Stars" name="consecutiveWishesBelow5Stars" type="number" title="Nombre de tirages successifs sans tirer de 5☆"></td>
 				</tr>
 				<tr>
 					<td><label for="isExclusiveGuaranteedOnNext5Stars">Prochain 5☆ exclusif :</label></td>

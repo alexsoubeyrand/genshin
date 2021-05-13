@@ -21,6 +21,14 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
+		<?php
+			$isDevEnvironment = $readConf("dev", "enabled", false) == true;
+			if ($isDevEnvironment) {
+				echo '<aside id="wip-board">';
+				include "./html/wip.html";
+				echo '</aside>';
+			}
+		?>
 		<h1>Outils Genshin Impact</h1>
 		<nav id="tab-list">
 			<button onclick="openTab('home')">Accueil</button>

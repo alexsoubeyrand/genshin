@@ -1,0 +1,26 @@
+<h1>Version de développement</h1>
+<script type="text/javascript">
+	function toggleWipDetails() {
+		const details = $("#wip-details");
+		details.css('display', details.css('display') === "none" ? "block" : "none");
+	}
+	// Hide by default
+	$(document).ready(() => toggleWipDetails());
+</script>
+<button id="wip-show" title="Afficher les détails" onclick="toggleWipDetails()">Détails</button>
+<button id="wip-clean" title="Effacer tout le stockage local pour repartir d'une version propre">RAZ</button>
+<button id="wip-memory-log" title="Afficher le stockage local dans la console">Stockage</button>
+<div id="wip-details">
+	<p>
+		Ce site est la version de développement.
+		Le code peut changer de manière incompatible.
+		Des erreurs peuvent donc survenir à n'importe quel moment.
+		Utilisez cette version à vos risques et périls.
+	</p>
+	<p>
+		Toutes les données affichées sont stockées localement (sur votre machine).
+		Si vous rencontrez des problèmes, utilisez le bouton RAZ pour effacer toutes ces données et repartir d'une version propre.
+		Utilisez le bouton de stockage pour voir ce qui est stocké sur votre navigateur dans la console.
+		Si vous n'arrivez pas à régler votre problème, n'hésitez pas à passer par la page de contact.
+	</p>
+</div>

@@ -31,28 +31,20 @@
 /* WORK IN PROGRESS */
 /********************/
 
-aside.wip-alpha {
+aside#wip-board {
 	border: 3px solid red;
 	background-color: salmon;
 	color: black;
-	padding: 1em;
+	padding: 0em;
+	text-align: center;
 }
 
-aside.wip-alpha button {
-	background-color: white;
-	color: red;
-	font-weight: bold;
-	padding: 1em;
+aside#wip-board h1 {
+	margin: 0em;
+	padding: 0em;
 }
 
-aside.wip-beta {
-	border: 3px solid orange;
-	background-color: moccasin;
-	color: black;
-	padding: 1em;
-}
-
-aside.wip-beta button {
+aside#wip-board button {
 	background-color: white;
 	color: red;
 	font-weight: bold;
