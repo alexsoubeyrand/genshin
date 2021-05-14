@@ -1,6 +1,6 @@
 package fr.sazaju.genshin.simulator;
 
-import static fr.sazaju.genshin.simulator.NumberGenerator.*;
+import static fr.sazaju.genshin.banner.NumberGenerator.*;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fr.sazaju.genshin.simulator.NumberGenerator.SplittableNumberGenerator;
+import fr.sazaju.genshin.banner.NumberGenerator;
+import fr.sazaju.genshin.banner.NumberGenerator.SplittableNumberGenerator;
 
 class NumberGeneratorTest {
 

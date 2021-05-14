@@ -5,8 +5,8 @@ import static fr.sazaju.genshin.service.controller.coder.StateDefinition.*;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import fr.sazaju.genshin.banner.character.State;
 import fr.sazaju.genshin.service.controller.coder.SequentialCoder.Option;
-import fr.sazaju.genshin.simulator.wish.State;
 
 public enum StateCoder implements Coder<State, String> {
 	SEQUENTIAL(1, new SequentialCoder<>(V1)), //

@@ -17,10 +17,10 @@ import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
+import fr.sazaju.genshin.banner.character.Wish;
 import fr.sazaju.genshin.model.Pack;
 import fr.sazaju.genshin.service.Rel;
 import fr.sazaju.genshin.service.controller.coder.ConfigurationDefinition.Configuration;
-import fr.sazaju.genshin.simulator.wish.Wish;
 
 public class Linker {
 	private final Predicate<LinkRelation> relationFilter;

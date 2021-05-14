@@ -1,39 +1,58 @@
 package fr.sazaju.genshin.character;
 
-import static fr.sazaju.genshin.character.Element.*;
-import static fr.sazaju.genshin.character.Rarity.*;
-import static fr.sazaju.genshin.character.Weapon.*;
-import static fr.sazaju.genshin.material.AscensionMaterial.*;
+import static fr.sazaju.genshin.Element.*;
+import static fr.sazaju.genshin.Rarity.*;
+import static fr.sazaju.genshin.material.CharacterAscensionMaterial.*;
 import static fr.sazaju.genshin.material.Book.*;
 import static fr.sazaju.genshin.material.BossDrop.*;
 import static fr.sazaju.genshin.material.LocalSpecialty.*;
-import static fr.sazaju.genshin.material.MobDrop.*;
+import static fr.sazaju.genshin.material.CommonMobDrop.*;
+import static fr.sazaju.genshin.weapon.WeaponType.*;
+
+import fr.sazaju.genshin.Element;
+import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.leveling.Levels;
+import fr.sazaju.genshin.weapon.Weapon;
+import fr.sazaju.genshin.weapon.WeaponType;
 
 public enum CharacterProfile {
 	KEQING("Keqing", FIVE_STARS, ELECTRO, SWORD, //
 			Levels.forCharacterTalent(PROSPERITY, NECTAR, RING_OF_BOREAS), //
-			AscensionLevels.basedOn(VAJRADA, PRISM, LAPIS, NECTAR)//
-	);
+			Levels.forCharacterAscension(VAJRADA, PRISM, LAPIS, NECTAR)//
+	),
+	YANFEI("Yanfei", FOUR_STARS, PYRO, CATALYST, //
+			Levels.forCharacterTalent(GOLD, INSIGNIA, BLOODJADE_BRANCH), //
+			Levels.forCharacterAscension(AGNIDUS, JUVENILE_JADE, NOCTILUCOUS_JADE, INSIGNIA)//
+	),
+	;
 
 	public final String name;
 	public final Rarity rarity;
 	public final Element element;
-	public final Weapon weapon;
+	public final WeaponType weaponType;
 	public final Levels talentLevels;
-	public final AscensionLevels ascensionLevels;
+	public final Levels ascensionLevels;
 
 	private CharacterProfile(//
 			String name, //
 			Rarity rarity, //
 			Element element, //
-			Weapon weapon, //
+			WeaponType weaponType, //
 			Levels talentLevels, //
-			AscensionLevels characterLevels) {
+			Levels characterLevels) {
 		this.name = name;
 		this.rarity = rarity;
 		this.element = element;
-		this.weapon = weapon;
+		this.weaponType = weaponType;
 		this.talentLevels = talentLevels;
 		this.ascensionLevels = characterLevels;
+	}
+
+	public Character.Builder buildInstance(Weapon weapon) {
+		return new Character.Builder(this, weapon);
+	}
+
+	public Character createBasicInstance(Weapon weapon) {
+		return buildInstance(weapon).create();
 	}
 }

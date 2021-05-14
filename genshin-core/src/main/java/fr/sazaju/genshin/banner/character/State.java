@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.simulator.wish;
+package fr.sazaju.genshin.banner.character;
 
 import fr.sazaju.genshin.StringUtils;
 

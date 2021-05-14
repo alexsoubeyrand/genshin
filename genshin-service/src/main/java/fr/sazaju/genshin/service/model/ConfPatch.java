@@ -2,13 +2,13 @@ package fr.sazaju.genshin.service.model;
 
 import java.util.List;
 
+import fr.sazaju.genshin.banner.character.Settings;
+import fr.sazaju.genshin.banner.character.State;
 import fr.sazaju.genshin.service.controller.coder.ConfigurationDefinition.Configuration;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.FixedNGDescriptor;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.ListNGDescriptor;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.NumberGeneratorDescriptor;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.RandomNGDescriptor;
-import fr.sazaju.genshin.simulator.wish.Settings;
-import fr.sazaju.genshin.simulator.wish.State;
 
 public class ConfPatch implements Modifier<Configuration> {
 	enum SettingsKey {

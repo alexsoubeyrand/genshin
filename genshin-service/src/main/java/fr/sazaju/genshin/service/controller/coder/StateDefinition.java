@@ -2,7 +2,7 @@ package fr.sazaju.genshin.service.controller.coder;
 
 import java.util.List;
 
-import fr.sazaju.genshin.simulator.wish.State;
+import fr.sazaju.genshin.banner.character.State;
 
 public class StateDefinition {
 

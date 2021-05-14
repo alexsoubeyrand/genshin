@@ -2,7 +2,7 @@ package fr.sazaju.genshin.service.controller.coder;
 
 import java.util.List;
 
-import fr.sazaju.genshin.simulator.wish.Settings;
+import fr.sazaju.genshin.banner.character.Settings;
 
 public class SettingsDefinition {
 

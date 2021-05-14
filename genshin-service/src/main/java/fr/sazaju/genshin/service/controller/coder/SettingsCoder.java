@@ -5,8 +5,8 @@ import static fr.sazaju.genshin.service.controller.coder.SettingsDefinition.*;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import fr.sazaju.genshin.banner.character.Settings;
 import fr.sazaju.genshin.service.controller.coder.SequentialCoder.Option;
-import fr.sazaju.genshin.simulator.wish.Settings;
 
 public enum SettingsCoder implements Coder<Settings, String> {
 	SEQUENTIAL(1, new SequentialCoder<>(V1)), //

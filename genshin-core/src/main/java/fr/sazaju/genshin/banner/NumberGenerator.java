@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.simulator;
+package fr.sazaju.genshin.banner;
 
 import static java.util.stream.Collectors.*;
 

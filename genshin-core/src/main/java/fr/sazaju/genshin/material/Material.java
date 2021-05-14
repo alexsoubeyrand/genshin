@@ -2,16 +2,24 @@ package fr.sazaju.genshin.material;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
-import fr.sazaju.genshin.character.Rarity;
+import fr.sazaju.genshin.Rarity;
 
 public class Material<T extends MaterialType> {
 	public final T type;
 	public final Rarity rarity;
 
 	public Material(T type, Rarity rarity) {
+		if (!type.hasRarity(rarity)) {
+			throw new IllegalArgumentException(String.format("'%s' does not exist with rarity '%s'", type, rarity));
+		}
 		this.type = type;
 		this.rarity = rarity;
+	}
+
+	public Optional<MaterialStack> getConversionRecipe() {
+		return type.getConversionRecipeAt(rarity);
 	}
 
 	@Override

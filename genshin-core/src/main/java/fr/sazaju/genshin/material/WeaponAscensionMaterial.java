@@ -2,11 +2,11 @@ package fr.sazaju.genshin.material;
 
 import fr.sazaju.genshin.Rarity;
 
-public enum LocalSpecialty implements MaterialType {
-	LAPIS, NOCTILUCOUS_JADE;
+public enum WeaponAscensionMaterial implements MaterialType {
+	GUYUN_PILAR;
 	
 	@Override
 	public boolean hasRarity(Rarity rarity) {
-		return Rarity.SPECIALTY.equals(rarity);
+		return Rarity.range(2, 5).contains(rarity);
 	}
 }

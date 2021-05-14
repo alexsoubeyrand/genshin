@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.simulator.wish;
+package fr.sazaju.genshin.banner.character;
 
 import static fr.sazaju.genshin.StringReference.*;
 import static java.util.Comparator.*;

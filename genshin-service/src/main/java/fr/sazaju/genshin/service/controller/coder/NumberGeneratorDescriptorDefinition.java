@@ -1,12 +1,12 @@
 package fr.sazaju.genshin.service.controller.coder;
 
-import static fr.sazaju.genshin.simulator.NumberGenerator.*;
+import static fr.sazaju.genshin.banner.NumberGenerator.*;
 
 import java.util.List;
 
 import fr.sazaju.genshin.StringUtils;
-import fr.sazaju.genshin.simulator.NumberGenerator;
-import fr.sazaju.genshin.simulator.NumberGenerator.SplittableNumberGenerator;
+import fr.sazaju.genshin.banner.NumberGenerator;
+import fr.sazaju.genshin.banner.NumberGenerator.SplittableNumberGenerator;
 
 public class NumberGeneratorDescriptorDefinition {
 

@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import fr.sazaju.genshin.banner.NumberGenerator;
+import fr.sazaju.genshin.banner.character.Settings;
+import fr.sazaju.genshin.banner.character.State;
+import fr.sazaju.genshin.banner.character.Wish;
+import fr.sazaju.genshin.banner.character.Wish.Run;
+import fr.sazaju.genshin.banner.character.Wish.Stats;
 import fr.sazaju.genshin.service.controller.coder.ConfigurationCoder;
 import fr.sazaju.genshin.service.controller.coder.ConfigurationDefinition.Configuration;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.NumberGeneratorDescriptor;
 import fr.sazaju.genshin.service.controller.coder.NumberGeneratorDescriptorDefinition.RandomNGDescriptor;
 import fr.sazaju.genshin.service.model.ConfPatch;
-import fr.sazaju.genshin.simulator.NumberGenerator;
-import fr.sazaju.genshin.simulator.wish.Settings;
-import fr.sazaju.genshin.simulator.wish.State;
-import fr.sazaju.genshin.simulator.wish.Wish;
-import fr.sazaju.genshin.simulator.wish.Wish.Run;
-import fr.sazaju.genshin.simulator.wish.Wish.Stats;
 
 @Controller
 // TODO Check HAL specifications: https://stateless.group/hal_specification.html
