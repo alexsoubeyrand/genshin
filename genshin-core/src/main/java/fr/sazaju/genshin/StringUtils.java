@@ -8,14 +8,14 @@ import java.util.function.Function;
 
 public class StringUtils {
 	public static String toStringFromFields(Object object) {
-		return toStringFormFields(object, value -> value);
+		return toStringFromFields(object, value -> value);
 	}
 
 	public static String toStringFromFieldsRecursive(Object object) {
-		return toStringFormFields(object, value -> toStringFromFieldsRecursive(value));
+		return toStringFromFields(object, value -> toStringFromFieldsRecursive(value));
 	}
 
-	public static String toStringFormFields(Object object, Function<Object, Object> valueAdapter) {
+	public static String toStringFromFields(Object object, Function<Object, Object> valueAdapter) {
 		Map<String, Object> values = new LinkedHashMap<>();
 		Class<?> clazz = object.getClass();
 		Field[] fields = clazz.getFields();
