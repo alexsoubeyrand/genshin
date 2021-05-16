@@ -1,12 +1,10 @@
-package fr.sazaju.genshin.material;
+package fr.sazaju.genshin.item;
 
 import static fr.sazaju.genshin.Rarity.*;
 
-import java.util.Collection;
-
 import fr.sazaju.genshin.Rarity;
 
-public enum BossDrop implements MaterialType {
+public enum BossDrop implements ItemType.WithSingleRarity {
 	/**************/
 	/* Hypostasis */
 	/**************/
@@ -37,17 +35,13 @@ public enum BossDrop implements MaterialType {
 		this.rarity = rarity;
 	}
 
-	public Material<BossDrop> material() {
-		return new Material<>(this, rarity);
+	@Override
+	public Rarity getRarity() {
+		return rarity;
 	}
 
 	@Override
-	public boolean hasRarity(Rarity rarity) {
-		return this.rarity.equals(rarity);
-	}
-
-	@Override
-	public Collection<MaterialStack> getConversionRecipesAt(Rarity rarity) {
-		throw new RuntimeException("Not yet implemented");
+	public Item<BossDrop> item() {
+		return new StackableItem<BossDrop>(this, getRarity());
 	}
 }

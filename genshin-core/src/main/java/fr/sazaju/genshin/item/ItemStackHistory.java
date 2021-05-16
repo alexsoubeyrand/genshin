@@ -1,46 +1,47 @@
-package fr.sazaju.genshin.material;
+package fr.sazaju.genshin.item;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface MaterialStackHistory {
+// TODO Use Recipe for diffs
+public interface ItemStackHistory {
 
-	MaterialStack getInitialStack();
+	ItemStack getInitialStack();
 
-	MaterialStack getResultingStack();
+	ItemStack getResultingStack();
 
-	MaterialStack getResultingDiff();
+	ItemStack getResultingDiff();
 
-	Stream<MaterialStack> streamStacks();
+	Stream<ItemStack> streamStacks();
 
-	Stream<MaterialStack> streamDiffs();
+	Stream<ItemStack> streamDiffs();
 
-	public static MaterialStackHistory from(MaterialStack stack) {
-		return new MaterialStackHistory() {
+	public static ItemStackHistory from(ItemStack stack) {
+		return new ItemStackHistory() {
 			@Override
-			public MaterialStack getInitialStack() {
+			public ItemStack getInitialStack() {
 				return stack;
 			}
 
 			@Override
-			public MaterialStack getResultingStack() {
+			public ItemStack getResultingStack() {
 				return stack;
 			}
 
 			@Override
-			public MaterialStack getResultingDiff() {
-				return MaterialStack.empty();
+			public ItemStack getResultingDiff() {
+				return ItemStack.empty();
 			}
 
 			@Override
-			public Stream<MaterialStack> streamStacks() {
+			public Stream<ItemStack> streamStacks() {
 				return Stream.of(stack);
 			}
 
 			@Override
-			public Stream<MaterialStack> streamDiffs() {
+			public Stream<ItemStack> streamDiffs() {
 				return Stream.empty();
 			}
 
@@ -57,35 +58,35 @@ public interface MaterialStackHistory {
 		};
 	}
 
-	default MaterialStackHistory appendStack(MaterialStack stack) {
-		MaterialStackHistory history = this;
-		return new MaterialStackHistory() {
+	default ItemStackHistory appendStack(ItemStack stack) {
+		ItemStackHistory history = this;
+		return new ItemStackHistory() {
 			@Override
-			public MaterialStack getInitialStack() {
+			public ItemStack getInitialStack() {
 				return history.getInitialStack();
 			}
 
-			private MaterialStack getDiff() {
+			private ItemStack getDiff() {
 				return stack.minusStack(history.getResultingStack());
 			}
 
 			@Override
-			public MaterialStack getResultingStack() {
+			public ItemStack getResultingStack() {
 				return stack;
 			}
 
 			@Override
-			public MaterialStack getResultingDiff() {
+			public ItemStack getResultingDiff() {
 				return stack.minusStack(history.getInitialStack());
 			}
 
 			@Override
-			public Stream<MaterialStack> streamStacks() {
+			public Stream<ItemStack> streamStacks() {
 				return Stream.concat(history.streamStacks(), Stream.of(getResultingStack()));
 			}
 
 			@Override
-			public Stream<MaterialStack> streamDiffs() {
+			public Stream<ItemStack> streamDiffs() {
 				return Stream.concat(history.streamDiffs(), Stream.of(getDiff()));
 			}
 
@@ -101,31 +102,31 @@ public interface MaterialStackHistory {
 		};
 	}
 
-	default MaterialStackHistory appendDiff(MaterialStack diff) {
-		MaterialStackHistory history = this;
-		return new MaterialStackHistory() {
+	default ItemStackHistory appendDiff(ItemStack diff) {
+		ItemStackHistory history = this;
+		return new ItemStackHistory() {
 			@Override
-			public MaterialStack getInitialStack() {
+			public ItemStack getInitialStack() {
 				return history.getInitialStack();
 			}
 
 			@Override
-			public MaterialStack getResultingStack() {
+			public ItemStack getResultingStack() {
 				return history.getResultingStack().addStack(diff);
 			}
 
 			@Override
-			public MaterialStack getResultingDiff() {
+			public ItemStack getResultingDiff() {
 				return history.getResultingDiff().addStack(diff);
 			}
 
 			@Override
-			public Stream<MaterialStack> streamStacks() {
+			public Stream<ItemStack> streamStacks() {
 				return Stream.concat(history.streamStacks(), Stream.of(getResultingStack()));
 			}
 
 			@Override
-			public Stream<MaterialStack> streamDiffs() {
+			public Stream<ItemStack> streamDiffs() {
 				return Stream.concat(history.streamDiffs(), Stream.of(diff));
 			}
 
@@ -142,15 +143,15 @@ public interface MaterialStackHistory {
 	}
 
 	public static class Internal {
-		private static List<MaterialStack> collect(Stream<MaterialStack> stream) {
+		private static List<ItemStack> collect(Stream<ItemStack> stream) {
 			return stream.collect(Collectors.toList());
 		}
 
-		private static boolean areEqual(MaterialStackHistory history, Object obj) {
+		private static boolean areEqual(ItemStackHistory history, Object obj) {
 			if (obj == history) {
 				return true;
-			} else if (obj instanceof MaterialStackHistory) {
-				MaterialStackHistory that = (MaterialStackHistory) obj;
+			} else if (obj instanceof ItemStackHistory) {
+				ItemStackHistory that = (ItemStackHistory) obj;
 				return Objects.equals(history.getResultingStack(), that.getResultingStack())//
 						&& Objects.equals(collect(history.streamDiffs()), collect(that.streamDiffs()));
 			} else {
@@ -158,7 +159,7 @@ public interface MaterialStackHistory {
 			}
 		}
 
-		private static int hashCode(MaterialStackHistory history) {
+		private static int hashCode(ItemStackHistory history) {
 			return Objects.hash(history.getResultingStack(), collect(history.streamDiffs()));
 		}
 	}

@@ -51,10 +51,10 @@ public class Character {
 		private int elementalBurstLevel;
 
 		Builder(CharacterProfile profile, Weapon weapon) {
-			if (!Objects.equals(profile.weaponType, weapon.profile.type)) {
+			if (!Objects.equals(profile.weaponCategory, weapon.type.category)) {
 				throw new IllegalArgumentException(
 						String.format("Invalid weapon '%s' of type '%s' for character '%s' which uses '%s'", weapon,
-								weapon.profile.type, profile, profile.weaponType));
+								weapon.type.category, profile, profile.weaponCategory));
 			}
 			this.profile = profile;
 			this.weapon = weapon;

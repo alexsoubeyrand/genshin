@@ -3,11 +3,11 @@ package fr.sazaju.genshin.leveling;
 import java.util.Map;
 
 import fr.sazaju.genshin.character.Character;
-import fr.sazaju.genshin.material.MaterialStack;
+import fr.sazaju.genshin.item.ItemStack;
 
 public interface Level {
 
-	MaterialStack getCost();
+	ItemStack getCost();
 
 	Requirement getRequirement();
 
@@ -46,11 +46,11 @@ public interface Level {
 
 	}
 
-	public static Level create(Requirement requirement, MaterialStack cost) {
+	public static Level create(Requirement requirement, ItemStack cost) {
 		return new Level() {
 
 			@Override
-			public MaterialStack getCost() {
+			public ItemStack getCost() {
 				return cost;
 			}
 

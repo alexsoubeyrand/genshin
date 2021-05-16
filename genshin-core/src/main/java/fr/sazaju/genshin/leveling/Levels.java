@@ -1,23 +1,23 @@
 package fr.sazaju.genshin.leveling;
 
 import static fr.sazaju.genshin.Rarity.*;
+import static fr.sazaju.genshin.item.EventMaterial.*;
+import static fr.sazaju.genshin.item.Mora.*;
 import static fr.sazaju.genshin.leveling.Level.Requirement.*;
-import static fr.sazaju.genshin.material.EventMaterial.*;
-import static fr.sazaju.genshin.material.Mora.*;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import fr.sazaju.genshin.character.Character;
-import fr.sazaju.genshin.material.Book;
-import fr.sazaju.genshin.material.BossDrop;
-import fr.sazaju.genshin.material.CharacterAscensionMaterial;
-import fr.sazaju.genshin.material.CommonMobDrop;
-import fr.sazaju.genshin.material.EliteMobDrop;
-import fr.sazaju.genshin.material.LocalSpecialty;
-import fr.sazaju.genshin.material.MaterialStack;
-import fr.sazaju.genshin.material.WeaponAscensionMaterial;
+import fr.sazaju.genshin.item.BossDrop;
+import fr.sazaju.genshin.item.CharacterAscensionMaterialMulti;
+import fr.sazaju.genshin.item.CommonAscensionMaterial;
+import fr.sazaju.genshin.item.EliteCommonAscensionMaterial;
+import fr.sazaju.genshin.item.LocalSpecialty;
+import fr.sazaju.genshin.item.ItemStack;
+import fr.sazaju.genshin.item.TalentLevelUpMaterial;
+import fr.sazaju.genshin.item.WeaponAscensionMaterial;
 import fr.sazaju.genshin.weapon.Weapon;
 
 public interface Levels {
@@ -46,153 +46,153 @@ public interface Levels {
 		};
 	}
 
-	default MaterialStack getCost() {
+	default ItemStack getCost() {
 		return toMap().values().stream()//
 				.map(Level::getCost)//
-				.reduce(MaterialStack::addStack)//
-				.orElse(MaterialStack.empty());
+				.reduce(ItemStack::addStack)//
+				.orElse(ItemStack.empty());
 	}
 
-	public static Levels forCharacterTalent(Book book, CommonMobDrop mobDrop, BossDrop bossDrop) {
+	public static Levels forCharacterTalent(TalentLevelUpMaterial talentLevelUpMaterial, CommonAscensionMaterial mobDrop, BossDrop bossDrop) {
 		return Levels.fromMap(Map.of(//
-				2, Level.create(minimumAscensionLevel(2), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 12500, //
-						book.material(TWO_STARS), 3, //
-						mobDrop.material(ONE_STAR), 6//
+				2, Level.create(minimumAscensionLevel(2), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 12500, //
+						talentLevelUpMaterial.item(TWO_STARS), 3, //
+						mobDrop.item(ONE_STAR), 6//
 				))), //
-				3, Level.create(minimumAscensionLevel(3), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 17500, //
-						book.material(THREE_STARS), 2, //
-						mobDrop.material(TWO_STARS), 3//
+				3, Level.create(minimumAscensionLevel(3), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 17500, //
+						talentLevelUpMaterial.item(THREE_STARS), 2, //
+						mobDrop.item(TWO_STARS), 3//
 				))), //
-				4, Level.create(minimumAscensionLevel(3), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 25000, //
-						book.material(THREE_STARS), 4, //
-						mobDrop.material(TWO_STARS), 4//
+				4, Level.create(minimumAscensionLevel(3), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 25000, //
+						talentLevelUpMaterial.item(THREE_STARS), 4, //
+						mobDrop.item(TWO_STARS), 4//
 				))), //
-				5, Level.create(minimumAscensionLevel(4), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 30000, //
-						book.material(THREE_STARS), 6, //
-						mobDrop.material(TWO_STARS), 6//
+				5, Level.create(minimumAscensionLevel(4), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 30000, //
+						talentLevelUpMaterial.item(THREE_STARS), 6, //
+						mobDrop.item(TWO_STARS), 6//
 				))), //
-				6, Level.create(minimumAscensionLevel(4), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 37500, //
-						book.material(THREE_STARS), 9, //
-						mobDrop.material(TWO_STARS), 9//
+				6, Level.create(minimumAscensionLevel(4), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 37500, //
+						talentLevelUpMaterial.item(THREE_STARS), 9, //
+						mobDrop.item(TWO_STARS), 9//
 				))), //
-				7, Level.create(minimumAscensionLevel(5), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 120000, //
-						book.material(FOUR_STARS), 4, //
-						mobDrop.material(THREE_STARS), 4, //
-						bossDrop.material(), 1//
+				7, Level.create(minimumAscensionLevel(5), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 120000, //
+						talentLevelUpMaterial.item(FOUR_STARS), 4, //
+						mobDrop.item(THREE_STARS), 4, //
+						bossDrop.item(), 1//
 				))), //
-				8, Level.create(minimumAscensionLevel(5), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 260000, //
-						book.material(FOUR_STARS), 6, //
-						mobDrop.material(THREE_STARS), 6, //
-						bossDrop.material(), 1//
+				8, Level.create(minimumAscensionLevel(5), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 260000, //
+						talentLevelUpMaterial.item(FOUR_STARS), 6, //
+						mobDrop.item(THREE_STARS), 6, //
+						bossDrop.item(), 1//
 				))), //
-				9, Level.create(minimumAscensionLevel(6), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 450000, //
-						book.material(FOUR_STARS), 12, //
-						mobDrop.material(THREE_STARS), 9, //
-						bossDrop.material(), 2//
+				9, Level.create(minimumAscensionLevel(6), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 450000, //
+						talentLevelUpMaterial.item(FOUR_STARS), 12, //
+						mobDrop.item(THREE_STARS), 9, //
+						bossDrop.item(), 2//
 				))), //
-				10, Level.create(minimumAscensionLevel(6), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 700000, //
-						book.material(FOUR_STARS), 16, //
-						mobDrop.material(THREE_STARS), 12, //
-						bossDrop.material(), 2, //
-						CROWN_OF_INSIGHT.material, 1//
+				10, Level.create(minimumAscensionLevel(6), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 700000, //
+						talentLevelUpMaterial.item(FOUR_STARS), 16, //
+						mobDrop.item(THREE_STARS), 12, //
+						bossDrop.item(), 2, //
+						CROWN_OF_INSIGHT.item(), 1//
 				))) //
 		));
 	}
 
-	public static Levels forCharacterAscension(CharacterAscensionMaterial ascensionMaterial, BossDrop bossDrop,
-			LocalSpecialty localSpecialty, CommonMobDrop commonMaterial) {
+	public static Levels forCharacterAscension(CharacterAscensionMaterialMulti ascensionMaterial, BossDrop bossDrop,
+			LocalSpecialty localSpecialty, CommonAscensionMaterial commonMaterial) {
 		return Levels.fromMap(Map.of(//
-				1, Level.create(minimumAdventureRank(15), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 20000, //
-						ascensionMaterial.material(TWO_STARS), 1, //
-						localSpecialty.material(), 3, //
-						commonMaterial.material(ONE_STAR), 3//
+				1, Level.create(minimumAdventureRank(15), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 20000, //
+						ascensionMaterial.item(TWO_STARS), 1, //
+						localSpecialty.item(), 3, //
+						commonMaterial.item(ONE_STAR), 3//
 				))), //
-				2, Level.create(minimumAdventureRank(25), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 40000, //
-						ascensionMaterial.material(THREE_STARS), 3, //
-						bossDrop.material(), 2, //
-						localSpecialty.material(), 10, //
-						commonMaterial.material(ONE_STAR), 15//
+				2, Level.create(minimumAdventureRank(25), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 40000, //
+						ascensionMaterial.item(THREE_STARS), 3, //
+						bossDrop.item(), 2, //
+						localSpecialty.item(), 10, //
+						commonMaterial.item(ONE_STAR), 15//
 				))), //
-				3, Level.create(minimumAdventureRank(30), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 60000, //
-						ascensionMaterial.material(THREE_STARS), 6, //
-						bossDrop.material(), 4, //
-						localSpecialty.material(), 20, //
-						commonMaterial.material(TWO_STARS), 12//
+				3, Level.create(minimumAdventureRank(30), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 60000, //
+						ascensionMaterial.item(THREE_STARS), 6, //
+						bossDrop.item(), 4, //
+						localSpecialty.item(), 20, //
+						commonMaterial.item(TWO_STARS), 12//
 				))), //
-				4, Level.create(minimumAdventureRank(35), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 80000, //
-						ascensionMaterial.material(FOUR_STARS), 3, //
-						bossDrop.material(), 8, //
-						localSpecialty.material(), 30, //
-						commonMaterial.material(TWO_STARS), 18//
+				4, Level.create(minimumAdventureRank(35), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 80000, //
+						ascensionMaterial.item(FOUR_STARS), 3, //
+						bossDrop.item(), 8, //
+						localSpecialty.item(), 30, //
+						commonMaterial.item(TWO_STARS), 18//
 				))), //
-				5, Level.create(minimumAdventureRank(40), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 100000, //
-						ascensionMaterial.material(FOUR_STARS), 6, //
-						bossDrop.material(), 12, //
-						localSpecialty.material(), 45, //
-						commonMaterial.material(THREE_STARS), 12//
+				5, Level.create(minimumAdventureRank(40), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 100000, //
+						ascensionMaterial.item(FOUR_STARS), 6, //
+						bossDrop.item(), 12, //
+						localSpecialty.item(), 45, //
+						commonMaterial.item(THREE_STARS), 12//
 				))), //
-				6, Level.create(minimumAdventureRank(50), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 120000, //
-						ascensionMaterial.material(FIVE_STARS), 6, //
-						bossDrop.material(), 20, //
-						localSpecialty.material(), 60, //
-						commonMaterial.material(THREE_STARS), 24//
+				6, Level.create(minimumAdventureRank(50), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 120000, //
+						ascensionMaterial.item(FIVE_STARS), 6, //
+						bossDrop.item(), 20, //
+						localSpecialty.item(), 60, //
+						commonMaterial.item(THREE_STARS), 24//
 				))) //
 		));
 	}
 
-	public static Levels forWeaponAscension(WeaponAscensionMaterial ascensionMaterial, EliteMobDrop eliteMaterial,
-			CommonMobDrop CommonMaterial) {
+	public static Levels forWeaponAscension(WeaponAscensionMaterial ascensionMaterial, EliteCommonAscensionMaterial eliteMaterial,
+			CommonAscensionMaterial CommonMaterial) {
 		return Levels.fromMap(Map.of(//
-				1, Level.create(minimumAdventureRank(15), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 5000, //
-						ascensionMaterial.material(TWO_STARS), 3, //
-						eliteMaterial.material(TWO_STARS), 3, //
-						CommonMaterial.material(ONE_STAR), 2//
+				1, Level.create(minimumAdventureRank(15), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 5000, //
+						ascensionMaterial.item(TWO_STARS), 3, //
+						eliteMaterial.item(TWO_STARS), 3, //
+						CommonMaterial.item(ONE_STAR), 2//
 				))), //
-				2, Level.create(minimumAdventureRank(25), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 15000, //
-						ascensionMaterial.material(THREE_STARS), 3, //
-						eliteMaterial.material(TWO_STARS), 12, //
-						CommonMaterial.material(ONE_STAR), 8//
+				2, Level.create(minimumAdventureRank(25), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 15000, //
+						ascensionMaterial.item(THREE_STARS), 3, //
+						eliteMaterial.item(TWO_STARS), 12, //
+						CommonMaterial.item(ONE_STAR), 8//
 				))), //
-				3, Level.create(minimumAdventureRank(30), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 20000, //
-						ascensionMaterial.material(THREE_STARS), 6, //
-						eliteMaterial.material(THREE_STARS), 6, //
-						CommonMaterial.material(TWO_STARS), 6//
+				3, Level.create(minimumAdventureRank(30), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 20000, //
+						ascensionMaterial.item(THREE_STARS), 6, //
+						eliteMaterial.item(THREE_STARS), 6, //
+						CommonMaterial.item(TWO_STARS), 6//
 				))), //
-				4, Level.create(minimumAdventureRank(35), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 30000, //
-						ascensionMaterial.material(FOUR_STARS), 3, //
-						eliteMaterial.material(THREE_STARS), 12, //
-						CommonMaterial.material(TWO_STARS), 9//
+				4, Level.create(minimumAdventureRank(35), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 30000, //
+						ascensionMaterial.item(FOUR_STARS), 3, //
+						eliteMaterial.item(THREE_STARS), 12, //
+						CommonMaterial.item(TWO_STARS), 9//
 				))), //
-				5, Level.create(minimumAdventureRank(40), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 35000, //
-						ascensionMaterial.material(FOUR_STARS), 6, //
-						eliteMaterial.material(FOUR_STARS), 9, //
-						CommonMaterial.material(THREE_STARS), 6//
+				5, Level.create(minimumAdventureRank(40), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 35000, //
+						ascensionMaterial.item(FOUR_STARS), 6, //
+						eliteMaterial.item(FOUR_STARS), 9, //
+						CommonMaterial.item(THREE_STARS), 6//
 				))), //
-				6, Level.create(minimumAdventureRank(50), MaterialStack.fromMap(Map.of(//
-						MORA.material(), 45000, //
-						ascensionMaterial.material(FIVE_STARS), 4, //
-						eliteMaterial.material(FOUR_STARS), 18, //
-						CommonMaterial.material(THREE_STARS), 12//
+				6, Level.create(minimumAdventureRank(50), ItemStack.fromItemsMap(Map.of(//
+						MORA.item(), 45000, //
+						ascensionMaterial.item(FIVE_STARS), 4, //
+						eliteMaterial.item(FOUR_STARS), 18, //
+						CommonMaterial.item(THREE_STARS), 12//
 				))) //
 		));
 	}

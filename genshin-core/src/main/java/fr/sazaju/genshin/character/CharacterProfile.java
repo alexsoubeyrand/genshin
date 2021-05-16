@@ -2,18 +2,18 @@ package fr.sazaju.genshin.character;
 
 import static fr.sazaju.genshin.Element.*;
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.material.CharacterAscensionMaterial.*;
-import static fr.sazaju.genshin.material.Book.*;
-import static fr.sazaju.genshin.material.BossDrop.*;
-import static fr.sazaju.genshin.material.LocalSpecialty.*;
-import static fr.sazaju.genshin.material.CommonMobDrop.*;
-import static fr.sazaju.genshin.weapon.WeaponType.*;
+import static fr.sazaju.genshin.item.BossDrop.*;
+import static fr.sazaju.genshin.item.CharacterAscensionMaterialMulti.*;
+import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.LocalSpecialty.*;
+import static fr.sazaju.genshin.item.TalentLevelUpMaterial.*;
+import static fr.sazaju.genshin.weapon.WeaponCategory.*;
 
 import fr.sazaju.genshin.Element;
 import fr.sazaju.genshin.Rarity;
 import fr.sazaju.genshin.leveling.Levels;
 import fr.sazaju.genshin.weapon.Weapon;
-import fr.sazaju.genshin.weapon.WeaponType;
+import fr.sazaju.genshin.weapon.WeaponCategory;
 
 public enum CharacterProfile {
 	KEQING("Keqing", FIVE_STARS, ELECTRO, SWORD, //
@@ -29,7 +29,7 @@ public enum CharacterProfile {
 	public final String name;
 	public final Rarity rarity;
 	public final Element element;
-	public final WeaponType weaponType;
+	public final WeaponCategory weaponCategory;
 	public final Levels talentLevels;
 	public final Levels ascensionLevels;
 
@@ -37,13 +37,13 @@ public enum CharacterProfile {
 			String name, //
 			Rarity rarity, //
 			Element element, //
-			WeaponType weaponType, //
+			WeaponCategory weaponCategory, //
 			Levels talentLevels, //
 			Levels characterLevels) {
 		this.name = name;
 		this.rarity = rarity;
 		this.element = element;
-		this.weaponType = weaponType;
+		this.weaponCategory = weaponCategory;
 		this.talentLevels = talentLevels;
 		this.ascensionLevels = characterLevels;
 	}

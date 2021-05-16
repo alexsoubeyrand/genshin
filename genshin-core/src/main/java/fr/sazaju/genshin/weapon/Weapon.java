@@ -1,15 +1,17 @@
 package fr.sazaju.genshin.weapon;
 
 import fr.sazaju.genshin.StringUtils;
+import fr.sazaju.genshin.item.Item;
 
-public class Weapon {
-	public final WeaponProfile profile;
+public class Weapon extends Item<WeaponType> {
+	public final WeaponType type;
 	public final int weaponLevel;
 	public final int ascensionLevel;
 	public final int refinementLevel;
 
-	private Weapon(WeaponProfile profile, int weaponLevel, int refinementLevel) {
-		this.profile = profile;
+	private Weapon(WeaponType type, int weaponLevel, int refinementLevel) {
+		super(type, type.getRarity());
+		this.type = type;
 
 		this.weaponLevel = weaponLevel;
 		this.ascensionLevel = //
@@ -30,11 +32,11 @@ public class Weapon {
 	}
 
 	public static class Builder {
-		private WeaponProfile profile;
+		private WeaponType profile;
 		private int weaponLevel;
 		private int refinementLevel;
 
-		Builder(WeaponProfile profile) {
+		Builder(WeaponType profile) {
 			this.profile = profile;
 			this.weaponLevel = 1;
 			this.refinementLevel = 1;
