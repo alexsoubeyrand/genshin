@@ -20,6 +20,7 @@ public enum Mora implements MaterialType {
 
 	@Override
 	public Collection<MaterialStack> getConversionRecipesAt(Rarity rarity) {
+		// TODO Implement mora recipes
 		throw new RuntimeException("Not yet implemented");
 	}
 }

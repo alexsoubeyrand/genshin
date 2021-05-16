@@ -94,34 +94,30 @@ public class MaterialStack {
 				});
 	}
 
-	public static interface RecipeStrategy {
-		public static final RecipeStrategy BEST_EFFORT = (originalHistory, currentHistory,
+	public static interface HistorySelector {
+		public static final HistorySelector BEST_EFFORT = (originalHistory, currentHistory,
 				targetQuantities) -> currentHistory;
-		public static final RecipeStrategy ONLY_IF_SUCCESSFUL = (originalHistory, currentHistory, targetQuantities) -> {
+		public static final HistorySelector ONLY_IF_SUCCESSFUL = (originalHistory, currentHistory,
+				targetQuantities) -> {
 			for (Material<?> material : targetQuantities.getMaterials()) {
 				if (currentHistory.getResultingStack().getQuantity(material) < targetQuantities.getQuantity(material)) {
 					// Cannot reach target, don't touch anything
-					// TODO Best effort? (as much as we can, even if incomplete)
 					return originalHistory;
 				}
 			}
 			return currentHistory;
 		};
 
-		MaterialStackHistory validate(MaterialStackHistory originalHistory, MaterialStackHistory currentHistory,
+		MaterialStackHistory select(MaterialStackHistory originalHistory, MaterialStackHistory currentHistory,
 				MaterialStack targetQuantities);
 	}
 
-	public MaterialStackHistory createRecipeHistory(MaterialStack targetQuantities) {
-		return createRecipeHistory(targetQuantities, RecipeStrategy.ONLY_IF_SUCCESSFUL);
-	}
-
-	public MaterialStackHistory createRecipeHistory(MaterialStack targetQuantities, RecipeStrategy strategy) {
-		return createRecipeHistory(MaterialStackHistory.from(this), targetQuantities, strategy);
+	public MaterialStackHistory createRecipeHistory(MaterialStack targetQuantities, HistorySelector historySelector) {
+		return createRecipeHistory(MaterialStackHistory.from(this), targetQuantities, historySelector);
 	}
 
 	private static MaterialStackHistory createRecipeHistory(MaterialStackHistory originalHistory,
-			MaterialStack targetQuantities, RecipeStrategy strategy) {
+			MaterialStack targetQuantities, HistorySelector historySelector) {
 		MaterialStackHistory currentHistory = originalHistory;
 		boolean isUpdated;
 		do {
@@ -129,16 +125,16 @@ public class MaterialStack {
 			for (Material<?> material : targetQuantities.getMaterials()) {
 				int targetQuantity = targetQuantities.getQuantity(material);
 				MaterialStackHistory nextHistory = fillMaterialByConversions(currentHistory, material, targetQuantity,
-						strategy);
+						historySelector);
 				isUpdated = isUpdated || !nextHistory.equals(currentHistory);
 				currentHistory = nextHistory;
 			}
 		} while (isUpdated);
-		return strategy.validate(originalHistory, currentHistory, targetQuantities);
+		return historySelector.select(originalHistory, currentHistory, targetQuantities);
 	}
 
 	private static MaterialStackHistory fillMaterialByConversions(MaterialStackHistory history, Material<?> material,
-			int targetQuantity, RecipeStrategy strategy) {
+			int targetQuantity, HistorySelector historySelector) {
 		int currentQuantity = history.getResultingStack().getQuantity(material);
 		if (targetQuantity <= currentQuantity) {
 			// Nothing to fill
@@ -151,7 +147,7 @@ public class MaterialStack {
 				// Example: enhancement ore forging
 				MaterialStack conversions = recipe.times(requiredQuantity);
 				MaterialStack requiredQuantities = conversions.filter(strictlyNegative()).times(-1);
-				MaterialStackHistory recipeHistory = createRecipeHistory(history, requiredQuantities, strategy);
+				MaterialStackHistory recipeHistory = createRecipeHistory(history, requiredQuantities, historySelector);
 				if (recipeHistory.getResultingStack().contains(requiredQuantities)) {
 					recipesResult.put(recipe, recipeHistory.appendDiff(conversions));
 				} else {

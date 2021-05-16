@@ -10,7 +10,7 @@ import static fr.sazaju.genshin.material.EliteMobDrop.*;
 import static fr.sazaju.genshin.material.LocalSpecialty.*;
 import static fr.sazaju.genshin.material.MaterialStack.*;
 import static fr.sazaju.genshin.material.MaterialStack.Filter.*;
-import static fr.sazaju.genshin.material.MaterialStack.RecipeStrategy.*;
+import static fr.sazaju.genshin.material.MaterialStack.HistorySelector.*;
 import static fr.sazaju.genshin.material.Mora.*;
 import static fr.sazaju.genshin.material.WeaponAscensionMaterial.*;
 
@@ -85,11 +85,11 @@ public class Main {
 		));
 		MaterialStackHistory conversionHistory = availableMaterial.createRecipeHistory(totalCost, ONLY_IF_SUCCESSFUL);
 		MaterialStack availableMaterialAfterConversion = conversionHistory.getResultingStack().filter(nonZero());
-		
+
 		///////////////////////////////////////
 		System.out.println("[Weapon]");
 		displayLevels("Ascension", weaponAscensionLevels);
-		
+
 		System.out.println("[Character]");
 		System.out.println(character);
 		displayLevels("Ascension", characterAscensionLevels);
@@ -97,7 +97,7 @@ public class Main {
 		displayStack(characterTalentsCost);
 		System.out.println("[Total cost]");
 		displayStack(totalCost);
-		
+
 		System.out.println("[Available]");
 		displayStack(availableMaterial);
 
@@ -112,6 +112,11 @@ public class Main {
 
 		System.out.println("[Remaining]");
 		displayStack(availableMaterialAfterConversion.minusStack(totalCost).filter(nonZero()));
+		
+		// TODO Expose on service
+		// TODO Test on service
+		// TODO Expose on website
+		// TODO Resolve TODOs
 	}
 
 	private static void displayDiff(MaterialStack diff) {

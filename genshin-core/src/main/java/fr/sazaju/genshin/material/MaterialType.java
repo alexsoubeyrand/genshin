@@ -15,15 +15,10 @@ public interface MaterialType {
 
 	Collection<MaterialStack> getConversionRecipesAt(Rarity rarity);
 
-	private static int costInMora(MaterialType type, Rarity rarity) {
-		// TODO
-		return 0;
-	}
-
 	public interface WithMultipleStarRanks extends MaterialType {
-		
+
 		Material<? extends WithMultipleStarRanks> material(Rarity rarity);
-		
+
 		public static Collection<MaterialStack> recipesOn3Submaterials(WithMultipleStarRanks type, Rarity rarity) {
 			Rarity belowRarity = rarity.below();
 			if (!type.hasRarity(belowRarity)) {
@@ -34,6 +29,11 @@ public interface MaterialType {
 					type.material(belowRarity), -3, //
 					MORA.material(), -costInMora(type, rarity)//
 			)));
+		}
+
+		private static int costInMora(MaterialType type, Rarity rarity) {
+			// TODO Compute cost in mora
+			return 0;
 		}
 
 	}
