@@ -1,10 +1,10 @@
 package fr.sazaju.genshin.material;
 
-import java.util.Optional;
+import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
 
-public enum EliteMobDrop implements MaterialType {
+public enum EliteMobDrop implements MaterialType.WithMultipleStarRanks {
 	SACRIFICIAL_KNIFE;
 
 	@Override
@@ -13,8 +13,13 @@ public enum EliteMobDrop implements MaterialType {
 	}
 
 	@Override
-	public Optional<MaterialStack> getConversionRecipeAt(Rarity rarity) {
-		return MaterialType.recipeOn3Submaterials(this, rarity);
+	public Material<EliteMobDrop> material(Rarity rarity) {
+		return new Material<>(this, rarity);
+	}
+
+	@Override
+	public Collection<MaterialStack> getConversionRecipesAt(Rarity rarity) {
+		return MaterialType.WithMultipleStarRanks.recipesOn3Submaterials(this, rarity);
 	}
 
 }

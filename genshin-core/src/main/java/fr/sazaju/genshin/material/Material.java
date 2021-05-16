@@ -1,8 +1,8 @@
 package fr.sazaju.genshin.material;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import fr.sazaju.genshin.Rarity;
 
@@ -18,8 +18,8 @@ public class Material<T extends MaterialType> {
 		this.rarity = rarity;
 	}
 
-	public Optional<MaterialStack> getConversionRecipe() {
-		return type.getConversionRecipeAt(rarity);
+	public Collection<MaterialStack> getConversionRecipes() {
+		return type.getConversionRecipesAt(rarity);
 	}
 
 	@Override

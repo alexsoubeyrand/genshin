@@ -2,6 +2,8 @@ package fr.sazaju.genshin.material;
 
 import static fr.sazaju.genshin.Rarity.*;
 
+import java.util.Collection;
+
 import fr.sazaju.genshin.Rarity;
 
 public enum BossDrop implements MaterialType {
@@ -32,11 +34,20 @@ public enum BossDrop implements MaterialType {
 	private final Rarity rarity;
 
 	BossDrop(Rarity rarity) {
-		this.rarity=rarity;
+		this.rarity = rarity;
 	}
-	
+
+	public Material<BossDrop> material() {
+		return new Material<>(this, rarity);
+	}
+
 	@Override
 	public boolean hasRarity(Rarity rarity) {
 		return this.rarity.equals(rarity);
+	}
+
+	@Override
+	public Collection<MaterialStack> getConversionRecipesAt(Rarity rarity) {
+		throw new RuntimeException("Not yet implemented");
 	}
 }

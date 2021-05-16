@@ -5,126 +5,87 @@ import static fr.sazaju.genshin.material.Mora.*;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.Rarity;
+public class MaterialStack {
+	private final Map<Material<?>, Integer> map;
 
-public interface MaterialStack {
-	Map<Material<?>, Integer> toMap();
-
-	public static MaterialStack fromMap(Map<Material<?>, Integer> stack) {
-		return new MaterialStack() {
-			@Override
-			public Map<Material<?>, Integer> toMap() {
-				return stack;
-			}
-
-			@Override
-			public String toString() {
-				return stack.toString();
-			}
-		};
+	private MaterialStack(Map<Material<?>, Integer> map) {
+		this.map = map;
 	}
 
-	default MaterialStack add(MaterialStack that) {
-		Map<Material<?>, Integer> map1 = this.toMap();
-		Map<Material<?>, Integer> map2 = that.toMap();
-		Map<Material<?>, Integer> aggregate = Stream.of(map1, map2)//
-				.map(Map::keySet)//
+	public static MaterialStack fromMap(Map<Material<?>, Integer> map) {
+		return new MaterialStack(map);
+	}
+
+	@Override
+	public String toString() {
+		return map.toString();
+	}
+
+	public Set<Material<?>> getMaterials() {
+		return map.keySet();
+	}
+
+	public int getQuantity(Material<?> material) {
+		return map.getOrDefault(material, 0);
+	}
+
+	public MaterialStack addStack(MaterialStack that) {
+		return MaterialStack.fromMap(Stream.of(this, that)//
+				// Retrieve each unique key
+				.map(MaterialStack::getMaterials)//
 				.flatMap(Set::stream)//
 				.distinct()//
+				// Retrieve the value of each key into a map
 				.collect(Collectors.toMap(//
 						key -> key, //
-						key -> map1.getOrDefault(key, 0) //
-								+ map2.getOrDefault(key, 0)//
-				));
-		return MaterialStack.fromMap(aggregate);
+						key -> this.getQuantity(key) //
+								+ that.getQuantity(key)//
+				)));
 	}
 
-	default MaterialStack add(Map<Material<?>, Integer> stack) {
-		return add(MaterialStack.fromMap(stack));
+	public MaterialStack addStack(Collection<Entry> stack) {
+		return addStack(MaterialStack.fromMap(stack.stream()//
+				.collect(Collectors.toMap(Entry::getMaterial, Entry::getQuantity))));
 	}
 
-	default MaterialStack add(Material<?> material, int quantity) {
-		return add(Map.of(material, quantity));
+	public MaterialStack addMaterial(Material<?> material, int quantity) {
+		return addStack(MaterialStack.fromMap(Map.of(material, quantity)));
 	}
 
-	default MaterialStack times(int multiplier) {
-		return MaterialStack.fromMap(this.toMap().entrySet().stream()//
+	public MaterialStack minusStack(MaterialStack stack) {
+		return addStack(stack.times(-1));
+	}
+
+	public MaterialStack minusStack(Collection<Entry> stack) {
+		return minusStack(MaterialStack.fromMap(stack.stream()//
+				.collect(Collectors.toMap(Entry::getMaterial, Entry::getQuantity))));
+	}
+
+	public MaterialStack minusMaterial(Material<?> material, int quantity) {
+		return minusStack(MaterialStack.fromMap(Map.of(material, quantity)));
+	}
+
+	public MaterialStack times(int multiplier) {
+		return MaterialStack.fromMap(map.entrySet().stream()//
 				.map(entry -> Map.entry(entry.getKey(), entry.getValue() * multiplier))//
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
-	default MaterialStack minus(MaterialStack stack) {
-		return add(stack.toMap().entrySet().stream()//
-				.map(entry -> Map.entry(entry.getKey(), -entry.getValue()))//
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-	}
-
-	default MaterialStack filter(Filter filter) {
-		return MaterialStack.fromMap(this.toMap().entrySet().stream()//
+	public MaterialStack filter(Filter filter) {
+		return MaterialStack.fromMap(map.entrySet().stream()//
 				.filter(entry -> filter.test(entry.getKey(), entry.getValue()))//
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
-	default MaterialStack fillWithConversions() {
-		// TODO Best effort conversion?
-		MaterialStack currentStack = this;
-		Map<Material<?>, Integer> map = this.toMap();
-		Material<?> material = Rarity.FOUR_STARS.of(CharacterAscensionMaterial.VAJRADA);
-		int negativeQuantity = map.get(material);
-		currentStack = search(currentStack, material, negativeQuantity);
-		// TODO Search for all negative values (don't compute twice the same)
-		return currentStack;
-	}
-
-	// TODO Refactor
-	default MaterialStack search(MaterialStack currentStack, Material<?> material, int negativeQuantity) {
-		int requiredValue = -negativeQuantity;
-		System.out.println(">>>");
-		System.out.println("Require: " + material + " x" + requiredValue);
-		Optional<MaterialStack> conversionRecipe = material.getConversionRecipe();
-		if (conversionRecipe.isPresent()) {
-			MaterialStack recipe = conversionRecipe.get();
-			System.out.println("Recipe: " + recipe);
-			MaterialStack singleConsumption = recipe.filter(strictlyNegative());
-			System.out.println("Single consumption: " + singleConsumption);
-			MaterialStack requiredStack = singleConsumption.times(negativeQuantity);
-			System.out.println("Require: " + requiredStack);
-			if (!currentStack.contains(requiredStack)) {
-				System.out.println("Not enough, search recursively");
-				Set<Material<?>> materials = requiredStack.toMap().keySet();
-				MaterialStack adaptedStack = currentStack;
-				for (Material<?> materialToFill : materials) {
-					int requiredQuantity = requiredStack.getQuantity(materialToFill);
-					int currentQuantity = currentStack.getQuantity(materialToFill);
-					adaptedStack = search(adaptedStack, materialToFill, currentQuantity - requiredQuantity);
-					if (adaptedStack.getQuantity(materialToFill) < requiredQuantity) {
-						System.out.println("Cannot fill");
-						return currentStack;
-					}
-					System.out.println("Adapted: " + adaptedStack);
-				}
-				currentStack = adaptedStack;
-			}
-			currentStack = currentStack.minus(requiredStack).add(material, requiredValue);
-		}
-		System.out.println("<<<");
-		return currentStack;
-	}
-
-	default int getQuantity(Material<?> material) {
-		return this.toMap().getOrDefault(material, 0);
-	}
-
-	default boolean contains(MaterialStack stack) {
+	public boolean contains(MaterialStack stack) {
 		// TODO What about negative quantities?
-		return stack.toMap().entrySet().stream()//
+		return map.entrySet().stream()//
 				.allMatch(entry -> {
 					Material<?> material = entry.getKey();
 					int quantity = entry.getValue();
@@ -133,7 +94,76 @@ public interface MaterialStack {
 				});
 	}
 
-	static MaterialStack empty() {
+	public static interface RecipeStrategy {
+		public static final RecipeStrategy BEST_EFFORT = (originalHistory, currentHistory,
+				targetQuantities) -> currentHistory;
+		public static final RecipeStrategy ONLY_IF_SUCCESSFUL = (originalHistory, currentHistory, targetQuantities) -> {
+			for (Material<?> material : targetQuantities.getMaterials()) {
+				if (currentHistory.getResultingStack().getQuantity(material) < targetQuantities.getQuantity(material)) {
+					// Cannot reach target, don't touch anything
+					// TODO Best effort? (as much as we can, even if incomplete)
+					return originalHistory;
+				}
+			}
+			return currentHistory;
+		};
+
+		MaterialStackHistory validate(MaterialStackHistory originalHistory, MaterialStackHistory currentHistory,
+				MaterialStack targetQuantities);
+	}
+
+	public MaterialStackHistory createRecipeHistory(MaterialStack targetQuantities) {
+		return createRecipeHistory(targetQuantities, RecipeStrategy.ONLY_IF_SUCCESSFUL);
+	}
+
+	public MaterialStackHistory createRecipeHistory(MaterialStack targetQuantities, RecipeStrategy strategy) {
+		return createRecipeHistory(MaterialStackHistory.from(this), targetQuantities, strategy);
+	}
+
+	private static MaterialStackHistory createRecipeHistory(MaterialStackHistory originalHistory,
+			MaterialStack targetQuantities, RecipeStrategy strategy) {
+		MaterialStackHistory currentHistory = originalHistory;
+		boolean isUpdated;
+		do {
+			isUpdated = false;
+			for (Material<?> material : targetQuantities.getMaterials()) {
+				int targetQuantity = targetQuantities.getQuantity(material);
+				MaterialStackHistory nextHistory = fillMaterialByConversions(currentHistory, material, targetQuantity,
+						strategy);
+				isUpdated = isUpdated || !nextHistory.equals(currentHistory);
+				currentHistory = nextHistory;
+			}
+		} while (isUpdated);
+		return strategy.validate(originalHistory, currentHistory, targetQuantities);
+	}
+
+	private static MaterialStackHistory fillMaterialByConversions(MaterialStackHistory history, Material<?> material,
+			int targetQuantity, RecipeStrategy strategy) {
+		int currentQuantity = history.getResultingStack().getQuantity(material);
+		if (targetQuantity <= currentQuantity) {
+			// Nothing to fill
+			return history;
+		} else {
+			int requiredQuantity = targetQuantity - currentQuantity;
+			Map<MaterialStack, MaterialStackHistory> recipesResult = new HashMap<>();
+			for (MaterialStack recipe : material.getConversionRecipes()) {
+				// TODO Consider cases where we produce more than one material at a time
+				// Example: enhancement ore forging
+				MaterialStack conversions = recipe.times(requiredQuantity);
+				MaterialStack requiredQuantities = conversions.filter(strictlyNegative()).times(-1);
+				MaterialStackHistory recipeHistory = createRecipeHistory(history, requiredQuantities, strategy);
+				if (recipeHistory.getResultingStack().contains(requiredQuantities)) {
+					recipesResult.put(recipe, recipeHistory.appendDiff(conversions));
+				} else {
+					// Cannot reach target, ignore recipe
+				}
+			}
+			// TODO Return best result instead of first one
+			return recipesResult.isEmpty() ? history : recipesResult.values().iterator().next();
+		}
+	}
+
+	public static MaterialStack empty() {
 		return MaterialStack.fromMap(Collections.emptyMap());
 	}
 
@@ -173,8 +203,34 @@ public interface MaterialStack {
 		}
 
 		public static Filter materialsIn(MaterialStack stack) {
-			return materials(stack.toMap().keySet());
+			return materials(stack.getMaterials());
 		}
 
 	}
+
+	public Stream<Entry> stream() {
+		return map.entrySet().stream().map(entry -> entry(entry.getKey(), entry.getValue()));
+	}
+
+	public static interface Entry {
+		Material<?> getMaterial();
+
+		int getQuantity();
+	}
+
+	public static Entry entry(Material<?> material, int quantity) {
+		return new Entry() {
+
+			@Override
+			public Material<?> getMaterial() {
+				return material;
+			}
+
+			@Override
+			public int getQuantity() {
+				return quantity;
+			}
+		};
+	}
+
 }

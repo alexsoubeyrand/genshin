@@ -49,61 +49,61 @@ public interface Levels {
 	default MaterialStack getCost() {
 		return toMap().values().stream()//
 				.map(Level::getCost)//
-				.reduce(MaterialStack::add)//
+				.reduce(MaterialStack::addStack)//
 				.orElse(MaterialStack.empty());
 	}
 
 	public static Levels forCharacterTalent(Book book, CommonMobDrop mobDrop, BossDrop bossDrop) {
 		return Levels.fromMap(Map.of(//
 				2, Level.create(minimumAscensionLevel(2), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 12500, //
-						TWO_STARS.of(book), 3, //
-						ONE_STAR.of(mobDrop), 6//
+						MORA.material(), 12500, //
+						book.material(TWO_STARS), 3, //
+						mobDrop.material(ONE_STAR), 6//
 				))), //
 				3, Level.create(minimumAscensionLevel(3), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 17500, //
-						THREE_STARS.of(book), 2, //
-						TWO_STARS.of(mobDrop), 3//
+						MORA.material(), 17500, //
+						book.material(THREE_STARS), 2, //
+						mobDrop.material(TWO_STARS), 3//
 				))), //
 				4, Level.create(minimumAscensionLevel(3), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 25000, //
-						THREE_STARS.of(book), 4, //
-						TWO_STARS.of(mobDrop), 4//
+						MORA.material(), 25000, //
+						book.material(THREE_STARS), 4, //
+						mobDrop.material(TWO_STARS), 4//
 				))), //
 				5, Level.create(minimumAscensionLevel(4), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 30000, //
-						THREE_STARS.of(book), 6, //
-						TWO_STARS.of(mobDrop), 6//
+						MORA.material(), 30000, //
+						book.material(THREE_STARS), 6, //
+						mobDrop.material(TWO_STARS), 6//
 				))), //
 				6, Level.create(minimumAscensionLevel(4), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 37500, //
-						THREE_STARS.of(book), 9, //
-						TWO_STARS.of(mobDrop), 9//
+						MORA.material(), 37500, //
+						book.material(THREE_STARS), 9, //
+						mobDrop.material(TWO_STARS), 9//
 				))), //
 				7, Level.create(minimumAscensionLevel(5), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 120000, //
-						FOUR_STARS.of(book), 4, //
-						THREE_STARS.of(mobDrop), 4, //
-						FIVE_STARS.of(bossDrop), 1//
+						MORA.material(), 120000, //
+						book.material(FOUR_STARS), 4, //
+						mobDrop.material(THREE_STARS), 4, //
+						bossDrop.material(), 1//
 				))), //
 				8, Level.create(minimumAscensionLevel(5), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 260000, //
-						FOUR_STARS.of(book), 6, //
-						THREE_STARS.of(mobDrop), 6, //
-						FIVE_STARS.of(bossDrop), 1//
+						MORA.material(), 260000, //
+						book.material(FOUR_STARS), 6, //
+						mobDrop.material(THREE_STARS), 6, //
+						bossDrop.material(), 1//
 				))), //
 				9, Level.create(minimumAscensionLevel(6), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 450000, //
-						FOUR_STARS.of(book), 12, //
-						THREE_STARS.of(mobDrop), 9, //
-						FIVE_STARS.of(bossDrop), 2//
+						MORA.material(), 450000, //
+						book.material(FOUR_STARS), 12, //
+						mobDrop.material(THREE_STARS), 9, //
+						bossDrop.material(), 2//
 				))), //
 				10, Level.create(minimumAscensionLevel(6), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 700000, //
-						FOUR_STARS.of(book), 16, //
-						THREE_STARS.of(mobDrop), 12, //
-						FIVE_STARS.of(bossDrop), 2, //
-						FIVE_STARS.of(CROWN_OF_INSIGHT), 1//
+						MORA.material(), 700000, //
+						book.material(FOUR_STARS), 16, //
+						mobDrop.material(THREE_STARS), 12, //
+						bossDrop.material(), 2, //
+						CROWN_OF_INSIGHT.material, 1//
 				))) //
 		));
 	}
@@ -112,45 +112,45 @@ public interface Levels {
 			LocalSpecialty localSpecialty, CommonMobDrop commonMaterial) {
 		return Levels.fromMap(Map.of(//
 				1, Level.create(minimumAdventureRank(15), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 20000, //
-						TWO_STARS.of(ascensionMaterial), 1, //
-						SPECIALTY.of(localSpecialty), 3, //
-						ONE_STAR.of(commonMaterial), 3//
+						MORA.material(), 20000, //
+						ascensionMaterial.material(TWO_STARS), 1, //
+						localSpecialty.material(), 3, //
+						commonMaterial.material(ONE_STAR), 3//
 				))), //
 				2, Level.create(minimumAdventureRank(25), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 40000, //
-						THREE_STARS.of(ascensionMaterial), 3, //
-						FOUR_STARS.of(bossDrop), 2, //
-						SPECIALTY.of(localSpecialty), 10, //
-						ONE_STAR.of(commonMaterial), 15//
+						MORA.material(), 40000, //
+						ascensionMaterial.material(THREE_STARS), 3, //
+						bossDrop.material(), 2, //
+						localSpecialty.material(), 10, //
+						commonMaterial.material(ONE_STAR), 15//
 				))), //
 				3, Level.create(minimumAdventureRank(30), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 60000, //
-						THREE_STARS.of(ascensionMaterial), 6, //
-						FOUR_STARS.of(bossDrop), 4, //
-						SPECIALTY.of(localSpecialty), 20, //
-						TWO_STARS.of(commonMaterial), 12//
+						MORA.material(), 60000, //
+						ascensionMaterial.material(THREE_STARS), 6, //
+						bossDrop.material(), 4, //
+						localSpecialty.material(), 20, //
+						commonMaterial.material(TWO_STARS), 12//
 				))), //
 				4, Level.create(minimumAdventureRank(35), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 80000, //
-						FOUR_STARS.of(ascensionMaterial), 3, //
-						FOUR_STARS.of(bossDrop), 8, //
-						SPECIALTY.of(localSpecialty), 30, //
-						TWO_STARS.of(commonMaterial), 18//
+						MORA.material(), 80000, //
+						ascensionMaterial.material(FOUR_STARS), 3, //
+						bossDrop.material(), 8, //
+						localSpecialty.material(), 30, //
+						commonMaterial.material(TWO_STARS), 18//
 				))), //
 				5, Level.create(minimumAdventureRank(40), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 100000, //
-						FOUR_STARS.of(ascensionMaterial), 6, //
-						FOUR_STARS.of(bossDrop), 12, //
-						SPECIALTY.of(localSpecialty), 45, //
-						THREE_STARS.of(commonMaterial), 12//
+						MORA.material(), 100000, //
+						ascensionMaterial.material(FOUR_STARS), 6, //
+						bossDrop.material(), 12, //
+						localSpecialty.material(), 45, //
+						commonMaterial.material(THREE_STARS), 12//
 				))), //
 				6, Level.create(minimumAdventureRank(50), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 120000, //
-						FIVE_STARS.of(ascensionMaterial), 6, //
-						FOUR_STARS.of(bossDrop), 20, //
-						SPECIALTY.of(localSpecialty), 60, //
-						THREE_STARS.of(commonMaterial), 24//
+						MORA.material(), 120000, //
+						ascensionMaterial.material(FIVE_STARS), 6, //
+						bossDrop.material(), 20, //
+						localSpecialty.material(), 60, //
+						commonMaterial.material(THREE_STARS), 24//
 				))) //
 		));
 	}
@@ -159,40 +159,40 @@ public interface Levels {
 			CommonMobDrop CommonMaterial) {
 		return Levels.fromMap(Map.of(//
 				1, Level.create(minimumAdventureRank(15), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 5000, //
-						TWO_STARS.of(ascensionMaterial), 3, //
-						TWO_STARS.of(eliteMaterial), 3, //
-						ONE_STAR.of(CommonMaterial), 2//
+						MORA.material(), 5000, //
+						ascensionMaterial.material(TWO_STARS), 3, //
+						eliteMaterial.material(TWO_STARS), 3, //
+						CommonMaterial.material(ONE_STAR), 2//
 				))), //
 				2, Level.create(minimumAdventureRank(25), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 15000, //
-						THREE_STARS.of(ascensionMaterial), 3, //
-						TWO_STARS.of(eliteMaterial), 12, //
-						ONE_STAR.of(CommonMaterial), 8//
+						MORA.material(), 15000, //
+						ascensionMaterial.material(THREE_STARS), 3, //
+						eliteMaterial.material(TWO_STARS), 12, //
+						CommonMaterial.material(ONE_STAR), 8//
 				))), //
 				3, Level.create(minimumAdventureRank(30), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 20000, //
-						THREE_STARS.of(ascensionMaterial), 6, //
-						THREE_STARS.of(eliteMaterial), 6, //
-						TWO_STARS.of(CommonMaterial), 6//
+						MORA.material(), 20000, //
+						ascensionMaterial.material(THREE_STARS), 6, //
+						eliteMaterial.material(THREE_STARS), 6, //
+						CommonMaterial.material(TWO_STARS), 6//
 				))), //
 				4, Level.create(minimumAdventureRank(35), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 30000, //
-						FOUR_STARS.of(ascensionMaterial), 3, //
-						THREE_STARS.of(eliteMaterial), 12, //
-						TWO_STARS.of(CommonMaterial), 9//
+						MORA.material(), 30000, //
+						ascensionMaterial.material(FOUR_STARS), 3, //
+						eliteMaterial.material(THREE_STARS), 12, //
+						CommonMaterial.material(TWO_STARS), 9//
 				))), //
 				5, Level.create(minimumAdventureRank(40), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 35000, //
-						FOUR_STARS.of(ascensionMaterial), 6, //
-						FOUR_STARS.of(eliteMaterial), 9, //
-						THREE_STARS.of(CommonMaterial), 6//
+						MORA.material(), 35000, //
+						ascensionMaterial.material(FOUR_STARS), 6, //
+						eliteMaterial.material(FOUR_STARS), 9, //
+						CommonMaterial.material(THREE_STARS), 6//
 				))), //
 				6, Level.create(minimumAdventureRank(50), MaterialStack.fromMap(Map.of(//
-						THREE_STARS.of(MORA), 45000, //
-						FIVE_STARS.of(ascensionMaterial), 4, //
-						FOUR_STARS.of(eliteMaterial), 18, //
-						THREE_STARS.of(CommonMaterial), 12//
+						MORA.material(), 45000, //
+						ascensionMaterial.material(FIVE_STARS), 4, //
+						eliteMaterial.material(FOUR_STARS), 18, //
+						CommonMaterial.material(THREE_STARS), 12//
 				))) //
 		));
 	}
@@ -200,15 +200,19 @@ public interface Levels {
 	public interface Filter {
 		boolean test(Entry<Integer, Level> entry);
 
-		public static Filter remainingForReachingLevel(int level) {
+		public static Filter atMostLevel(int level) {
 			return entry -> entry.getKey() <= level;
 		}
 
-		public static Filter remainingForCharacter(Character character) {
+		public static Filter remainingForTalent(int talentLevel) {
+			return entry -> entry.getKey() > talentLevel;
+		}
+
+		public static Filter remainingForCharacterAscension(Character character) {
 			return entry -> entry.getKey() > character.ascensionLevel;
 		}
 
-		public static Filter remainingForWeapon(Weapon weapon) {
+		public static Filter remainingForWeaponAscension(Weapon weapon) {
 			return entry -> entry.getKey() > weapon.ascensionLevel;
 		}
 
