@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.weapon;
+package fr.sazaju.genshin.item.weapon;
 
 import fr.sazaju.genshin.StringUtils;
 import fr.sazaju.genshin.item.Item;

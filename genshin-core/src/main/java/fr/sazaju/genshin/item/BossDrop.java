@@ -10,6 +10,7 @@ public enum BossDrop implements ItemType.WithSingleRarity {
 	/**************/
 
 	PRISM(FOUR_STARS),
+	HURRICANE_SEED(FOUR_STARS),
 
 	/***********/
 	/* Andrius */
@@ -41,7 +42,7 @@ public enum BossDrop implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public Item<BossDrop> item() {
+	public StackableItem<BossDrop> item() {
 		return new StackableItem<BossDrop>(this, getRarity());
 	}
 }

@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 
 import fr.sazaju.genshin.character.Character;
 import fr.sazaju.genshin.item.BossDrop;
-import fr.sazaju.genshin.item.CharacterAscensionMaterialMulti;
+import fr.sazaju.genshin.item.CharacterAscensionMaterial;
 import fr.sazaju.genshin.item.CommonAscensionMaterial;
 import fr.sazaju.genshin.item.EliteCommonAscensionMaterial;
 import fr.sazaju.genshin.item.LocalSpecialty;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.TalentLevelUpMaterial;
 import fr.sazaju.genshin.item.WeaponAscensionMaterial;
-import fr.sazaju.genshin.weapon.Weapon;
+import fr.sazaju.genshin.item.weapon.Weapon;
 
 public interface Levels {
 
@@ -108,7 +108,7 @@ public interface Levels {
 		));
 	}
 
-	public static Levels forCharacterAscension(CharacterAscensionMaterialMulti ascensionMaterial, BossDrop bossDrop,
+	public static Levels forCharacterAscension(CharacterAscensionMaterial ascensionMaterial, BossDrop bossDrop,
 			LocalSpecialty localSpecialty, CommonAscensionMaterial commonMaterial) {
 		return Levels.fromMap(Map.of(//
 				1, Level.create(minimumAdventureRank(15), ItemStack.fromItemsMap(Map.of(//

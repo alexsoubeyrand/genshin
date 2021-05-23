@@ -1,12 +1,12 @@
 package fr.sazaju.genshin.item;
 
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.weapon.WeaponCategory.*;
+import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
-import fr.sazaju.genshin.weapon.WeaponCategory;
+import fr.sazaju.genshin.item.weapon.WeaponCategory;
 
 public enum Billet implements ItemType.WithSingleRarity {
 	NORTHLANDER_BOW_BILLET(BOW), //

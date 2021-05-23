@@ -4,9 +4,8 @@ import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
 
-public enum CharacterAscensionMaterialSingle implements ItemType.WithSingleRarity {
-	HURRICANE_SEED, //
-	;
+public enum OriginalResin implements ItemType.WithSingleRarity {
+	ORIGINAL_RESIN;
 
 	@Override
 	public Rarity getRarity() {
@@ -14,8 +13,7 @@ public enum CharacterAscensionMaterialSingle implements ItemType.WithSingleRarit
 	}
 
 	@Override
-	public StackableItem<CharacterAscensionMaterialSingle> item() {
+	public StackableItem<OriginalResin> item() {
 		return new StackableItem<>(this, getRarity());
 	}
-
 }

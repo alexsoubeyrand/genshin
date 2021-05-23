@@ -3,7 +3,7 @@ package fr.sazaju.genshin.character;
 import java.util.Objects;
 
 import fr.sazaju.genshin.StringUtils;
-import fr.sazaju.genshin.weapon.Weapon;
+import fr.sazaju.genshin.item.weapon.Weapon;
 
 public class Character {
 	public final CharacterProfile profile;

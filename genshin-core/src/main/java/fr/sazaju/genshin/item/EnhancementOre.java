@@ -22,7 +22,7 @@ public enum EnhancementOre implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public Item<EnhancementOre> item() {
-		return new Item<EnhancementOre>(this, getRarity());
+	public StackableItem<EnhancementOre> item() {
+		return new StackableItem<EnhancementOre>(this, getRarity());
 	}
 }

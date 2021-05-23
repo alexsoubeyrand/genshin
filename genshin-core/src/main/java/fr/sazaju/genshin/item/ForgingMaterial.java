@@ -24,8 +24,7 @@ public enum ForgingMaterial implements ItemType.WithSingleRarity {
 
 	ELECTRO_CRYSTAL(NO_RARITY), //
 	VITALIZED_DRAGONTOOTH(NO_RARITY), //
-
-	ORIGINAL_RESIN(THREE_STARS);
+	;
 
 	private final Rarity rarity;
 

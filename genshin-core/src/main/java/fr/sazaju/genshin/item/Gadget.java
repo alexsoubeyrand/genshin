@@ -27,7 +27,7 @@ public enum Gadget implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public Item<Gadget> item() {
-		return new Item<Gadget>(this, getRarity());
+	public StackableItem<Gadget> item() {
+		return new StackableItem<Gadget>(this, getRarity());
 	}
 }

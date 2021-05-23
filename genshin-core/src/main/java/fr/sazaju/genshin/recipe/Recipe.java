@@ -2,7 +2,7 @@ package fr.sazaju.genshin.recipe;
 
 import static fr.sazaju.genshin.Rarity.*;
 import static fr.sazaju.genshin.item.Billet.*;
-import static fr.sazaju.genshin.item.CharacterAscensionMaterialSingle.*;
+import static fr.sazaju.genshin.item.BossDrop.*;
 import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.EliteCommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.EnhancementOre.*;
@@ -11,11 +11,13 @@ import static fr.sazaju.genshin.item.Gadget.*;
 import static fr.sazaju.genshin.item.ItemStack.Filter.*;
 import static fr.sazaju.genshin.item.LocalSpecialty.*;
 import static fr.sazaju.genshin.item.Mora.*;
+import static fr.sazaju.genshin.item.OriginalResin.ORIGINAL_RESIN;
 import static fr.sazaju.genshin.item.Potion.*;
-import static fr.sazaju.genshin.weapon.WeaponType.*;
+import static fr.sazaju.genshin.item.weapon.WeaponType.*;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
 import fr.sazaju.genshin.item.Billet;
-import fr.sazaju.genshin.item.CharacterAscensionMaterialMulti;
+import fr.sazaju.genshin.item.CharacterAscensionMaterial;
 import fr.sazaju.genshin.item.CommonAscensionMaterial;
 import fr.sazaju.genshin.item.EliteCommonAscensionMaterial;
 import fr.sazaju.genshin.item.EnhancementOre;
@@ -34,7 +36,7 @@ import fr.sazaju.genshin.item.ItemType;
 import fr.sazaju.genshin.item.Potion;
 import fr.sazaju.genshin.item.TalentLevelUpMaterial;
 import fr.sazaju.genshin.item.WeaponAscensionMaterial;
-import fr.sazaju.genshin.weapon.WeaponType;
+import fr.sazaju.genshin.item.weapon.WeaponType;
 
 public class Recipe {
 
@@ -56,8 +58,43 @@ public class Recipe {
 		return diff.filter(strictlyNegative()).times(-1);
 	}
 
+	public Recipe add(Recipe recipe) {
+		return Recipe.fromDiff(diff.addStack(recipe.diff));
+	}
+
 	public Recipe times(int multiplier) {
 		return Recipe.fromDiff(diff.times(multiplier));
+	}
+
+	public Recipe reverse() {
+		return times(-1);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof Recipe) {
+			Recipe that = (Recipe) obj;
+			return Objects.equals(this.diff, that.diff);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(diff);
+	}
+
+	@Override
+	public String toString() {
+		Function<ItemStack, String> stackFormater = stack -> {
+			return stack.stream()//
+					.map(entry -> (entry.getQuantity() == 1 ? "" : entry.getQuantity() + " x ") + entry.getItem())//
+					.collect(Collectors.joining(" + "));
+		};
+		return stackFormater.apply(getCost()) + " => " + stackFormater.apply(getProducts());
 	}
 
 	public static Recipe fromDiff(ItemStack diff) {
@@ -223,7 +260,7 @@ public class Recipe {
 		};
 		return Stream.of(//
 				recipesFactory.apply(//
-						CharacterAscensionMaterialMulti.class, //
+						CharacterAscensionMaterial.class, //
 						Map.of(THREE_STARS, 300, FOUR_STARS, 900, FIVE_STARS, 2700)//
 				), //
 				recipesFactory.apply(//

@@ -31,7 +31,7 @@ public enum Potion implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public Item<Potion> item() {
-		return new Item<Potion>(this, getRarity());
+	public StackableItem<Potion> item() {
+		return new StackableItem<Potion>(this, getRarity());
 	}
 }

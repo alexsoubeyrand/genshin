@@ -3,17 +3,17 @@ package fr.sazaju.genshin.character;
 import static fr.sazaju.genshin.Element.*;
 import static fr.sazaju.genshin.Rarity.*;
 import static fr.sazaju.genshin.item.BossDrop.*;
-import static fr.sazaju.genshin.item.CharacterAscensionMaterialMulti.*;
+import static fr.sazaju.genshin.item.CharacterAscensionMaterial.*;
 import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.LocalSpecialty.*;
 import static fr.sazaju.genshin.item.TalentLevelUpMaterial.*;
-import static fr.sazaju.genshin.weapon.WeaponCategory.*;
+import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 
 import fr.sazaju.genshin.Element;
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.weapon.Weapon;
+import fr.sazaju.genshin.item.weapon.WeaponCategory;
 import fr.sazaju.genshin.leveling.Levels;
-import fr.sazaju.genshin.weapon.Weapon;
-import fr.sazaju.genshin.weapon.WeaponCategory;
 
 public enum CharacterProfile {
 	KEQING("Keqing", FIVE_STARS, ELECTRO, SWORD, //

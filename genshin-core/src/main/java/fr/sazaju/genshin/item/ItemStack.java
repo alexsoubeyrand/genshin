@@ -1,18 +1,21 @@
 package fr.sazaju.genshin.item;
 
 import static fr.sazaju.genshin.item.Mora.*;
+import static java.util.stream.Collectors.*;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.recipe.Recipe;
+import fr.sazaju.genshin.PlayerData;
 
-public class ItemStack {
+// TODO Reduce to minimum (internal computation)
+// TODO Rename based on actual usage
+public class ItemStack implements Iterable<ItemEntry> {
 	private final Map<Item<?>, Integer> map;
 
 	private ItemStack(Map<Item<?>, Integer> map) {
@@ -29,12 +32,19 @@ public class ItemStack {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
+	public static ItemStack fromPlayerData(PlayerData data) {
+		return fromItemsMap(data.stream().collect(toMap(//
+				ItemEntry::getItem, //
+				ItemEntry::getQuantity//
+		)));
+	}
+
 	@Override
 	public String toString() {
 		return map.toString();
 	}
 
-	public Set<Item<?>> getMaterials() {
+	public Set<Item<?>> getItems() {
 		return map.keySet();
 	}
 
@@ -45,7 +55,7 @@ public class ItemStack {
 	public ItemStack addStack(ItemStack that) {
 		return ItemStack.fromItemsMap(Stream.of(this, that)//
 				// Retrieve each unique key
-				.map(ItemStack::getMaterials)//
+				.map(ItemStack::getItems)//
 				.flatMap(Set::stream)//
 				.distinct()//
 				// Retrieve the value of each key into a map
@@ -56,9 +66,9 @@ public class ItemStack {
 				)));
 	}
 
-	public ItemStack addStack(Collection<Entry> stack) {
+	public ItemStack addStack(Collection<ItemEntry> stack) {
 		return addStack(ItemStack.fromItemsMap(stack.stream()//
-				.collect(Collectors.toMap(Entry::getItem, Entry::getQuantity))));
+				.collect(Collectors.toMap(ItemEntry::getItem, ItemEntry::getQuantity))));
 	}
 
 	public ItemStack addMaterial(Item<?> item, int quantity) {
@@ -69,9 +79,9 @@ public class ItemStack {
 		return addStack(stack.times(-1));
 	}
 
-	public ItemStack minusStack(Collection<Entry> stack) {
+	public ItemStack minusStack(Collection<ItemEntry> stack) {
 		return minusStack(ItemStack.fromItemsMap(stack.stream()//
-				.collect(Collectors.toMap(Entry::getItem, Entry::getQuantity))));
+				.collect(Collectors.toMap(ItemEntry::getItem, ItemEntry::getQuantity))));
 	}
 
 	public ItemStack minusMaterial(Item<?> item, int quantity) {
@@ -105,79 +115,17 @@ public class ItemStack {
 		// TODO What about negative quantities?
 		return getQuantity(item) != 0;
 	}
-
-	public static interface HistorySelector {
-		public static final HistorySelector BEST_EFFORT = (originalHistory, currentHistory,
-				targetQuantities) -> currentHistory;
-		public static final HistorySelector ONLY_IF_SUCCESSFUL = (originalHistory, currentHistory,
-				targetQuantities) -> {
-			for (Item<?> item : targetQuantities.getMaterials()) {
-				if (currentHistory.getResultingStack().getQuantity(item) < targetQuantities.getQuantity(item)) {
-					// Cannot reach target, don't touch anything
-					return originalHistory;
-				}
-			}
-			return currentHistory;
-		};
-
-		ItemStackHistory select(ItemStackHistory originalHistory, ItemStackHistory currentHistory,
-				ItemStack targetQuantities);
-	}
-
-	public ItemStackHistory createRecipeHistory(ItemStack targetQuantities, HistorySelector historySelector) {
-		return createRecipeHistory(ItemStackHistory.from(this), targetQuantities, historySelector);
-	}
-
-	private static ItemStackHistory createRecipeHistory(ItemStackHistory originalHistory, ItemStack targetQuantities,
-			HistorySelector historySelector) {
-		ItemStackHistory currentHistory = originalHistory;
-		boolean isUpdated;
-		do {
-			isUpdated = false;
-			for (Item<?> item : targetQuantities.getMaterials()) {
-				int targetQuantity = targetQuantities.getQuantity(item);
-				ItemStackHistory nextHistory = fillMaterialByConversions(currentHistory, item, targetQuantity,
-						historySelector);
-				isUpdated = isUpdated || !nextHistory.equals(currentHistory);
-				currentHistory = nextHistory;
-			}
-		} while (isUpdated);
-		return historySelector.select(originalHistory, currentHistory, targetQuantities);
-	}
-
-	private static ItemStackHistory fillMaterialByConversions(ItemStackHistory history, Item<?> item,
-			int targetQuantity, HistorySelector historySelector) {
-		int currentQuantity = history.getResultingStack().getQuantity(item);
-		if (targetQuantity <= currentQuantity) {
-			// Nothing to fill
-			return history;
-		} else {
-			int requiredQuantity = targetQuantity - currentQuantity;
-			Map<Recipe, ItemStackHistory> recipesResult = new HashMap<>();
-			ItemType type = item.getType();
-			Stream<Recipe> recipes;
-			if (type instanceof ItemType.WithMultipleRarities) {
-				recipes = ((ItemType.WithMultipleRarities) type).streamRecipesAt(item.getRarity());
-			} else if (type instanceof ItemType.WithSingleRarity) {
-				recipes = ((ItemType.WithSingleRarity) type).streamRecipes();
+	
+	@Override
+	public Iterator<ItemEntry> iterator() {
+		return map.entrySet().stream().map(entry -> {
+			Item<?> item = entry.getKey();
+			if (item instanceof StackableItem<?>) {
+				return ItemEntry.of((StackableItem<?>)item, entry.getValue());
 			} else {
-				throw new RuntimeException("Not managed type: " + type);
+				return ItemEntry.of(item);
 			}
-			recipes.forEach(recipe -> {
-				// FIXME Consider cases where we produce more than one item at a time
-				// Example: enhancement ore forging
-				Recipe conversions = recipe.times(requiredQuantity);
-				ItemStack cost = conversions.getCost();
-				ItemStackHistory recipeHistory = createRecipeHistory(history, cost, historySelector);
-				if (recipeHistory.getResultingStack().contains(cost)) {
-					recipesResult.put(recipe, recipeHistory.appendDiff(conversions.getDiff()));
-				} else {
-					// Cannot reach target, ignore recipe
-				}
-			});
-			// TODO Return best result instead of first one
-			return recipesResult.isEmpty() ? history : recipesResult.values().iterator().next();
-		}
+		}).iterator();
 	}
 
 	public static ItemStack empty() {
@@ -220,34 +168,20 @@ public class ItemStack {
 		}
 
 		public static Filter itemsIn(ItemStack stack) {
-			return items(stack.getMaterials());
+			return items(stack.getItems());
 		}
 
 	}
 
-	public Stream<Entry> stream() {
-		return map.entrySet().stream().map(entry -> entry(entry.getKey(), entry.getValue()));
-	}
-
-	public static interface Entry {
-		Item<?> getItem();
-
-		int getQuantity();
-	}
-
-	public static Entry entry(Item<?> item, int quantity) {
-		return new Entry() {
-
-			@Override
-			public Item<?> getItem() {
-				return item;
+	public Stream<ItemEntry> stream() {
+		return map.entrySet().stream().map(entry -> {
+			Item<?> item = entry.getKey();
+			if (item instanceof StackableItem<?>) {
+				return ItemEntry.of((StackableItem<?>) item, entry.getValue());
+			} else {
+				return ItemEntry.of(item);
 			}
-
-			@Override
-			public int getQuantity() {
-				return quantity;
-			}
-		};
+		});
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
 
-public enum CharacterAscensionMaterialMulti implements ItemType.WithMultipleRarities {
+public enum CharacterAscensionMaterial implements ItemType.WithMultipleRarities {
 	VAJRADA, //
 	AGNIDUS,//
 	;
@@ -15,7 +15,7 @@ public enum CharacterAscensionMaterialMulti implements ItemType.WithMultipleRari
 	}
 
 	@Override
-	public StackableItem<CharacterAscensionMaterialMulti> item(Rarity rarity) {
+	public StackableItem<CharacterAscensionMaterial> item(Rarity rarity) {
 		return new StackableItem<>(this, rarity);
 	}
 

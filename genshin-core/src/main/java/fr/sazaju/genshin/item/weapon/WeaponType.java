@@ -1,10 +1,10 @@
-package fr.sazaju.genshin.weapon;
+package fr.sazaju.genshin.item.weapon;
 
 import static fr.sazaju.genshin.Rarity.*;
 import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.EliteCommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.WeaponAscensionMaterial.*;
-import static fr.sazaju.genshin.weapon.WeaponCategory.*;
+import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 
 import java.util.Map;
 
