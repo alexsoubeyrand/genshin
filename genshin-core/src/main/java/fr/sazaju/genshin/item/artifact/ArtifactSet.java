@@ -19,10 +19,10 @@ public enum ArtifactSet {
 		this.rarities = rarities;
 	}
 
-	ArtifactType ofCategory(ArtifactCategory category) {
+	public ArtifactType ofCategory(ArtifactCategory category) {
 		if (!categories.contains(category)) {
 			throw new IllegalArgumentException(String.format("'%s' does not exist with category '%s'", this, category));
 		}
-		return new ArtifactType(category, rarities);
+		return new ArtifactType(this, category, rarities);
 	}
 }

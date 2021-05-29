@@ -1,18 +1,18 @@
 package fr.sazaju.genshin.recipe;
 
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.Billet.*;
-import static fr.sazaju.genshin.item.BossDrop.*;
-import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.EliteCommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.EnhancementOre.*;
-import static fr.sazaju.genshin.item.ForgingMaterial.*;
-import static fr.sazaju.genshin.item.Gadget.*;
 import static fr.sazaju.genshin.item.ItemStack.Filter.*;
-import static fr.sazaju.genshin.item.LocalSpecialty.*;
-import static fr.sazaju.genshin.item.Mora.*;
-import static fr.sazaju.genshin.item.OriginalResin.ORIGINAL_RESIN;
-import static fr.sazaju.genshin.item.Potion.*;
+import static fr.sazaju.genshin.item.simple.Billet.*;
+import static fr.sazaju.genshin.item.simple.BossDrop.*;
+import static fr.sazaju.genshin.item.simple.CommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.EnhancementOre.*;
+import static fr.sazaju.genshin.item.simple.ForgingMaterial.*;
+import static fr.sazaju.genshin.item.simple.Gadget.*;
+import static fr.sazaju.genshin.item.simple.LocalSpecialty.*;
+import static fr.sazaju.genshin.item.simple.Mora.*;
+import static fr.sazaju.genshin.item.simple.OriginalResin.*;
+import static fr.sazaju.genshin.item.simple.Potion.*;
 import static fr.sazaju.genshin.item.weapon.WeaponType.*;
 
 import java.util.Map;
@@ -24,18 +24,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
-import fr.sazaju.genshin.item.Billet;
-import fr.sazaju.genshin.item.CharacterAscensionMaterial;
-import fr.sazaju.genshin.item.CommonAscensionMaterial;
-import fr.sazaju.genshin.item.EliteCommonAscensionMaterial;
-import fr.sazaju.genshin.item.EnhancementOre;
-import fr.sazaju.genshin.item.ForgingMaterial;
 import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.Potion;
-import fr.sazaju.genshin.item.TalentLevelUpMaterial;
-import fr.sazaju.genshin.item.WeaponAscensionMaterial;
+import fr.sazaju.genshin.item.simple.Billet;
+import fr.sazaju.genshin.item.simple.CharacterAscensionMaterial;
+import fr.sazaju.genshin.item.simple.CommonAscensionMaterial;
+import fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial;
+import fr.sazaju.genshin.item.simple.EnhancementOre;
+import fr.sazaju.genshin.item.simple.ForgingMaterial;
+import fr.sazaju.genshin.item.simple.Potion;
+import fr.sazaju.genshin.item.simple.TalentLevelUpMaterial;
+import fr.sazaju.genshin.item.simple.WeaponAscensionMaterial;
 import fr.sazaju.genshin.item.weapon.WeaponType;
 
 public class Recipe {
@@ -101,12 +101,16 @@ public class Recipe {
 		return new Recipe(diff);
 	}
 
-	public static Recipe fromCost(Item<?> itemProduced, ItemStack cost) {
+	public static Recipe forItem(Item<?> itemProduced, ItemStack cost) {
 		return new Recipe(cost.times(-1).addMaterial(itemProduced, 1));
 	}
 
-	public static Recipe fromCost(int quantityProduced, Item<?> itemProduced, ItemStack cost) {
+	public static Recipe forItems(int quantityProduced, Item<?> itemProduced, ItemStack cost) {
 		return new Recipe(cost.times(-1).addMaterial(itemProduced, quantityProduced));
+	}
+	
+	public static Recipe forItems(ItemStack products, ItemStack cost) {
+		return new Recipe(cost.times(-1).addStack(products));
 	}
 
 	public static Stream<Recipe> streamRecipes() {
@@ -121,54 +125,54 @@ public class Recipe {
 
 	private static Stream<Recipe> weaponRecipes() {
 		return Stream.of(//
-				Recipe.fromCost(ADEPTI_SEEKER_S_STOVE.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(ADEPTI_SEEKER_S_STOVE.item(), ItemStack.fromItemsMap(Map.of(//
 						FLAMING_ESSENTIAL_OIL.item(), 1, //
 						CRYSTAL_CORE.item(), 2, //
 						IRON_CHUNK.item(), 2, //
 						MORA.item(), 500//
 				))), //
-				Recipe.fromCost(ANEMOCULUS_RESONANCE_STONE.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(ANEMOCULUS_RESONANCE_STONE.item(), ItemStack.fromItemsMap(Map.of(//
 						DANDELION_SEED.item(), 5, //
 						CECILIA.item(), 5, //
 						CRYSTAL_CHUNK.item(), 1, //
 						MORA.item(), 500//
 				))), //
-				Recipe.fromCost(GEOCULUS_RESONANCE_STONE.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(GEOCULUS_RESONANCE_STONE.item(), ItemStack.fromItemsMap(Map.of(//
 						LAPIS.item(), 5, //
 						GLAZE_LILY.item(), 5, //
 						CRYSTAL_CHUNK.item(), 1, //
 						MORA.item(), 500//
 				))), //
-				Recipe.fromCost(WARMING_BOTTLE.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(WARMING_BOTTLE.item(), ItemStack.fromItemsMap(Map.of(//
 						FLAMING_FLOWER_STAMEN.item(), 2, //
 						STARSILVER.item(), 2, //
 						MORA.item(), 500//
 				))), //
-				Recipe.fromCost(ANEMO_TREASURE_COMPASS.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(ANEMO_TREASURE_COMPASS.item(), ItemStack.fromItemsMap(Map.of(//
 						INSIGNIA.item(THREE_STARS), 10, //
 						PHILANEMO_MUSHROOM.item(), 30, //
 						CRYSTAL_CHUNK.item(), 50, //
 						MORA.item(), 50000//
 				))), //
-				Recipe.fromCost(GEO_TREASURE_COMPASS.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(GEO_TREASURE_COMPASS.item(), ItemStack.fromItemsMap(Map.of(//
 						INSIGNIA.item(THREE_STARS), 10, //
 						LAPIS.item(), 30, //
 						CRYSTAL_CHUNK.item(), 50, //
 						MORA.item(), 50000//
 				))), //
-				Recipe.fromCost(NRE_MENU_30.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(NRE_MENU_30.item(), ItemStack.fromItemsMap(Map.of(//
 						CHAOS.item(THREE_STARS), 20, //
 						LIZARD_TAIL.item(), 20, //
 						ELECTRO_CRYSTAL.item(), 50, //
 						MORA.item(), 50000//
 				))), //
-				Recipe.fromCost(PORTABLE_WAYPOINT.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(PORTABLE_WAYPOINT.item(), ItemStack.fromItemsMap(Map.of(//
 						LEY_LINE.item(THREE_STARS), 1, //
 						LUMINESCENT_SPINE.item(), 2, //
 						CRYSTAL_CHUNK.item(), 5, //
 						MORA.item(), 500//
 				))), //
-				Recipe.fromCost(WIND_CATCHER.item(), ItemStack.fromItemsMap(Map.of(//
+				Recipe.forItem(WIND_CATCHER.item(), ItemStack.fromItemsMap(Map.of(//
 						HURRICANE_SEED.item(), 10, //
 						WINDWHEEL_ASTER.item(), 30, //
 						CRYSTAL_CHUNK.item(), 50, //
@@ -179,7 +183,7 @@ public class Recipe {
 
 	private static Stream<Recipe> gadgetRecipes() {
 		BiFunction<WeaponType, ForgingMaterial, Recipe> recipeFactory = (weaponType, specificMineral) -> {
-			return Recipe.fromCost(weaponType.item(), ItemStack.fromTypesMap(Map.of(//
+			return Recipe.forItem(weaponType.item(), ItemStack.fromTypesMap(Map.of(//
 					Billet.selectFor(weaponType.category), 1, //
 					CRYSTAL_CHUNK, 50, //
 					specificMineral, 50, //
@@ -208,7 +212,7 @@ public class Recipe {
 				// Dragonspine
 				dragonspineRecipeFactory.apply(FROSTBEARER), //
 				dragonspineRecipeFactory.apply(SNOW_TOMBED_STARSILVER), //
-				Recipe.fromCost(DRAGONSPINE_SPEAR.item(), ItemStack.fromTypesMap(Map.of(//
+				Recipe.forItem(DRAGONSPINE_SPEAR.item(), ItemStack.fromTypesMap(Map.of(//
 						NORTHLANDER_POLEARM_BILLET, 1, //
 						VITALIZED_DRAGONTOOTH, 8, // Particular item & quantity here
 						STARSILVER, 50, //
@@ -223,7 +227,7 @@ public class Recipe {
 					specificItemTypes.map(type -> Map.entry(type.item(), 1)), // Add one of each
 					Stream.of(Map.entry(MORA.item(), 100))// Add 100 Moras
 			).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-			return Recipe.fromCost(potion.item(), ItemStack.fromItemsMap(cost));
+			return Recipe.forItem(potion.item(), ItemStack.fromItemsMap(cost));
 		};
 		return Stream.of(//
 				// Oils
@@ -255,7 +259,7 @@ public class Recipe {
 					.map(item -> {
 						Item<?> subItem = item.getType().item(item.getRarity().below());
 						int moras = morasCosts.get(item.getRarity());
-						return Recipe.fromCost(item, ItemStack.fromItemsMap(Map.of(subItem, 3, MORA.item(), moras)));
+						return Recipe.forItem(item, ItemStack.fromItemsMap(Map.of(subItem, 3, MORA.item(), moras)));
 					});
 		};
 		return Stream.of(//
@@ -284,7 +288,7 @@ public class Recipe {
 
 	private static Stream<Recipe> enhancementOreRecipes() {
 		BiFunction<EnhancementOre, Map<ItemType.WithSingleRarity, Integer>, Recipe> recipeFactory = (ore, costs) -> {
-			return Recipe.fromCost(ore.item(), ItemStack.fromTypesMap(costs));
+			return Recipe.forItem(ore.item(), ItemStack.fromTypesMap(costs));
 		};
 		return Stream.of(//
 				recipeFactory.apply(ENHANCEMENT_ORE, Map.of(IRON_CHUNK, 2, MORA, 5)), //

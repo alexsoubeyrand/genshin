@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.item;
+package fr.sazaju.genshin;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +8,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.PlayerData;
+import fr.sazaju.genshin.item.Item;
+import fr.sazaju.genshin.item.ItemEntry;
+import fr.sazaju.genshin.item.ItemStack;
+import fr.sazaju.genshin.item.ItemType;
 import fr.sazaju.genshin.recipe.Recipe;
 
 public interface PlayerDataHistory {
@@ -79,7 +82,7 @@ public interface PlayerDataHistory {
 
 			@Override
 			public PlayerData getResultingData() {
-				return history.getResultingData().apply(recipe);
+				return history.getResultingData().update(recipe);
 			}
 
 			@Override
@@ -159,7 +162,8 @@ public interface PlayerDataHistory {
 		boolean isUpdated;
 		do {
 			isUpdated = false;
-			for (Item<?> item : target) {
+			for (ItemEntry entry : target) {
+				Item<?> item = entry.getItem();
 				int targetQuantity = target.getQuantity(item);
 				PlayerDataHistory nextHistory = fillMaterialByConversions(currentHistory, item, targetQuantity,
 						historySelector);

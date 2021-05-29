@@ -2,11 +2,11 @@ package fr.sazaju.genshin.character;
 
 import static fr.sazaju.genshin.Element.*;
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.BossDrop.*;
-import static fr.sazaju.genshin.item.CharacterAscensionMaterial.*;
-import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.LocalSpecialty.*;
-import static fr.sazaju.genshin.item.TalentLevelUpMaterial.*;
+import static fr.sazaju.genshin.item.simple.BossDrop.*;
+import static fr.sazaju.genshin.item.simple.CharacterAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.CommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.LocalSpecialty.*;
+import static fr.sazaju.genshin.item.simple.TalentLevelUpMaterial.*;
 import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 
 import fr.sazaju.genshin.Element;

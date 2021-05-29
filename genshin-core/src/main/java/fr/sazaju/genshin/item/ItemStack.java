@@ -1,6 +1,6 @@
 package fr.sazaju.genshin.item;
 
-import static fr.sazaju.genshin.item.Mora.*;
+import static fr.sazaju.genshin.item.simple.Mora.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.Collection;

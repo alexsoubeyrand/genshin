@@ -1,4 +1,4 @@
-package fr.sazaju.genshin.item;
+package fr.sazaju.genshin.item.simple;
 
 import static fr.sazaju.genshin.Rarity.*;
 import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
@@ -6,6 +6,8 @@ import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemType;
+import fr.sazaju.genshin.item.StackableItem;
 import fr.sazaju.genshin.item.weapon.WeaponCategory;
 
 public enum Billet implements ItemType.WithSingleRarity {

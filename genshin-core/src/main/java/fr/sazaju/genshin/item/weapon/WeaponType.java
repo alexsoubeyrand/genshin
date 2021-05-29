@@ -1,9 +1,9 @@
 package fr.sazaju.genshin.item.weapon;
 
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.EliteCommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.WeaponAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.CommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.WeaponAscensionMaterial.*;
 import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 
 import java.util.Map;

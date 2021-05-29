@@ -1,8 +1,8 @@
 package fr.sazaju.genshin.leveling;
 
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.EventMaterial.*;
-import static fr.sazaju.genshin.item.Mora.*;
+import static fr.sazaju.genshin.item.simple.EventMaterial.*;
+import static fr.sazaju.genshin.item.simple.Mora.*;
 import static fr.sazaju.genshin.leveling.Level.Requirement.*;
 
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import fr.sazaju.genshin.character.Character;
-import fr.sazaju.genshin.item.BossDrop;
-import fr.sazaju.genshin.item.CharacterAscensionMaterial;
-import fr.sazaju.genshin.item.CommonAscensionMaterial;
-import fr.sazaju.genshin.item.EliteCommonAscensionMaterial;
-import fr.sazaju.genshin.item.LocalSpecialty;
 import fr.sazaju.genshin.item.ItemStack;
-import fr.sazaju.genshin.item.TalentLevelUpMaterial;
-import fr.sazaju.genshin.item.WeaponAscensionMaterial;
+import fr.sazaju.genshin.item.simple.BossDrop;
+import fr.sazaju.genshin.item.simple.CharacterAscensionMaterial;
+import fr.sazaju.genshin.item.simple.CommonAscensionMaterial;
+import fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial;
+import fr.sazaju.genshin.item.simple.LocalSpecialty;
+import fr.sazaju.genshin.item.simple.TalentLevelUpMaterial;
+import fr.sazaju.genshin.item.simple.WeaponAscensionMaterial;
 import fr.sazaju.genshin.item.weapon.Weapon;
 
 public interface Levels {

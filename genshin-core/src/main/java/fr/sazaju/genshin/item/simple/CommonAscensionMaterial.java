@@ -1,8 +1,10 @@
-package fr.sazaju.genshin.item;
+package fr.sazaju.genshin.item.simple;
 
 import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemType;
+import fr.sazaju.genshin.item.StackableItem;
 
 public enum CommonAscensionMaterial implements ItemType.WithMultipleRarities {
 	NECTAR, //

@@ -8,10 +8,12 @@ import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemType;
 
 public class ArtifactType implements ItemType.WithMultipleRarities {
+	private final ArtifactSet set;
 	public final ArtifactCategory category;
 	public final Set<Rarity> rarities;
 
-	ArtifactType(ArtifactCategory category, Set<Rarity> rarities) {
+	ArtifactType(ArtifactSet set, ArtifactCategory category, Set<Rarity> rarities) {
+		this.set = set;
 		this.category = category;
 		this.rarities = rarities;
 	}
@@ -24,5 +26,10 @@ public class ArtifactType implements ItemType.WithMultipleRarities {
 	@Override
 	public Item<ArtifactType> item(Rarity rarity) {
 		return new Artifact(this, rarity);
+	}
+
+	@Override
+	public String toString() {
+		return set + " " + category;
 	}
 }

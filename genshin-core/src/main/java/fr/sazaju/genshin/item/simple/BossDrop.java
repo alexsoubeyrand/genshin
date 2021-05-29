@@ -1,16 +1,17 @@
-package fr.sazaju.genshin.item;
+package fr.sazaju.genshin.item.simple;
 
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemType;
+import fr.sazaju.genshin.item.StackableItem;
 
 public enum BossDrop implements ItemType.WithSingleRarity {
 	/**************/
 	/* Hypostasis */
 	/**************/
 
-	PRISM(FOUR_STARS),
-	HURRICANE_SEED(FOUR_STARS),
+	PRISM(FOUR_STARS), HURRICANE_SEED(FOUR_STARS),
 
 	/***********/
 	/* Andrius */

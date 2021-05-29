@@ -1,28 +1,23 @@
 package fr.sazaju.genshin.character;
 
+import static fr.sazaju.genshin.PlayerDataHistory.HistorySelector.*;
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.Billet.*;
-import static fr.sazaju.genshin.item.BossDrop.*;
-import static fr.sazaju.genshin.item.CharacterAscensionMaterial.*;
-import static fr.sazaju.genshin.item.CommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.EliteCommonAscensionMaterial.*;
-import static fr.sazaju.genshin.item.ForgingMaterial.*;
 import static fr.sazaju.genshin.item.ItemStack.Filter.*;
-import static fr.sazaju.genshin.item.LocalSpecialty.*;
-import static fr.sazaju.genshin.item.Mora.*;
-import static fr.sazaju.genshin.item.PlayerDataHistory.HistorySelector.*;
-import static fr.sazaju.genshin.item.TalentLevelUpMaterial.*;
-import static fr.sazaju.genshin.item.WeaponAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.Billet.*;
+import static fr.sazaju.genshin.item.simple.BossDrop.*;
+import static fr.sazaju.genshin.item.simple.CharacterAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.CommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial.*;
+import static fr.sazaju.genshin.item.simple.ForgingMaterial.*;
+import static fr.sazaju.genshin.item.simple.LocalSpecialty.*;
+import static fr.sazaju.genshin.item.simple.Mora.*;
+import static fr.sazaju.genshin.item.simple.TalentLevelUpMaterial.*;
+import static fr.sazaju.genshin.item.simple.WeaponAscensionMaterial.*;
 import static fr.sazaju.genshin.leveling.Levels.Filter.*;
-import static java.util.Collections.*;
 import static java.util.Comparator.*;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,12 +25,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.PlayerData;
+import fr.sazaju.genshin.PlayerDataHistory;
 import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
-import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.PlayerDataHistory;
-import fr.sazaju.genshin.item.StackableItem;
 import fr.sazaju.genshin.item.weapon.Weapon;
 import fr.sazaju.genshin.item.weapon.WeaponType;
 import fr.sazaju.genshin.leveling.Level;
@@ -43,172 +36,6 @@ import fr.sazaju.genshin.leveling.Levels;
 import fr.sazaju.genshin.recipe.Recipe;
 
 public class Main {
-
-	public static class InventoryTab implements Iterable<ItemEntry> {
-
-		private final InventoryTab.Definition definition;
-		private final Set<Item<?>> nonStackableItems;
-		private final Map<StackableItem<?>, Integer> stackableItems;
-
-		public InventoryTab(InventoryTab.Definition definition) {
-			this(definition, emptySet(), emptyMap());
-		}
-
-		private InventoryTab(//
-				InventoryTab.Definition definition, //
-				Set<Item<?>> nonStackableItems, //
-				Map<StackableItem<?>, Integer> stackableItems) {
-			this.definition = definition;
-			this.nonStackableItems = unmodifiableSet(nonStackableItems);
-			this.stackableItems =unmodifiableMap(stackableItems);
-		}
-
-		public Stream<ItemEntry> stream() {
-			return Stream.concat(//
-					nonStackableItems.stream().map(item -> ItemEntry.of(item)), //
-					stackableItems.entrySet().stream().map(entry -> ItemEntry.of(entry.getKey(), entry.getValue()))//
-			);
-		}
-
-		@Override
-		public Iterator<ItemEntry> iterator() {
-			return stream().iterator();
-		}
-
-		public boolean accept(Item<?> item) {
-			return definition.accept(item);
-		}
-
-		public InventoryTab add(Item<?> item) {
-			if (!accept(item)) {
-				throw new IllegalArgumentException("This tab does not accept " + item);
-			}
-			if (item instanceof StackableItem<?>) {
-				StackableItem<?> stackableItem = (StackableItem<?>) item;
-				return add(stackableItem, 1);
-			} else {
-				Set<Item<?>> newNonStackableItems = new HashSet<>(this.nonStackableItems);
-				newNonStackableItems.add(item);
-				return new InventoryTab(//
-						this.definition, //
-						unmodifiableSet(newNonStackableItems), //
-						this.stackableItems//
-				);
-			}
-		}
-
-		public InventoryTab remove(Item<?> item) {
-			if (!accept(item)) {
-				throw new IllegalArgumentException("This tab does not accept " + item);
-			}
-			if (item instanceof StackableItem<?>) {
-				StackableItem<?> stackableItem = (StackableItem<?>) item;
-				return add(stackableItem, 1);
-			} else {
-				Set<Item<?>> newNonStackableItems = new HashSet<>(this.nonStackableItems);
-				boolean wasPresent = newNonStackableItems.remove(item);
-				if (!wasPresent) {
-					throw new IllegalArgumentException("Cannot remove absent item: " + item);
-				}
-				return new InventoryTab(//
-						this.definition, //
-						unmodifiableSet(newNonStackableItems), //
-						this.stackableItems//
-				);
-			}
-		}
-
-		public InventoryTab add(StackableItem<?> item, int quantity) {
-			if (!accept(item)) {
-				throw new IllegalArgumentException("This tab does not accept " + item);
-			} else if (quantity < 0) {
-				throw new IllegalArgumentException("Cannot add negative quantity of " + item);
-			}
-			Map<StackableItem<?>, Integer> newStackableItems = new HashMap<>(this.stackableItems);
-			newStackableItems.compute(item, (k, current) -> current == null ? quantity : current + quantity);
-			return new InventoryTab(//
-					this.definition, //
-					this.nonStackableItems, //
-					unmodifiableMap(newStackableItems)//
-			);
-		}
-
-		public InventoryTab remove(StackableItem<?> item, int quantity) {
-			if (!accept(item)) {
-				throw new IllegalArgumentException("This tab does not accept " + item);
-			} else if (quantity < 0) {
-				throw new IllegalArgumentException("Cannot remove negative quantity of " + item);
-			}
-			Map<StackableItem<?>, Integer> newStackableItems = new HashMap<>(this.stackableItems);
-			newStackableItems.compute(item, (k, current) -> {
-				if (current == null) {
-					return quantity;
-				} else {
-					if (current < quantity) {
-						throw new IllegalArgumentException(
-								"Cannot remove " + quantity + " of " + item + " if there is only " + current);
-					} else if (current == quantity) {
-						return null;
-					} else {
-						return current - quantity;
-					}
-				}
-			});
-			return new InventoryTab(//
-					this.definition, //
-					this.nonStackableItems, //
-					unmodifiableMap(newStackableItems)//
-			);
-		}
-
-		@Override
-		public String toString() {
-			return nonStackableItems.toString() + stackableItems.toString();
-		}
-
-		public static class Definition {
-
-			private final Set<Class<? extends Item<?>>> nonStackableItemClasses;
-			private final Set<Class<? extends ItemType>> stackableTypeClasses;
-
-			public Definition(DefinitionPart... parts) {
-				Set<Class<? extends Item<?>>> nonStackableItemClasses = new HashSet<>();
-				Set<Class<? extends ItemType>> stackableTypeClasses = new HashSet<>();
-				for (DefinitionPart part : parts) {
-					part.feed(nonStackableItemClasses, stackableTypeClasses);
-				}
-				this.nonStackableItemClasses = unmodifiableSet(nonStackableItemClasses);
-				this.stackableTypeClasses = unmodifiableSet(stackableTypeClasses);
-			}
-
-			public boolean accept(Item<?> item) {
-				if (item instanceof StackableItem<?>) {
-					return stackableTypeClasses.contains(item.getType().getClass());
-				} else {
-					return nonStackableItemClasses.contains(item.getClass());
-				}
-			}
-
-			public static interface DefinitionPart {
-
-				void feed(Set<Class<? extends Item<?>>> nonStackableItemClasses,
-						Set<Class<? extends ItemType>> stackableTypeClasses);
-
-			}
-
-			// TODO Item or ItemType?
-			public static DefinitionPart items(Class<? extends Item<?>> itemClass) {
-				return (nonStackableItemClasses, stackableTypeClasses) -> nonStackableItemClasses.add(itemClass);
-			}
-
-			// TODO Item or ItemType?
-			// TODO Restrict to stackable class through generics
-			public static DefinitionPart stacks(Class<? extends ItemType> stackableTypeClass) {
-				return (nonStackableItemClasses, stackableTypeClasses) -> stackableTypeClasses.add(stackableTypeClass);
-			}
-
-		}
-	}
 
 	public static void main(String[] args) {
 		PlayerData data = PlayerData.empty();
@@ -305,7 +132,7 @@ public class Main {
 		displayStack(totalCost.getCost());
 
 		System.out.println("[Remaining]");
-		displayPlayerData(dataAfterConversion.apply(totalCost));
+		displayPlayerData(dataAfterConversion.update(totalCost));
 
 		// TODO Expose on service
 		// TODO Test on service

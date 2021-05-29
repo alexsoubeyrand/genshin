@@ -1,8 +1,10 @@
-package fr.sazaju.genshin.item;
+package fr.sazaju.genshin.item.simple;
 
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemType;
+import fr.sazaju.genshin.item.StackableItem;
 
 public enum Gadget implements ItemType.WithSingleRarity {
 	ADEPTI_SEEKER_S_STOVE(THREE_STARS), //
