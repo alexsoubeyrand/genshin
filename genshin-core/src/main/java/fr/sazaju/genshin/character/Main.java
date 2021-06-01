@@ -1,6 +1,5 @@
 package fr.sazaju.genshin.character;
 
-import static fr.sazaju.genshin.PlayerDataHistory.HistorySelector.*;
 import static fr.sazaju.genshin.Rarity.*;
 import static fr.sazaju.genshin.item.ItemStack.Filter.*;
 import static fr.sazaju.genshin.item.simple.Billet.*;
@@ -26,6 +25,7 @@ import java.util.stream.Stream;
 
 import fr.sazaju.genshin.PlayerData;
 import fr.sazaju.genshin.PlayerDataHistory;
+import fr.sazaju.genshin.PlayerDataHistoryFactory;
 import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
@@ -98,8 +98,9 @@ public class Main {
 				ItemEntry.of(NORTHLANDER_CATALYST_BILLET.item(), 1), //
 				ItemEntry.of(CRYSTAL_CHUNK.item(), 50)//
 		));
-		PlayerData target = PlayerData.fromItemEntries(totalCost.getCost());
-		PlayerDataHistory conversionHistory = PlayerDataHistory.search(data, target, ONLY_IF_SUCCESSFUL);
+		PlayerData target = PlayerData.fromItemEntries(totalCost.streamCosts());
+		PlayerDataHistory conversionHistory = new PlayerDataHistoryFactory()
+				.naiveSearch(data, target, Recipe::streamMihoyoRecipes).findFirst().get();
 		PlayerData dataAfterConversion = conversionHistory.getResultingData();
 
 		///////////////////////////////////////
@@ -112,13 +113,13 @@ public class Main {
 		System.out.println("[Talents total]");
 		displayStack(characterTalentsCost);
 		System.out.println("[Total cost]");
-		displayStack(totalCost.getCost());
+		displayEntries(totalCost.streamCosts());
 
 		System.out.println("[Available]");
 		displayPlayerData(data);
 
 		System.out.println("[Recipes]");
-		Recipe.streamRecipes().forEach(recipe -> {
+		Recipe.streamMihoyoRecipes().forEach(recipe -> {
 			displayDiff(recipe.getDiff());
 		});
 
@@ -129,7 +130,7 @@ public class Main {
 		displayPlayerData(dataAfterConversion);
 
 		System.out.println("[Consumed]");
-		displayStack(totalCost.getCost());
+		displayEntries(totalCost.streamCosts());
 
 		System.out.println("[Remaining]");
 		displayPlayerData(dataAfterConversion.update(totalCost));
@@ -180,13 +181,17 @@ public class Main {
 	}
 
 	private static void displayStack(ItemStack stack) {
-		stack.stream()//
+		displayEntries(stack.stream());
+	}
+
+	private static void displayEntries(Stream<ItemEntry> entries) {
+		entries//
 				.sorted(Comparator.comparing(entry -> entry.getItem(), Item.syntaxicComparator()))//
 				.forEach(entry -> {
 					System.out.println("  " + entry.getItem() + " x" + entry.getQuantity());
 				});
 	}
-
+	
 	private static void displayPlayerData(PlayerData data) {
 		data.stream()//
 				.sorted(comparing(entry -> entry.getItem(), Item.syntaxicComparator()))//

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import fr.sazaju.genshin.InventoryTab.NotEnoughItemsException;
 import fr.sazaju.genshin.item.Item;
@@ -93,6 +94,10 @@ public class PlayerData implements Iterable<ItemEntry> {
 		this.moras = moras;
 		this.resin = resin;
 		this.tabs = tabs;
+	}
+
+	public boolean isEmpty() {
+		return !stream().findFirst().isPresent();
 	}
 
 	public PlayerData add(Item<?> item) {
@@ -189,12 +194,12 @@ public class PlayerData implements Iterable<ItemEntry> {
 
 	public PlayerData addAll(Iterable<ItemEntry> items) {
 		PlayerData data = this;
-		for (ItemEntry itemEntry : items) {
-			Item<?> item = itemEntry.getItem();
+		for (ItemEntry entry : items) {
+			Item<?> item = entry.getItem();
 			if (item instanceof StackableItem<?>) {
 				StackableItem<?> stackableItem = (StackableItem<?>) item;
-				data = data.add(stackableItem, itemEntry.getQuantity());
-			} else if (itemEntry.getQuantity() > 1) {
+				data = data.add(stackableItem, entry.getQuantity());
+			} else if (entry.getQuantity() > 1) {
 				throw new IllegalArgumentException("Cannot add more than one non stackable item: " + item);
 			} else {
 				data = data.add(item);
@@ -249,14 +254,19 @@ public class PlayerData implements Iterable<ItemEntry> {
 	}
 
 	public PlayerData update(Recipe recipe) {
-		List<ItemEntry> costs = recipe.getCost().stream().collect(toList());
-		List<ItemEntry> products = recipe.getProducts().stream().collect(toList());
+		List<ItemEntry> costs = recipe.streamCosts().collect(toList());
+		List<ItemEntry> products = recipe.streamProducts().collect(toList());
 		return this.addAll(products).removeAll(costs);
 	}
 
 	@Override
 	public Iterator<ItemEntry> iterator() {
 		return stream().iterator();
+	}
+
+	@Override
+	public String toString() {
+		return stream().collect(toList()).toString();
 	}
 
 	public static PlayerData empty() {
@@ -272,5 +282,15 @@ public class PlayerData implements Iterable<ItemEntry> {
 
 	public static PlayerData fromItemEntries(Iterable<ItemEntry> entries) {
 		return PlayerData.empty().addAll(entries);
+	}
+	
+	public static PlayerData fromItemEntries(Stream<ItemEntry> entries) {
+		return fromItemEntries(entries.collect(toList()));
+	}
+
+	public boolean contains(Iterable<ItemEntry> content) {
+		return !StreamSupport.stream(content.spliterator(), false)//
+				.filter(entry -> entry.getQuantity() > getQuantity(entry.getItem()))//
+				.findAny().isPresent();
 	}
 }

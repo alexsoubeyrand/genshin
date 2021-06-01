@@ -8,6 +8,7 @@ import static org.junit.jupiter.params.provider.Arguments.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fr.sazaju.genshin.InventoryTab.NotEnoughItemsException;
 import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemType;
@@ -39,6 +39,7 @@ import fr.sazaju.genshin.item.simple.Potion;
 import fr.sazaju.genshin.item.simple.TalentLevelUpMaterial;
 import fr.sazaju.genshin.item.simple.WeaponAscensionMaterial;
 import fr.sazaju.genshin.item.weapon.WeaponType;
+import fr.sazaju.genshin.recipe.Recipe;
 
 class PlayerDataTest {
 
@@ -104,18 +105,16 @@ class PlayerDataTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource("differentStackableItems")
+	@MethodSource("stackableItemsNonRedundantPairs")
 	void testAddWithQuantityDoesNotChangeOtherQuantity(StackableItem<?> item1, StackableItem<?> item2) {
 		assertEquals(0, PlayerData.empty().add(item1, 123).getQuantity(item2));
 	}
-
-	// TODO Test addAll
 
 	@ParameterizedTest
 	@MethodSource("items")
 	void testRemoveRejectsItemIfNotPresent(Item<?> item) {
 		PlayerData data = PlayerData.empty();
-		assertThrows(NotEnoughItemsException.class, () -> data.remove(item));
+		assertThrows(IllegalArgumentException.class, () -> data.remove(item));
 	}
 
 	@ParameterizedTest
@@ -132,7 +131,7 @@ class PlayerDataTest {
 	@MethodSource("stackableItems")
 	void testRemoveWithQuantityRejectsStackableItemIfNotEnough(StackableItem<?> item) {
 		PlayerData data = PlayerData.empty().add(item, 123);
-		assertThrows(NotEnoughItemsException.class, () -> data.remove(item, 456));
+		assertThrows(IllegalArgumentException.class, () -> data.remove(item, 456));
 	}
 
 	@ParameterizedTest
@@ -146,16 +145,182 @@ class PlayerDataTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource("differentStackableItems")
+	@MethodSource("stackableItemsNonRedundantPairs")
 	void testRemoveWithQuantityDoesNotChangeOtherQuantity(StackableItem<?> item1, StackableItem<?> item2) {
 		assertEquals(123, PlayerData.empty().add(item1, 123).add(item2, 123).remove(item1, 23).getQuantity(item2));
 	}
 
-	// TODO Test removeAll
+	@ParameterizedTest
+	@MethodSource("nonStackableItems")
+	void testAddAllRejectsNonStackableItemIfPresent(Item<?> item) {
+		PlayerData data = PlayerData.empty().add(item);
+		List<ItemEntry> illegalEntries = List.of(ItemEntry.of(item));
+		assertThrows(IllegalArgumentException.class, () -> data.addAll(illegalEntries));
+	}
 
-	// TODO Test update(Recipe)
+	@ParameterizedTest
+	@MethodSource("nonStackableItems")
+	void testAddAllRejectsRedundantNonStackableItem(Item<?> item) {
+		PlayerData data = PlayerData.empty();
+		List<ItemEntry> illegalEntries = List.of(ItemEntry.of(item), ItemEntry.of(item));
+		assertThrows(IllegalArgumentException.class, () -> data.addAll(illegalEntries));
+	}
+
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndItemsPairs")
+	void testAddAllEquivalentToAddSequence(ItemsExtractor itemsExtractor, Item<?> item1, Item<?> item2) {
+		PlayerData originData = PlayerData.empty();
+		PlayerData sequenceData = originData.add(item1).add(item2);
+		PlayerData addAllData = originData.addAll(List.of(//
+				ItemEntry.of(item1), //
+				ItemEntry.of(item2)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(addAllData));
+	}
+
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndStackableItemsPairs")
+	void testAddAllEquivalentToAddWithQuantitySequence(ItemsExtractor itemsExtractor, StackableItem<?> item1,
+			StackableItem<?> item2) {
+		PlayerData originData = PlayerData.empty();
+		PlayerData sequenceData = originData.add(item1, 123).add(item2, 456);
+		PlayerData addAllData = originData.addAll(List.of(//
+				ItemEntry.of(item1, 123), //
+				ItemEntry.of(item2, 456)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(addAllData));
+	}
+
+	@ParameterizedTest
+	@MethodSource("nonStackableItems")
+	void testRemoveAllRejectsNonStackableItemIfAbsent(Item<?> item) {
+		PlayerData data = PlayerData.empty();
+		List<ItemEntry> entries = List.of(ItemEntry.of(item));
+		assertThrows(IllegalArgumentException.class, () -> data.removeAll(entries));
+	}
+
+	@ParameterizedTest
+	@MethodSource("nonStackableItems")
+	void testRemoveAllRejectsRedundantNonStackableItem(Item<?> item) {
+		PlayerData data = PlayerData.empty().add(item);
+		List<ItemEntry> entries = List.of(ItemEntry.of(item), ItemEntry.of(item));
+		assertThrows(IllegalArgumentException.class, () -> data.removeAll(entries));
+	}
+
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndItemsPairs")
+	void testRemoveAllEquivalentToRemoveSequence(ItemsExtractor itemsExtractor, Item<?> item1, Item<?> item2) {
+		PlayerData originData = PlayerData.empty().add(item1).add(item2);
+		PlayerData sequenceData = originData.remove(item1).remove(item2);
+		PlayerData addAllData = originData.removeAll(List.of(//
+				ItemEntry.of(item1), //
+				ItemEntry.of(item2)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(addAllData));
+	}
+
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndStackableItemsPairs")
+	void testRemoveAllEquivalentToRemoveWithQuantitySequence(ItemsExtractor itemsExtractor, StackableItem<?> item1,
+			StackableItem<?> item2) {
+		PlayerData originData = PlayerData.empty().add(item1, 999).add(item2, 999);
+		PlayerData sequenceData = originData.remove(item1, 123).remove(item2, 456);
+		PlayerData addAllData = originData.removeAll(List.of(//
+				ItemEntry.of(item1, 123), //
+				ItemEntry.of(item2, 456)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(addAllData));
+	}
+
+	static Stream<Arguments> testUpdateRejectsRecipeWhichConsumesMoreThanAvailableItems() {
+		PlayerData emptyData = PlayerData.empty();
+		Stream<Arguments> nonStackableItemCases = nonStackableItems().flatMap(item -> {
+			return Stream.of(arguments(emptyData, Recipe.fromDiff(Map.of(item, -1))));
+		});
+		Stream<Arguments> stackableItemCases = stackableItems().flatMap(item -> {
+			return Stream.concat(//
+					Stream.of(arguments(emptyData, Recipe.fromDiff(Map.of(item, -1)))), //
+					Stream.of(arguments(emptyData.add(item, 10), Recipe.fromDiff(Map.of(item, -11))))//
+			);
+		});
+		return Stream.concat(nonStackableItemCases, stackableItemCases);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void testUpdateRejectsRecipeWhichConsumesMoreThanAvailableItems(PlayerData data, Recipe recipe) {
+		assertThrows(IllegalArgumentException.class, () -> data.update(recipe));
+	}
+
+	static Stream<Arguments> testUpdateRejectsRecipeWhichProducesMoreThanOneNonStackableItems() {
+		PlayerData emptyData = PlayerData.empty();
+		return nonStackableItems().flatMap(item -> Stream.concat(//
+				Stream.of(arguments(emptyData, Recipe.fromDiff(Map.of(item, 2)))), //
+				Stream.of(arguments(emptyData.add(item), Recipe.fromDiff(Map.of(item, 1))))//
+		));
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void testUpdateRejectsRecipeWhichProducesMoreThanOneNonStackableItems(PlayerData data, Recipe recipe) {
+		assertThrows(IllegalArgumentException.class, () -> data.update(recipe));
+	}
+
+	static Stream<Arguments> testUpdateSumsItemsOfRecipe() {
+		PlayerData emptyData = PlayerData.empty();
+		Stream<Arguments> nonStackableCases = nonStackableItems().flatMap(item -> {
+			return Stream.of(//
+					arguments(emptyData, Recipe.fromDiff(Map.of(item, 1)), item, 1), //
+					arguments(emptyData.add(item), Recipe.fromDiff(Map.of(item, -1)), item, 0)//
+			);
+		});
+		Stream<Arguments> stackableCases = stackableItems().flatMap(item -> {
+			return Stream.of(//
+					arguments(emptyData, Recipe.fromDiff(Map.of(item, 10)), item, 10), //
+					arguments(emptyData.add(item, 123), Recipe.fromDiff(Map.of(item, 654)), item, 777), //
+					arguments(emptyData.add(item, 10), Recipe.fromDiff(Map.of(item, -3)), item, 7), //
+					arguments(emptyData.add(item, 10), Recipe.fromDiff(Map.of(item, -10)), item, 0)//
+			);
+		});
+		return Stream.concat(nonStackableCases, stackableCases);
+	}
+
+	@ParameterizedTest(name = "data {0} with recipe {1} results in {3} x {2}")
+	@MethodSource
+	void testUpdateSumsItemsOfRecipe(PlayerData data, Recipe recipe, Item<?> item, int finalQuantity) {
+		assertEquals(finalQuantity, data.update(recipe).getQuantity(item));
+	}
+
+	@ParameterizedTest
+	@MethodSource("nonStackableItems")
+	void testPlayerDataFromItemEntriesRejectsRedundantNonStackableItem(Item<?> item) {
+		List<ItemEntry> illegalEntries = List.of(ItemEntry.of(item), ItemEntry.of(item));
+		assertThrows(IllegalArgumentException.class, () -> PlayerData.fromItemEntries(illegalEntries));
+	}
 	
-	// TODO Test fromItemEntries
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndItemsPairs")
+	void testPlayerDataFromItemEntriesEquivalentToAddSequence(ItemsExtractor itemsExtractor, Item<?> item1, Item<?> item2) {
+		PlayerData sequenceData = PlayerData.empty().add(item1).add(item2);
+		PlayerData entriesData = PlayerData.fromItemEntries(List.of(//
+				ItemEntry.of(item1), //
+				ItemEntry.of(item2)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(entriesData));
+	}
+	
+	@ParameterizedTest
+	@MethodSource("itemsExtractorAndStackableItemsPairs")
+	void testPlayerDataFromItemEntriesEquivalentToAddWithQuantitySequence(ItemsExtractor itemsExtractor, StackableItem<?> item1,
+			StackableItem<?> item2) {
+		PlayerData sequenceData = PlayerData.empty().add(item1, 123).add(item2, 456);
+		PlayerData entriesData = PlayerData.fromItemEntries(List.of(//
+				ItemEntry.of(item1, 123), //
+				ItemEntry.of(item2, 456)//
+		));
+		assertEquals(itemsExtractor.apply(sequenceData), itemsExtractor.apply(entriesData));
+	}
+
 
 	@Test
 	void testGetQuantityRejectsUnknownItem() {
@@ -170,7 +335,7 @@ class PlayerDataTest {
 		Item<?> item = mockItem();
 		assertThrows(IllegalArgumentException.class, () -> data.add(item));
 	}
-	
+
 	@Test
 	void testRemoveRejectsUnknownItem() {
 		PlayerData data = PlayerData.empty();
@@ -190,6 +355,13 @@ class PlayerDataTest {
 		PlayerData data = PlayerData.empty();
 		StackableItem<?> item = mockStackableItem();
 		assertThrows(IllegalArgumentException.class, () -> data.remove(item, 123));
+	}
+
+	@Test
+	void testUpdateRejectsUnknownItem() {
+		PlayerData data = PlayerData.empty();
+		Recipe recipe = Recipe.fromDiff(Map.of(mockItem(), 1));
+		assertThrows(IllegalArgumentException.class, () -> data.update(recipe));
 	}
 
 	static Stream<ItemsExtractor> itemsExtractors() {
@@ -242,15 +414,31 @@ class PlayerDataTest {
 		));
 	}
 
-	static Stream<?> nonStackableItems() {
+	static Stream<Arguments> itemsExtractorAndItemsPairs() {
+		return itemsExtractors().flatMap(extractor -> //
+		items().flatMap(item1 -> //
+		items().flatMap(item2 -> //
+		Stream.of(arguments(extractor, item1, item2))//
+		)));
+	}
+
+	static Stream<Arguments> itemsExtractorAndStackableItemsPairs() {
+		return itemsExtractors().flatMap(extractor -> //
+		stackableItems().flatMap(item1 -> //
+		stackableItems().flatMap(item2 -> //
+		Stream.of(arguments(extractor, item1, item2))//
+		)));
+	}
+
+	static Stream<Item<?>> nonStackableItems() {
 		return items().filter(item -> !(item instanceof StackableItem<?>));
 	}
 
-	static Stream<?> stackableItems() {
-		return items().filter(item -> item instanceof StackableItem<?>);
+	static Stream<StackableItem<?>> stackableItems() {
+		return items().filter(item -> item instanceof StackableItem<?>).map(item -> (StackableItem<?>) item);
 	}
 
-	static Stream<Arguments> differentStackableItems() {
+	static Stream<Arguments> stackableItemsNonRedundantPairs() {
 		return stackableItems().flatMap(item1 -> //
 		stackableItems().flatMap(item2 -> //
 		item1.equals(item2) //

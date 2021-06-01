@@ -7,19 +7,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.PlayerData;
 
-// TODO Reduce to minimum (internal computation)
-// TODO Rename based on actual usage
+// TODO Deprecate
+// TODO Remove
 public class ItemStack implements Iterable<ItemEntry> {
 	private final Map<Item<?>, Integer> map;
 
 	private ItemStack(Map<Item<?>, Integer> map) {
+		Objects.requireNonNull(map);
 		this.map = map;
+	}
+	
+	public Map<Item<?>, Integer> getMap() {
+		return Collections.unmodifiableMap(map);
 	}
 
 	public static ItemStack fromItemsMap(Map<Item<?>, Integer> map) {
@@ -175,12 +181,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 
 	public Stream<ItemEntry> stream() {
 		return map.entrySet().stream().map(entry -> {
-			Item<?> item = entry.getKey();
-			if (item instanceof StackableItem<?>) {
-				return ItemEntry.of((StackableItem<?>) item, entry.getValue());
-			} else {
-				return ItemEntry.of(item);
-			}
+			return new ItemEntry(entry.getKey(), entry.getValue());
 		});
 	}
 

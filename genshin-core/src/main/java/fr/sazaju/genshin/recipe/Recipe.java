@@ -15,6 +15,7 @@ import static fr.sazaju.genshin.item.simple.OriginalResin.*;
 import static fr.sazaju.genshin.item.simple.Potion.*;
 import static fr.sazaju.genshin.item.weapon.WeaponType.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
 import fr.sazaju.genshin.item.Item;
+import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemType;
 import fr.sazaju.genshin.item.simple.Billet;
@@ -41,25 +43,52 @@ import fr.sazaju.genshin.item.weapon.WeaponType;
 public class Recipe {
 
 	private final ItemStack diff;
+	private final Map<Item<?>, Integer> map;
 
+	@Deprecated
 	private Recipe(ItemStack diff) {
 		this.diff = diff;
+		this.map = diff.getMap();
+	}
+
+	private Recipe(Map<Item<?>, Integer> map) {
+		this.diff = ItemStack.fromItemsMap(map);
+		this.map = map;
+	}
+
+	public boolean isEmpty() {
+		return map.isEmpty();
 	}
 
 	public ItemStack getDiff() {
 		return diff;
 	}
 
-	public ItemStack getProducts() {
-		return diff.filter(strictlyPositive());
+	public Stream<ItemEntry> streamProducts() {
+		return diff.filter(strictlyPositive()).stream();
 	}
 
-	public ItemStack getCost() {
-		return diff.filter(strictlyNegative()).times(-1);
+	public int getProducedQuantity(Item<?> item) {
+		return map.getOrDefault(item, 0);
+	}
+
+	public Stream<ItemEntry> streamCosts() {
+		return diff.filter(strictlyNegative()).times(-1).stream();
+	}
+
+	public int getConsumedQuantity(Item<?> item) {
+		return -map.getOrDefault(item, 0);
 	}
 
 	public Recipe add(Recipe recipe) {
-		return Recipe.fromDiff(diff.addStack(recipe.diff));
+		Map<Item<?>, Integer> newMap = new HashMap<Item<?>, Integer>(map);
+		recipe.map.entrySet().forEach(entry -> {
+			newMap.merge(entry.getKey(), entry.getValue(), (v1, v2) -> {
+				int sum = v1 + v2;
+				return sum == 0 ? null : sum;
+			});
+		});
+		return Recipe.fromDiff(newMap);
 	}
 
 	public Recipe times(int multiplier) {
@@ -89,31 +118,61 @@ public class Recipe {
 
 	@Override
 	public String toString() {
-		Function<ItemStack, String> stackFormater = stack -> {
-			return stack.stream()//
+		Function<Stream<ItemEntry>, String> stackFormater = entries -> {
+			String content = entries//
 					.map(entry -> (entry.getQuantity() == 1 ? "" : entry.getQuantity() + " x ") + entry.getItem())//
 					.collect(Collectors.joining(" + "));
+			return content.isBlank() ? "∅" : content;
 		};
-		return stackFormater.apply(getCost()) + " => " + stackFormater.apply(getProducts());
+		return stackFormater.apply(streamCosts()) + " => " + stackFormater.apply(streamProducts());
 	}
 
+	@Deprecated
 	public static Recipe fromDiff(ItemStack diff) {
 		return new Recipe(diff);
 	}
 
+	public static Recipe fromDiff(Map<Item<?>, Integer> map) {
+		Map<Item<?>, Integer> cleanedMap = new HashMap<>();
+		map.entrySet().forEach(entry -> {
+			Integer value = entry.getValue();
+			if (value == 0) {
+				// Ignore
+			} else {
+				cleanedMap.put(entry.getKey(), value);
+			}
+		});
+		return new Recipe(cleanedMap);
+	}
+
+	@Deprecated
 	public static Recipe forItem(Item<?> itemProduced, ItemStack cost) {
 		return new Recipe(cost.times(-1).addMaterial(itemProduced, 1));
 	}
 
+	public static Recipe forItem(Item<?> itemProduced, Map<Item<?>, Integer> cost) {
+		return Recipe.fromDiff(cost).reverse().produces(itemProduced, 1);
+	}
+
+	@Deprecated
 	public static Recipe forItems(int quantityProduced, Item<?> itemProduced, ItemStack cost) {
 		return new Recipe(cost.times(-1).addMaterial(itemProduced, quantityProduced));
 	}
-	
+
+	public static Recipe forItems(int quantityProduced, Item<?> itemProduced, Map<Item<?>, Integer> cost) {
+		return Recipe.fromDiff(cost).reverse().produces(itemProduced, quantityProduced);
+	}
+
+	@Deprecated
 	public static Recipe forItems(ItemStack products, ItemStack cost) {
 		return new Recipe(cost.times(-1).addStack(products));
 	}
 
-	public static Stream<Recipe> streamRecipes() {
+	public static Recipe forItems(Map<Item<?>, Integer> products, Map<Item<?>, Integer> cost) {
+		return Recipe.fromDiff(products).add(Recipe.fromDiff(cost).reverse());
+	}
+
+	public static Stream<Recipe> streamMihoyoRecipes() {
 		return Stream.of(//
 				recipesOn3SubItems(), //
 				enhancementOreRecipes(), //
@@ -301,7 +360,19 @@ public class Recipe {
 	}
 
 	public static Stream<Recipe> streamRecipesProducing(Item<?> item) {
-		return streamRecipes().filter(recipe -> recipe.diff.getQuantity(item) > 0);
+		return streamMihoyoRecipes().filter(recipe -> recipe.diff.getQuantity(item) > 0);
+	}
+
+	public static Recipe empty() {
+		return new Recipe(Map.of());
+	}
+
+	public Recipe consumes(Item<?> item, int quantity) {
+		return add(Recipe.fromDiff(Map.of(item, -quantity)));
+	}
+
+	public Recipe produces(Item<?> item, int quantity) {
+		return add(Recipe.fromDiff(Map.of(item, quantity)));
 	}
 
 }
