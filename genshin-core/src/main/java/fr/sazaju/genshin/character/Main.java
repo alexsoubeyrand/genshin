@@ -1,7 +1,6 @@
 package fr.sazaju.genshin.character;
 
 import static fr.sazaju.genshin.Rarity.*;
-import static fr.sazaju.genshin.item.ItemStack.Filter.*;
 import static fr.sazaju.genshin.item.simple.Billet.*;
 import static fr.sazaju.genshin.item.simple.BossDrop.*;
 import static fr.sazaju.genshin.item.simple.CharacterAscensionMaterial.*;
@@ -19,7 +18,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -120,7 +118,7 @@ public class Main {
 
 		System.out.println("[Recipes]");
 		Recipe.streamMihoyoRecipes().forEach(recipe -> {
-			displayDiff(recipe.getDiff());
+			displayRecipe(recipe);
 		});
 
 		System.out.println("[Required Conversions]");
@@ -139,19 +137,6 @@ public class Main {
 		// TODO Test on service
 		// TODO Expose on website
 		// TODO Resolve TODOs
-	}
-
-	private static void displayDiff(ItemStack diff) {
-		ItemStack consumed = diff.filter(strictlyNegative()).times(-1);
-		ItemStack produced = diff.filter(strictlyPositive());
-		Function<ItemStack, String> formater = stack -> {
-			return stack.stream().map(entry -> {
-				Item<?> material = entry.getItem();
-				int quantity = entry.getQuantity();
-				return (quantity == 1 ? "" : quantity + " x ") + material;
-			}).collect(Collectors.joining(" + "));
-		};
-		System.out.println("  " + formater.apply(consumed) + " => " + formater.apply(produced));
 	}
 
 	private static void displayRecipe(Recipe recipe) {

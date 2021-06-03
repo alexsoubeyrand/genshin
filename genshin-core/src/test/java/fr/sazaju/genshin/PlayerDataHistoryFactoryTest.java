@@ -30,6 +30,7 @@ class PlayerDataHistoryFactoryTest {
 		// THEN
 		assertEquals(1, histories.size());
 		PlayerDataHistory history = histories.get(0);
+		// TODO Test history to ensure it works as intended
 		assertEquals(0, history.streamRecipes().count());
 	}
 

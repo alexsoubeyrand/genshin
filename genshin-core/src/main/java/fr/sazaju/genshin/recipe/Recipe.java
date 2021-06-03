@@ -29,6 +29,9 @@ import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemType;
+import fr.sazaju.genshin.item.NeitherStackableNorNonStackableItemException;
+import fr.sazaju.genshin.item.NonStackableItem;
+import fr.sazaju.genshin.item.StackableItem;
 import fr.sazaju.genshin.item.simple.Billet;
 import fr.sazaju.genshin.item.simple.CharacterAscensionMaterial;
 import fr.sazaju.genshin.item.simple.CommonAscensionMaterial;
@@ -60,8 +63,12 @@ public class Recipe {
 		return map.isEmpty();
 	}
 
-	public ItemStack getDiff() {
-		return diff;
+	public Map<Item<?>, Integer> getDiff() {
+		return diff.getMap();
+	}
+	
+	public int getQuantity(Item<?> item) {
+		return map.getOrDefault(item, 0);
 	}
 
 	public Stream<ItemEntry> streamProducts() {
@@ -69,7 +76,7 @@ public class Recipe {
 	}
 
 	public int getProducedQuantity(Item<?> item) {
-		return map.getOrDefault(item, 0);
+		return Math.max(0, map.getOrDefault(item, 0));
 	}
 
 	public Stream<ItemEntry> streamCosts() {
@@ -77,7 +84,7 @@ public class Recipe {
 	}
 
 	public int getConsumedQuantity(Item<?> item) {
-		return -map.getOrDefault(item, 0);
+		return -Math.min(0, map.getOrDefault(item, 0));
 	}
 
 	public Recipe add(Recipe recipe) {
@@ -92,7 +99,25 @@ public class Recipe {
 	}
 
 	public Recipe times(int multiplier) {
-		return Recipe.fromDiff(diff.times(multiplier));
+		return Recipe.fromDiff(map.entrySet().stream()//
+				.flatMap(entry -> {
+					Item<?> item = entry.getKey();
+					Integer quantity = entry.getValue();
+					if (item instanceof StackableItem<?>) {
+						return Stream.of(Map.entry(item, quantity * multiplier));
+					} else if (item instanceof NonStackableItem<?>) {
+						NonStackableItem<?> nonStackableItem = (NonStackableItem<?>) item;
+						int sign = multiplier < 0 ? -1 : 1;
+						int factor = sign * multiplier;// Result always positive
+						Stream<Item<?>> firstPull = Stream.of(nonStackableItem);
+						Stream<Item<?>> otherPulls = Stream.generate(nonStackableItem::duplicate);
+						return Stream.concat(firstPull, otherPulls)//
+								.limit(factor)//
+								.map(pulledItem -> Map.entry(pulledItem, sign * quantity));
+					} else {
+						throw new NeitherStackableNorNonStackableItemException(item);
+					}
+				}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
 	public Recipe reverse() {
@@ -105,7 +130,7 @@ public class Recipe {
 			return true;
 		} else if (obj instanceof Recipe) {
 			Recipe that = (Recipe) obj;
-			return Objects.equals(this.diff, that.diff);
+			return Objects.equals(this.map, that.map);
 		} else {
 			return false;
 		}
@@ -113,7 +138,7 @@ public class Recipe {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(diff);
+		return Objects.hash(map);
 	}
 
 	@Override

@@ -38,6 +38,16 @@ import fr.sazaju.genshin.item.simple.WeaponAscensionMaterial;
 import fr.sazaju.genshin.item.weapon.Weapon;
 import fr.sazaju.genshin.recipe.Recipe;
 
+// TODO ItemSlot.stackable(item, quantity)
+// TODO ItemSlot.nonStackable(item)
+// TODO PlayerData.getTab(WEAPONS).streamSlots()
+// TODO Rename Item as ItemState
+// TODO StackableItem <|- NonStackableItem
+// TODO Replace NonStackableItem by StackableItem (reduce complexity everywhere)
+// TODO Remove NonStackableItem
+// TODO Move StackableItem stuff into Item
+// TODO Remove StackableItem
+// TODO Resume testing
 public class PlayerData implements Iterable<ItemEntry> {
 	public static enum Tab {
 		WEAPONS(new InventoryTab.Definition(//

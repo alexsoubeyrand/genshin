@@ -39,4 +39,5 @@ public class Item<T extends ItemType> {
 		Comparator<Item<?>> itemComparator = type.thenComparing(rarity);
 		return itemComparator;
 	}
+	
 }
