@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum BossDrop implements ItemType.WithSingleRarity {
 	/**************/
@@ -43,7 +43,7 @@ public enum BossDrop implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<BossDrop> item() {
-		return new StackableItem<BossDrop>(this, getRarity());
+	public ItemState<BossDrop> itemState() {
+		return new ItemState<BossDrop>(this, getRarity());
 	}
 }

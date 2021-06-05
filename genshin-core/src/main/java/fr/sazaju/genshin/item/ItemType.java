@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
 import fr.sazaju.genshin.recipe.Recipe;
+import fr.sazaju.genshin.recipe.Recipes;
 
 public interface ItemType {
 
@@ -19,10 +20,10 @@ public interface ItemType {
 			return getRarity().equals(rarity);
 		}
 
-		Item<? extends WithSingleRarity> item();
+		ItemState<? extends WithSingleRarity> itemState();
 
 		default Stream<Recipe> streamRecipes() {
-			return Recipe.streamRecipesProducing(this.item());
+			return Recipes.streamRecipesProducing(this.itemState());
 		}
 	}
 
@@ -35,10 +36,10 @@ public interface ItemType {
 			return getRarities().contains(rarity);
 		}
 
-		Item<? extends WithMultipleRarities> item(Rarity rarity);
+		ItemState<? extends WithMultipleRarities> itemState(Rarity rarity);
 
 		default Stream<Recipe> streamRecipesAt(Rarity rarity) {
-			return Recipe.streamRecipesProducing(this.item(rarity));
+			return Recipes.streamRecipesProducing(this.itemState(rarity));
 		}
 
 	}

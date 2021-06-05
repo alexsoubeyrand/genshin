@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum EnhancementOre implements ItemType.WithSingleRarity {
 	ENHANCEMENT_ORE(ONE_STAR), //
@@ -24,7 +24,7 @@ public enum EnhancementOre implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<EnhancementOre> item() {
-		return new StackableItem<EnhancementOre>(this, getRarity());
+	public ItemState<EnhancementOre> itemState() {
+		return new ItemState<EnhancementOre>(this, getRarity());
 	}
 }

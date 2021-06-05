@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum Food implements ItemType.WithSingleRarity {
 	/***********/
@@ -99,7 +99,7 @@ public enum Food implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<Food> item() {
-		return new StackableItem<Food>(this, getRarity());
+	public ItemState<Food> itemState() {
+		return new ItemState<Food>(this, getRarity());
 	}
 }

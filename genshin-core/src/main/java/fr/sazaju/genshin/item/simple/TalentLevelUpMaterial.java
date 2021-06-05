@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum TalentLevelUpMaterial implements ItemType.WithMultipleRarities {
 	PROSPERITY, GOLD;
@@ -15,7 +15,7 @@ public enum TalentLevelUpMaterial implements ItemType.WithMultipleRarities {
 	}
 
 	@Override
-	public StackableItem<TalentLevelUpMaterial> item(Rarity rarity) {
-		return new StackableItem<>(this, rarity);
+	public ItemState<TalentLevelUpMaterial> itemState(Rarity rarity) {
+		return new ItemState<>(this, rarity);
 	}
 }

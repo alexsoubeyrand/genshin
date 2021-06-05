@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum EliteCommonAscensionMaterial implements ItemType.WithMultipleRarities {
 	CHAOS, //
@@ -17,8 +17,8 @@ public enum EliteCommonAscensionMaterial implements ItemType.WithMultipleRaritie
 	}
 
 	@Override
-	public StackableItem<EliteCommonAscensionMaterial> item(Rarity rarity) {
-		return new StackableItem<>(this, rarity);
+	public ItemState<EliteCommonAscensionMaterial> itemState(Rarity rarity) {
+		return new ItemState<>(this, rarity);
 	}
 
 }

@@ -1,9 +1,9 @@
 package fr.sazaju.genshin.item.weapon;
 
 import fr.sazaju.genshin.StringUtils;
-import fr.sazaju.genshin.item.NonStackableItem;
+import fr.sazaju.genshin.item.ItemState;
 
-public class Weapon extends NonStackableItem<WeaponType> {
+public class Weapon extends ItemState<WeaponType> {
 	public final WeaponType type;
 	public final int weaponLevel;
 	public final int ascensionLevel;
@@ -24,11 +24,6 @@ public class Weapon extends NonStackableItem<WeaponType> {
 																: 0;
 
 		this.refinementLevel = refinementLevel;
-	}
-	
-	@Override
-	public NonStackableItem<WeaponType> duplicate() {
-		return new Weapon(type, weaponLevel, refinementLevel);
 	}
 
 	@Override

@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum OriginalResin implements ItemType.WithSingleRarity {
 	ORIGINAL_RESIN;
@@ -15,7 +15,7 @@ public enum OriginalResin implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<OriginalResin> item() {
-		return new StackableItem<>(this, getRarity());
+	public ItemState<OriginalResin> itemState() {
+		return new ItemState<>(this, getRarity());
 	}
 }

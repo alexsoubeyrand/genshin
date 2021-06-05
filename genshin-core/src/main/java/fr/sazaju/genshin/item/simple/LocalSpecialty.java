@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum LocalSpecialty implements ItemType.WithSingleRarity {
 	/*************/
@@ -26,7 +26,7 @@ public enum LocalSpecialty implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<LocalSpecialty> item() {
-		return new StackableItem<>(this, getRarity());
+	public ItemState<LocalSpecialty> itemState() {
+		return new ItemState<>(this, getRarity());
 	}
 }

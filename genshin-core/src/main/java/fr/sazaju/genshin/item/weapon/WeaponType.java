@@ -109,7 +109,7 @@ public enum WeaponType implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public Weapon item() {
+	public Weapon itemState() {
 		return createBasicInstance();
 	}
 

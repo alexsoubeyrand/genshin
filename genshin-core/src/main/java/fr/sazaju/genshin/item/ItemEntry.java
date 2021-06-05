@@ -3,16 +3,16 @@ package fr.sazaju.genshin.item;
 import java.util.Objects;
 
 public class ItemEntry {
-	private final Item<?> item;
+	private final ItemState<?> itemState;
 	private final int quantity;
 
-	ItemEntry(Item<?> item, int quantity) {
-		this.item = item;
+	ItemEntry(ItemState<?> item, int quantity) {
+		this.itemState = item;
 		this.quantity = quantity;
 	}
 
-	public Item<?> getItem() {
-		return item;
+	public ItemState<?> getItem() {
+		return itemState;
 	}
 
 	public int getQuantity() {
@@ -26,10 +26,14 @@ public class ItemEntry {
 	public ItemEntry removeQuantity(int quantity) {
 		return ItemEntry.of(getItem(), getQuantity() - quantity);
 	}
+	
+	public ItemEntry reverse() {
+		return ItemEntry.of(getItem(), -getQuantity());
+	}
 
 	@Override
 	public String toString() {
-		return quantity + "x " + item;
+		return quantity + "x " + itemState;
 	}
 
 	@Override
@@ -38,7 +42,7 @@ public class ItemEntry {
 			return true;
 		} else if (obj instanceof ItemEntry) {
 			ItemEntry that = (ItemEntry) obj;
-			return Objects.equals(this.item, that.item) //
+			return Objects.equals(this.itemState, that.itemState) //
 					&& Objects.equals(this.quantity, that.quantity);
 		} else {
 			return false;
@@ -47,14 +51,14 @@ public class ItemEntry {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(item, quantity);
+		return Objects.hash(itemState, quantity);
 	}
 
-	public static ItemEntry of(Item<?> item) {
+	public static ItemEntry of(ItemState<?> item) {
 		return new ItemEntry(item, 1);
 	}
 
-	public static ItemEntry of(Item<?> item, int quantity) {
+	public static ItemEntry of(ItemState<?> item, int quantity) {
 		return new ItemEntry(item, quantity);
 	}
 }

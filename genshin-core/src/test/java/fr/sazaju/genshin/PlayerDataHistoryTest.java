@@ -51,7 +51,7 @@ interface PlayerDataHistoryTest {
 			PlayerData emptyData = PlayerData.empty();
 			return Stream.of(//
 					PlayerDataHistory.from(emptyData), //
-					PlayerDataHistory.from(emptyData.add(Mora.MORA.item(), 10))//
+					PlayerDataHistory.from(emptyData.update(Mora.MORA.itemState(), 10))//
 			);
 		}
 

@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum Gadget implements ItemType.WithSingleRarity {
 	ADEPTI_SEEKER_S_STOVE(THREE_STARS), //
@@ -29,7 +29,7 @@ public enum Gadget implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<Gadget> item() {
-		return new StackableItem<Gadget>(this, getRarity());
+	public ItemState<Gadget> itemState() {
+		return new ItemState<Gadget>(this, getRarity());
 	}
 }

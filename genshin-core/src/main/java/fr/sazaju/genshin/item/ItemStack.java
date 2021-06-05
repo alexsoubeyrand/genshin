@@ -17,24 +17,24 @@ import fr.sazaju.genshin.PlayerData;
 // TODO Deprecate
 // TODO Remove
 public class ItemStack implements Iterable<ItemEntry> {
-	private final Map<Item<?>, Integer> map;
+	private final Map<ItemState<?>, Integer> map;
 
-	private ItemStack(Map<Item<?>, Integer> map) {
+	private ItemStack(Map<ItemState<?>, Integer> map) {
 		Objects.requireNonNull(map);
 		this.map = map;
 	}
 	
-	public Map<Item<?>, Integer> getMap() {
+	public Map<ItemState<?>, Integer> getMap() {
 		return Collections.unmodifiableMap(map);
 	}
 
-	public static ItemStack fromItemsMap(Map<Item<?>, Integer> map) {
+	public static ItemStack fromItemsMap(Map<ItemState<?>, Integer> map) {
 		return new ItemStack(map);
 	}
 
 	public static ItemStack fromTypesMap(Map<ItemType.WithSingleRarity, Integer> map) {
 		return fromItemsMap(map.entrySet().stream()//
-				.map(entry -> Map.entry(entry.getKey().item(), entry.getValue()))//
+				.map(entry -> Map.entry(entry.getKey().itemState(), entry.getValue()))//
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
@@ -50,11 +50,11 @@ public class ItemStack implements Iterable<ItemEntry> {
 		return map.toString();
 	}
 
-	public Set<Item<?>> getItems() {
+	public Set<ItemState<?>> getItems() {
 		return map.keySet();
 	}
 
-	public int getQuantity(Item<?> item) {
+	public int getQuantity(ItemState<?> item) {
 		return map.getOrDefault(item, 0);
 	}
 
@@ -77,7 +77,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 				.collect(Collectors.toMap(ItemEntry::getItem, ItemEntry::getQuantity))));
 	}
 
-	public ItemStack addMaterial(Item<?> item, int quantity) {
+	public ItemStack addMaterial(ItemState<?> item, int quantity) {
 		return addStack(ItemStack.fromItemsMap(Map.of(item, quantity)));
 	}
 
@@ -90,7 +90,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 				.collect(Collectors.toMap(ItemEntry::getItem, ItemEntry::getQuantity))));
 	}
 
-	public ItemStack minusMaterial(Item<?> item, int quantity) {
+	public ItemStack minusMaterial(ItemState<?> item, int quantity) {
 		return minusStack(ItemStack.fromItemsMap(Map.of(item, quantity)));
 	}
 
@@ -110,28 +110,21 @@ public class ItemStack implements Iterable<ItemEntry> {
 		// TODO What about negative quantities?
 		return map.entrySet().stream()//
 				.allMatch(entry -> {
-					Item<?> item = entry.getKey();
+					ItemState<?> item = entry.getKey();
 					int quantity = entry.getValue();
 					int currentQuantity = getQuantity(item);
 					return currentQuantity >= quantity;
 				});
 	}
 
-	public boolean contains(Item<?> item) {
+	public boolean contains(ItemState<?> item) {
 		// TODO What about negative quantities?
 		return getQuantity(item) != 0;
 	}
 	
 	@Override
 	public Iterator<ItemEntry> iterator() {
-		return map.entrySet().stream().map(entry -> {
-			Item<?> item = entry.getKey();
-			if (item instanceof StackableItem<?>) {
-				return ItemEntry.of((StackableItem<?>)item, entry.getValue());
-			} else {
-				return ItemEntry.of(item);
-			}
-		}).iterator();
+		return map.entrySet().stream().map(entry -> ItemEntry.of(entry.getKey(), entry.getValue())).iterator();
 	}
 
 	public static ItemStack empty() {
@@ -139,7 +132,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 	}
 
 	public static interface Filter {
-		boolean test(Item<?> item, int quantity);
+		boolean test(ItemState<?> item, int quantity);
 
 		default Filter and(Filter otherFilter) {
 			return (item, quantity) -> this.test(item, quantity) && otherFilter.test(item, quantity);
@@ -165,11 +158,11 @@ public class ItemStack implements Iterable<ItemEntry> {
 			return (item, quantity) -> !item.getType().equals(MORA);
 		}
 
-		public static Filter items(Collection<Item<?>> items) {
+		public static Filter items(Collection<ItemState<?>> items) {
 			return (item, quantity) -> items.contains(item);
 		}
 
-		public static Filter items(Item<?>... items) {
+		public static Filter items(ItemState<?>... items) {
 			return items(Set.of(items));
 		}
 

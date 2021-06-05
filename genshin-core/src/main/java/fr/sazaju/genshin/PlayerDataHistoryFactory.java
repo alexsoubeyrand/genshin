@@ -24,7 +24,6 @@ public class PlayerDataHistoryFactory {
 		PlayerData missing = PlayerData.fromItemEntries(target.stream()//
 				.map(entry -> entry.removeQuantity(available.getQuantity(entry.getItem())))//
 				.filter(entry -> entry.getQuantity() > 0)//
-				.collect(Collectors.toList())//
 		);
 
 		if (missing.isEmpty()) {

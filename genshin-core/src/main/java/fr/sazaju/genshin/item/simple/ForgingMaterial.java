@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum ForgingMaterial implements ItemType.WithSingleRarity {
 	IRON_CHUNK(NO_RARITY), //
@@ -40,7 +40,7 @@ public enum ForgingMaterial implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<ForgingMaterial> item() {
-		return new StackableItem<>(this, getRarity());
+	public ItemState<ForgingMaterial> itemState() {
+		return new ItemState<>(this, getRarity());
 	}
 }

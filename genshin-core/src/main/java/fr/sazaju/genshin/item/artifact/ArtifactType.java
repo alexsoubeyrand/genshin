@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import fr.sazaju.genshin.Rarity;
-import fr.sazaju.genshin.item.Item;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
 
 public class ArtifactType implements ItemType.WithMultipleRarities {
@@ -24,7 +24,7 @@ public class ArtifactType implements ItemType.WithMultipleRarities {
 	}
 
 	@Override
-	public Item<ArtifactType> item(Rarity rarity) {
+	public ItemState<ArtifactType> itemState(Rarity rarity) {
 		return new Artifact(this, rarity);
 	}
 

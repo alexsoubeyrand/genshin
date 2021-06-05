@@ -12,81 +12,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
-import fr.sazaju.genshin.item.Item;
+import fr.sazaju.genshin.EqualHashCodeTest;
 import fr.sazaju.genshin.item.ItemEntry;
-import fr.sazaju.genshin.item.NonStackableItem;
-import fr.sazaju.genshin.item.StackableItem;
+import fr.sazaju.genshin.item.ItemState;
 
-// TODO Complete test coverage
-class RecipeTest {
-	static Stream<Arguments> testFromDiffReturnsProvidedQuantity() {
-		StackableItem<?> stackableItem = mockStackableItem();
-		NonStackableItem<?> nonStackableItem = mockNonStackableItem();
+class RecipeTest implements EqualHashCodeTest<Recipe> {
+	@Override
+	public Stream<Comparison<Recipe>> equalityComparisons() {
+		ItemState<?> item = mockItem();
+		Recipe recipe = Recipe.fromDiff(Map.of(item, 1));
+		Recipe identicalRecipe = Recipe.fromDiff(Map.of(item, 1));
+		Recipe equivalentRecipe = Recipe.empty().consumes(item, 5).produces(item, 6);
+		Recipe differentQuantity = Recipe.fromDiff(Map.of(item, 2));
+		Recipe differentItem = Recipe.fromDiff(Map.of(mockItem(), 1));
+		Recipe differentContent = Recipe.empty();
 		return Stream.of(//
-				arguments(stackableItem, 0),//
-				arguments(stackableItem, 1),//
-				arguments(stackableItem, 123),//
-				arguments(stackableItem, -1),//
-				arguments(stackableItem, -123),//
-				
-				arguments(nonStackableItem, 0),//
-				arguments(nonStackableItem, 1),//
-				arguments(nonStackableItem, -1)//
+				new Comparison<>(recipe, recipe, true), //
+				new Comparison<>(recipe, identicalRecipe, true), //
+				new Comparison<>(recipe, equivalentRecipe, true), //
+				new Comparison<>(recipe, differentQuantity, false), //
+				new Comparison<>(recipe, differentItem, false), //
+				new Comparison<>(recipe, differentContent, false), //
+				new Comparison<>(recipe, new Object(), false), //
+				new Comparison<>(recipe, null, false)//
 		);
 	}
 
 	@ParameterizedTest
-	@MethodSource
-	void testFromDiffReturnsProvidedQuantity(Item<?> item, int quantity) {
+	@ValueSource(ints = { 0, 1, 123, -1, -123 })
+	void testFromDiffReturnsProvidedQuantity(int quantity) {
+		ItemState<?> item = mockItem();
 		assertEquals(quantity, Recipe.fromDiff(Map.of(item, quantity)).getQuantity(item));
-	}
-
-	static Stream<Map<Item<?>, Integer>> testGetDiffReturnsContent() {
-		return Stream.of(//
-				// Empty
-				Map.of(), //
-
-				// Products only
-				Map.of(mockNonStackableItem(), 1), //
-				Map.of(mockStackableItem(), 10), //
-				Map.of(//
-						mockNonStackableItem(), 1, //
-						mockStackableItem(), 10//
-				), //
-
-				// Costs only
-				Map.of(mockNonStackableItem(), -1), //
-				Map.of(mockStackableItem(), -10), //
-				Map.of(//
-						mockNonStackableItem(), -1, //
-						mockStackableItem(), -10//
-				), //
-
-				// Products and costs
-				Map.of(//
-						mockNonStackableItem(), -1, //
-						mockStackableItem(), -5, //
-						mockNonStackableItem(), 1, //
-						mockStackableItem(), 10//
-				)//
-		);
-	}
-
-	@ParameterizedTest
-	@MethodSource
-	void testGetDiffReturnsContent(Map<Item<?>, Integer> map) {
-		assertTrue(Recipe.fromDiff(map).getDiff().equals(map));
-	}
-
-	@Test
-	void testGetDiffDoesNotReturnZeros() {
-		Map<Item<?>, Integer> map = Map.of(//
-				mockNonStackableItem(), 0, //
-				mockStackableItem(), 0//
-		);
-		assertTrue(Recipe.fromDiff(map).getDiff().isEmpty());
 	}
 
 	@ParameterizedTest
@@ -97,22 +56,67 @@ class RecipeTest {
 
 	@Test
 	void testNonEmptyRecipeIsNotEmpty() {
-		Recipe recipe = Recipe.fromDiff(Map.of(mockStackableItem(), 10));
+		Recipe recipe = Recipe.fromDiff(Map.of(mockItem(), 10));
 		assertFalse(recipe.isEmpty());
+	}
+
+	static Stream<Map<ItemState<?>, Integer>> testGetDiffReturnsContent() {
+		return Stream.of(//
+				// Empty
+				Map.of(), //
+
+				// Products only
+				Map.of(mockItem(), 1), //
+				Map.of(mockItem(), 10), //
+				Map.of(//
+						mockItem(), 1, //
+						mockItem(), 10//
+				), //
+
+				// Costs only
+				Map.of(mockItem(), -1), //
+				Map.of(mockItem(), -10), //
+				Map.of(//
+						mockItem(), -1, //
+						mockItem(), -10//
+				), //
+
+				// Products and costs
+				Map.of(//
+						mockItem(), -1, //
+						mockItem(), -5, //
+						mockItem(), 1, //
+						mockItem(), 10//
+				)//
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void testGetDiffReturnsContent(Map<ItemState<?>, Integer> map) {
+		assertTrue(Recipe.fromDiff(map).getDiff().equals(map));
+	}
+
+	@Test
+	void testGetDiffDoesNotReturnZeros() {
+		Recipe recipe = Recipe.fromDiff(Map.of(//
+				mockItem(), 0//
+		));
+		assertTrue(recipe.getDiff().isEmpty());
 	}
 
 	@ParameterizedTest
 	@MethodSource("emptyRecipes")
-	void testEmptyRecipeHasNoCost(Recipe emptyRecipe) {
+	void testStreamCostsReturnsNothingIfEmpty(Recipe emptyRecipe) {
 		assertEquals(0, emptyRecipe.streamCosts().count());
 	}
 
 	@Test
 	void testStreamCostsReturnsRecipeCostsOnly() {
-		StackableItem<?> cost1 = mockStackableItem();
-		NonStackableItem<?> cost2 = mockNonStackableItem();
-		StackableItem<?> product1 = mockStackableItem();
-		NonStackableItem<?> product2 = mockNonStackableItem();
+		ItemState<?> cost1 = mockItem();
+		ItemState<?> cost2 = mockItem();
+		ItemState<?> product1 = mockItem();
+		ItemState<?> product2 = mockItem();
 		Recipe recipe = Recipe.fromDiff(Map.of(//
 				cost1, -10, //
 				cost2, -1, //
@@ -128,16 +132,16 @@ class RecipeTest {
 
 	@ParameterizedTest
 	@MethodSource("emptyRecipes")
-	void testEmptyRecipeHasNoProducts(Recipe emptyRecipe) {
+	void testStreamProductsReturnsNothingIfEmpty(Recipe emptyRecipe) {
 		assertEquals(0, emptyRecipe.streamCosts().count());
 	}
 
 	@Test
 	void testStreamProductsReturnsRecipeProductsOnly() {
-		StackableItem<?> cost1 = mockStackableItem();
-		NonStackableItem<?> cost2 = mockNonStackableItem();
-		StackableItem<?> product1 = mockStackableItem();
-		NonStackableItem<?> product2 = mockNonStackableItem();
+		ItemState<?> cost1 = mockItem();
+		ItemState<?> cost2 = mockItem();
+		ItemState<?> product1 = mockItem();
+		ItemState<?> product2 = mockItem();
 		Recipe recipe = Recipe.fromDiff(Map.of(//
 				cost1, -10, //
 				cost2, -1, //
@@ -153,58 +157,53 @@ class RecipeTest {
 
 	@ParameterizedTest
 	@MethodSource("recipeUpdates")
-	void testConsumesAddsCost(Recipe recipe, Item<?> item, int addedCost) {
+	void testConsumesAddsCost(Recipe recipe, ItemState<?> item, int addedCost) {
 		assertEquals(recipe.getQuantity(item) - addedCost, recipe.consumes(item, addedCost).getQuantity(item));
 	}
 
 	@ParameterizedTest
 	@MethodSource("recipeUpdates")
-	void testProducesAddsProduct(Recipe recipe, Item<?> item, int addedCost) {
+	void testProducesAddsProduct(Recipe recipe, ItemState<?> item, int addedCost) {
 		assertEquals(recipe.getQuantity(item) + addedCost, recipe.produces(item, addedCost).getQuantity(item));
 	}
 
-	static Stream<Arguments> itemQuantities() {
-		StackableItem<?> stackableItem = mockStackableItem();
-		NonStackableItem<?> nonStackableItem = mockNonStackableItem();
-		return Stream.of(//
-				arguments(stackableItem, 0), //
-				arguments(stackableItem, 1), //
-				arguments(stackableItem, 123), //
-
-				arguments(nonStackableItem, 0), //
-				arguments(nonStackableItem, 1)//
-		);
+	static Stream<Integer> itemQuantities() {
+		return Stream.of(0, 1, 123);
 	}
 
 	@ParameterizedTest
 	@MethodSource("itemQuantities")
-	void testProducedQuantityIsZeroIfConsumed(Item<?> item, int quantity) {
+	void testProducedQuantityIsZeroIfConsumed(int quantity) {
+		ItemState<?> item = mockItem();
 		assertEquals(0, Recipe.empty().consumes(item, quantity).getProducedQuantity(item));
 	}
 
 	@ParameterizedTest
 	@MethodSource("itemQuantities")
-	void testProducedQuantityIsQuantityProduced(Item<?> item, int quantity) {
+	void testProducedQuantityIsQuantityProduced(int quantity) {
+		ItemState<?> item = mockItem();
 		assertEquals(quantity, Recipe.empty().produces(item, quantity).getProducedQuantity(item));
 	}
 
 	@ParameterizedTest
 	@MethodSource("itemQuantities")
-	void testConsumedQuantityIsZeroIfProduced(Item<?> item, int quantity) {
+	void testConsumedQuantityIsZeroIfProduced(int quantity) {
+		ItemState<?> item = mockItem();
 		assertEquals(0, Recipe.empty().produces(item, quantity).getConsumedQuantity(item));
 	}
 
 	@ParameterizedTest
 	@MethodSource("itemQuantities")
-	void testConsumedQuantityIsQuantityConsumed(Item<?> item, int quantity) {
+	void testConsumedQuantityIsQuantityConsumed(int quantity) {
+		ItemState<?> item = mockItem();
 		assertEquals(quantity, Recipe.empty().consumes(item, quantity).getConsumedQuantity(item));
 	}
 
 	static Stream<Arguments> testAddSumsRecipes() {
-		NonStackableItem<?> cost1 = mockNonStackableItem();
-		StackableItem<?> cost2 = mockStackableItem();
-		NonStackableItem<?> product1 = mockNonStackableItem();
-		StackableItem<?> product2 = mockStackableItem();
+		ItemState<?> cost1 = mockItem();
+		ItemState<?> cost2 = mockItem();
+		ItemState<?> product1 = mockItem();
+		ItemState<?> product2 = mockItem();
 		Recipe emptyRecipe = Recipe.empty();
 		Recipe costsOnlyRecipe = Recipe.fromDiff(Map.of(//
 				cost1, -1, //
@@ -256,7 +255,7 @@ class RecipeTest {
 		assertEquals(recipeSum, recipe1.add(recipe2));
 	}
 
-	static Stream<Arguments> testTimesMultipliesQuantitiesOfStackableItems() {
+	static Stream<Arguments> testTimesMultipliesQuantitiesOfItems() {
 		// Zero = item present with zero quantity
 		// Null = no item at all
 		return Stream.of(//
@@ -284,77 +283,33 @@ class RecipeTest {
 
 	@ParameterizedTest(name = "{0} x {1} = {2}")
 	@MethodSource
-	void testTimesMultipliesQuantitiesOfStackableItems(Integer initialQuantity, int multiplier, Integer finalQuantity) {
-		StackableItem<?> item = mockStackableItem();
-		Map<Item<?>, Integer> content = initialQuantity == null ? Map.of() : Map.of(item, initialQuantity);
-		assertEquals(finalQuantity, Recipe.fromDiff(content).times(multiplier).getDiff().get(item));
-	}
-
-	static Stream<Arguments> testTimesMultipliesQuantitiesOfNonStackableItems() {
-		// Zero = item present with zero quantity
-		// Null = no item at all
-		return Stream.of(//
-				// Zero multiplier
-				arguments(0, 0, null, 0), //
-				arguments(null, 0, null, 0), //
-				arguments(1, 0, null, 0), //
-
-				// Positive multipliers
-				arguments(0, 3, null, 0), //
-				arguments(null, 3, null, 0), //
-				arguments(1, 1, 1, 1), //
-				arguments(1, 3, 1, 3), //
-				arguments(-1, 2, -1, 2), //
-
-				// Negative multipliers
-				arguments(0, -3, null, 0), //
-				arguments(null, -3, null, 0), //
-				arguments(1, -1, -1, 1), //
-				arguments(1, -2, -1, 2), //
-				arguments(-1, -2, 1, 2)//
-		);
-	}
-
-	@ParameterizedTest(name = "item at {0} x {1} = {3} items at {2}")
-	@MethodSource
-	void testTimesMultipliesQuantitiesOfNonStackableItems(Integer initialQuantity, int multiplier,
-			Integer finalQuantity, int occurrences) {
-		NonStackableItem<?> item = mockNonStackableItem();
-		Map<Item<?>, Integer> content = initialQuantity == null ? Map.of() : Map.of(item, initialQuantity);
-		Recipe recipe = Recipe.fromDiff(content).times(multiplier);
-		assertEquals(occurrences, recipe.getDiff().keySet().size());
-		assertEquals(finalQuantity, recipe.getDiff().get(item));// TODO Check each item
+	void testTimesMultipliesQuantitiesOfItems(Integer initialQuantity, int multiplier, Integer finalQuantity) {
+		ItemState<?> item = mockItem();
+		Map<ItemState<?>, Integer> map = initialQuantity == null ? Map.of() : Map.of(item, initialQuantity);
+		assertEquals(finalQuantity, Recipe.fromDiff(map).times(multiplier).getDiff().get(item));
 	}
 
 	static Stream<Arguments> testReverseTakesOppositeQuantities() {
-		NonStackableItem<?> nonStackableItem = mockNonStackableItem();
-		StackableItem<?> stackableItem = mockStackableItem();
 		// Zero = item present with zero quantity
 		// Null = no item at all
 		return Stream.of(//
-				// Stackable item
-				arguments(stackableItem, 0, null), //
-				arguments(stackableItem, null, null), //
-				arguments(stackableItem, 3, -3), //
-				arguments(stackableItem, -3, 3), //
-
-				// Non stackable item
-				arguments(nonStackableItem, 0, null), //
-				arguments(nonStackableItem, null, null), //
-				arguments(nonStackableItem, 1, -1), //
-				arguments(nonStackableItem, -1, 1)//
+				arguments(0, null), //
+				arguments(null, null), //
+				arguments(3, -3), //
+				arguments(-3, 3) //
 		);
 	}
 
-	@ParameterizedTest(name = "{0} x {1} => {2}")
+	@ParameterizedTest(name = "{1} becomes {2}")
 	@MethodSource
-	void testReverseTakesOppositeQuantities(Item<?> item, Integer initialQuantity, Integer finalQuantity) {
-		Map<Item<?>, Integer> content = initialQuantity == null ? Map.of() : Map.of(item, initialQuantity);
+	void testReverseTakesOppositeQuantities(Integer initialQuantity, Integer finalQuantity) {
+		ItemState<?> item = mockItem();
+		Map<ItemState<?>, Integer> content = initialQuantity == null ? Map.of() : Map.of(item, initialQuantity);
 		assertEquals(finalQuantity, Recipe.fromDiff(content).reverse().getDiff().get(item));
 	}
 
 	static Stream<Recipe> emptyRecipes() {
-		StackableItem<?> item = mockStackableItem();
+		ItemState<?> item = mockItem();
 		int quantity = 10;
 		return Stream.of(//
 				Recipe.empty(), //
@@ -365,37 +320,27 @@ class RecipeTest {
 	}
 
 	static Stream<Arguments> recipeUpdates() {
-		StackableItem<?> stackableItem = mockStackableItem();
-		NonStackableItem<?> nonStackableItem = mockNonStackableItem();
+		ItemState<?> item = mockItem();
 
 		Recipe emptyRecipe = Recipe.empty();
 		Recipe recipeWithoutItem = Recipe.fromDiff(Map.of(//
-				mockStackableItem(), 50, //
-				mockNonStackableItem(), 1//
+				mockItem(), 50 //
 		));
-		Recipe recipeWithItem = Recipe.fromDiff(Map.of(stackableItem, 50));
+		Recipe recipeWithItem = Recipe.fromDiff(Map.of(item, 50));
 
 		return Stream.of(//
-				arguments(emptyRecipe, stackableItem, 1), //
-				arguments(emptyRecipe, stackableItem, 10), //
-				arguments(emptyRecipe, nonStackableItem, 1), //
+				arguments(emptyRecipe, item, 1), //
+				arguments(emptyRecipe, item, 10), //
 
-				arguments(recipeWithoutItem, stackableItem, 1), //
-				arguments(recipeWithoutItem, stackableItem, 10), //
-				arguments(recipeWithoutItem, nonStackableItem, 1), //
+				arguments(recipeWithoutItem, item, 1), //
+				arguments(recipeWithoutItem, item, 10), //
 
-				arguments(recipeWithItem, stackableItem, 1), //
-				arguments(recipeWithItem, stackableItem, 10)//
+				arguments(recipeWithItem, item, 1), //
+				arguments(recipeWithItem, item, 10)//
 		);
 	}
 
-	private static NonStackableItem<?> mockNonStackableItem() {
-		NonStackableItem<?> item = Mockito.mock(NonStackableItem.class, "non stackable item");
-		Mockito.when(item.duplicate()).then(invocation -> mockNonStackableItem());
-		return item;
-	}
-
-	private static StackableItem<?> mockStackableItem() {
-		return Mockito.mock(StackableItem.class, "stackable item");
+	private static ItemState<?> mockItem() {
+		return Mockito.mock(ItemState.class);
 	}
 }

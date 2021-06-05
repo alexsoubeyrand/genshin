@@ -1,12 +1,14 @@
 package fr.sazaju.genshin;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.PlayerDataHistory.Internal.AbstractHistory;
 import fr.sazaju.genshin.item.ItemStack;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.recipe.Recipe;
 
 public interface PlayerDataHistory {
@@ -25,8 +27,12 @@ public interface PlayerDataHistory {
 		PlayerDataHistory history = this;
 		return new AbstractHistory() {
 			private Recipe getRecipe() {
-				return Recipe.fromDiff(ItemStack.fromPlayerData(data)
-						.minusStack(ItemStack.fromPlayerData(history.getResultingData())));
+				PlayerData previousData = history.getResultingData();
+				ItemStack previousStack = ItemStack.fromPlayerData(previousData);
+				ItemStack nextStack = ItemStack.fromPlayerData(data);
+				ItemStack diffStack = nextStack.minusStack(previousStack);
+				Map<ItemState<?>, Integer> diffMap = diffStack.getMap();
+				return Recipe.fromDiff(diffMap);
 			}
 
 			@Override
@@ -41,8 +47,12 @@ public interface PlayerDataHistory {
 
 			@Override
 			public Recipe getResultingRecipe() {
-				return Recipe.fromDiff(
-						ItemStack.fromPlayerData(data).minusStack(ItemStack.fromPlayerData(history.getInitialData())));
+				ItemStack lastStack = ItemStack.fromPlayerData(data);
+				PlayerData initialData = history.getInitialData();
+				ItemStack initialStack = ItemStack.fromPlayerData(initialData);
+				ItemStack diffStack = lastStack.minusStack(initialStack);
+				Map<ItemState<?>, Integer> diffMap = diffStack.getMap();
+				return Recipe.fromDiff(diffMap);
 			}
 
 			@Override
@@ -101,7 +111,7 @@ public interface PlayerDataHistory {
 
 			@Override
 			public Recipe getResultingRecipe() {
-				return Recipe.fromDiff(ItemStack.empty());
+				return Recipe.empty();
 			}
 
 			@Override
@@ -126,8 +136,7 @@ public interface PlayerDataHistory {
 					return true;
 				} else if (obj instanceof PlayerDataHistory) {
 					PlayerDataHistory that = (PlayerDataHistory) obj;
-					return Objects.equals(ItemStack.fromPlayerData(this.getResultingData()),
-							ItemStack.fromPlayerData(that.getResultingData()))//
+					return Objects.equals(this.getResultingData(), that.getResultingData())//
 							&& Objects.equals(collect(this.streamRecipes()), collect(that.streamRecipes()));
 				} else {
 					return false;
@@ -136,8 +145,7 @@ public interface PlayerDataHistory {
 
 			@Override
 			public int hashCode() {
-				return Objects.hash(Recipe.fromDiff(ItemStack.fromPlayerData(getResultingData())),
-						collect(streamRecipes()));
+				return Objects.hash(getResultingData(), collect(streamRecipes()));
 			}
 
 			private List<Recipe> collect(Stream<Recipe> stream) {

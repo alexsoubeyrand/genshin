@@ -24,14 +24,17 @@ import java.util.stream.Stream;
 import fr.sazaju.genshin.PlayerData;
 import fr.sazaju.genshin.PlayerDataHistory;
 import fr.sazaju.genshin.PlayerDataHistoryFactory;
-import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.weapon.Weapon;
 import fr.sazaju.genshin.item.weapon.WeaponType;
 import fr.sazaju.genshin.leveling.Level;
 import fr.sazaju.genshin.leveling.Levels;
 import fr.sazaju.genshin.recipe.Recipe;
+import fr.sazaju.genshin.recipe.Recipes;
+import fr.sazaju.genshin.tab.Slot;
+import fr.sazaju.genshin.tab.Tab;
 
 public class Main {
 
@@ -41,16 +44,18 @@ public class Main {
 		Weapon weapon = WeaponType.LION_S_ROAR.buildInstance()//
 				.withWeaponLevel(1)//
 				.create();
-		data.add(weapon);
 		Character character = CharacterProfile.KEQING.buildInstance(weapon)//
 				.withCharacterLevel(1)//
 				.create();
+		System.out.println("[Character]");
+		System.out.println(character);
 		// TODO Add to data
 
 		int adventureRank = 40;
 		Levels characterAscensionLevels = character.profile.ascensionLevels//
 				.filter(remainingForCharacterAscension(character).and(allowedForAdventureRank(adventureRank)));
 		ItemStack characterAscensionsCost = characterAscensionLevels.getCost();
+		displayLevels("Ascension", characterAscensionLevels);
 
 		int characterTalentLevelLimit = 6;
 		ItemStack characterTalentsCost = Stream.of(character.normalAttackLevel)//
@@ -61,77 +66,74 @@ public class Main {
 							.getCost();
 				})//
 				.reduce(ItemStack::addStack).get();
+		System.out.println("[Talents total]");
+		displayStack(characterTalentsCost);
 
 		int weaponLevelLimit = 4;
 		Levels weaponAscensionLevels = weapon.type.ascensionLevels//
 				.filter(remainingForWeaponAscension(weapon).and(atMostLevel(weaponLevelLimit))
 						.and(allowedForAdventureRank(adventureRank)));
 		ItemStack weaponAscensionCost = weaponAscensionLevels.getCost();
-
-		Recipe totalCost = Recipe
-				.fromDiff(characterAscensionsCost.addStack(characterTalentsCost).addStack(weaponAscensionCost))
-				.reverse();
-		data = data.addAll(List.of(//
-				ItemEntry.of(weapon), //
-				ItemEntry.of(MORA.item(), Integer.MAX_VALUE), //
-				ItemEntry.of(LAPIS.item(), 200), //
-				ItemEntry.of(PRISM.item(), 26), //
-				ItemEntry.of(VAJRADA.item(TWO_STARS), 26), //
-				ItemEntry.of(VAJRADA.item(THREE_STARS), 29), //
-				ItemEntry.of(NECTAR.item(ONE_STAR), 196), //
-				ItemEntry.of(NECTAR.item(TWO_STARS), 46), //
-				ItemEntry.of(NECTAR.item(THREE_STARS), 12), //
-				ItemEntry.of(GUYUN_PILAR.item(TWO_STARS), 14), //
-				ItemEntry.of(GUYUN_PILAR.item(THREE_STARS), 15), //
-				ItemEntry.of(GUYUN_PILAR.item(FOUR_STARS), 2), //
-				ItemEntry.of(PROSPERITY.item(TWO_STARS), 41), //
-				ItemEntry.of(PROSPERITY.item(THREE_STARS), 53), //
-				ItemEntry.of(SACRIFICIAL_KNIFE.item(TWO_STARS), 78), //
-				ItemEntry.of(SACRIFICIAL_KNIFE.item(THREE_STARS), 15), //
-				ItemEntry.of(SACRIFICIAL_KNIFE.item(FOUR_STARS), 4), //
-				ItemEntry.of(INSIGNIA.item(ONE_STAR), 357), //
-				ItemEntry.of(INSIGNIA.item(TWO_STARS), 79), //
-				ItemEntry.of(INSIGNIA.item(THREE_STARS), 12), //
-				ItemEntry.of(WHITE_IRON_CHUNK.item(), 50), //
-				ItemEntry.of(NORTHLANDER_CATALYST_BILLET.item(), 1), //
-				ItemEntry.of(CRYSTAL_CHUNK.item(), 50)//
-		));
-		PlayerData target = PlayerData.fromItemEntries(totalCost.streamCosts());
-		PlayerDataHistory conversionHistory = new PlayerDataHistoryFactory()
-				.naiveSearch(data, target, Recipe::streamMihoyoRecipes).findFirst().get();
-		PlayerData dataAfterConversion = conversionHistory.getResultingData();
-
-		///////////////////////////////////////
 		System.out.println("[Weapon]");
 		displayLevels("Ascension", weaponAscensionLevels);
 
-		System.out.println("[Character]");
-		System.out.println(character);
-		displayLevels("Ascension", characterAscensionLevels);
-		System.out.println("[Talents total]");
-		displayStack(characterTalentsCost);
+		Recipe totalCost = Recipe.fromDiff(characterAscensionsCost//
+				.addStack(characterTalentsCost)//
+				.addStack(weaponAscensionCost)//
+				.getMap()//
+		).reverse();
 		System.out.println("[Total cost]");
 		displayEntries(totalCost.streamCosts());
 
+		data = data.updateAll(Stream.of(//
+				ItemEntry.of(weapon), //
+				ItemEntry.of(MORA.itemState(), Integer.MAX_VALUE), //
+				ItemEntry.of(LAPIS.itemState(), 200), //
+				ItemEntry.of(PRISM.itemState(), 26), //
+				ItemEntry.of(VAJRADA.itemState(TWO_STARS), 26), //
+				ItemEntry.of(VAJRADA.itemState(THREE_STARS), 29), //
+				ItemEntry.of(NECTAR.itemState(ONE_STAR), 196), //
+				ItemEntry.of(NECTAR.itemState(TWO_STARS), 46), //
+				ItemEntry.of(NECTAR.itemState(THREE_STARS), 12), //
+				ItemEntry.of(GUYUN_PILAR.itemState(TWO_STARS), 14), //
+				ItemEntry.of(GUYUN_PILAR.itemState(THREE_STARS), 15), //
+				ItemEntry.of(GUYUN_PILAR.itemState(FOUR_STARS), 2), //
+				ItemEntry.of(PROSPERITY.itemState(TWO_STARS), 41), //
+				ItemEntry.of(PROSPERITY.itemState(THREE_STARS), 53), //
+				ItemEntry.of(SACRIFICIAL_KNIFE.itemState(TWO_STARS), 78), //
+				ItemEntry.of(SACRIFICIAL_KNIFE.itemState(THREE_STARS), 15), //
+				ItemEntry.of(SACRIFICIAL_KNIFE.itemState(FOUR_STARS), 4), //
+				ItemEntry.of(INSIGNIA.itemState(ONE_STAR), 357), //
+				ItemEntry.of(INSIGNIA.itemState(TWO_STARS), 79), //
+				ItemEntry.of(INSIGNIA.itemState(THREE_STARS), 12), //
+				ItemEntry.of(WHITE_IRON_CHUNK.itemState(), 50), //
+				ItemEntry.of(NORTHLANDER_CATALYST_BILLET.itemState(), 1), //
+				ItemEntry.of(CRYSTAL_CHUNK.itemState(), 50)//
+		));
 		System.out.println("[Available]");
 		displayPlayerData(data);
 
 		System.out.println("[Recipes]");
-		Recipe.streamMihoyoRecipes().forEach(recipe -> {
+		Recipes.streamMihoyoRecipes().forEach(recipe -> {
 			displayRecipe(recipe);
 		});
 
+		PlayerData target = PlayerData.fromItemEntries(totalCost.streamCosts());
+		PlayerDataHistory conversionHistory = new PlayerDataHistoryFactory()
+				.naiveSearch(data, target, Recipes::streamMihoyoRecipes).findFirst().get();
 		System.out.println("[Required Conversions]");
 		conversionHistory.streamRecipes().forEach(Main::displayRecipe);
 
+		PlayerData dataAfterConversion = conversionHistory.getResultingData();
 		System.out.println("[Available After Conversion]");
 		displayPlayerData(dataAfterConversion);
 
 		System.out.println("[Consumed]");
 		displayEntries(totalCost.streamCosts());
 
+		PlayerData dataRemaining = dataAfterConversion.update(totalCost);
 		System.out.println("[Remaining]");
-		displayPlayerData(dataAfterConversion.update(totalCost));
+		displayPlayerData(dataRemaining);
 
 		// TODO Expose on service
 		// TODO Test on service
@@ -171,17 +173,25 @@ public class Main {
 
 	private static void displayEntries(Stream<ItemEntry> entries) {
 		entries//
-				.sorted(Comparator.comparing(entry -> entry.getItem(), Item.syntaxicComparator()))//
+				.sorted(Comparator.comparing(entry -> entry.getItem(), ItemState.syntaxicComparator()))//
 				.forEach(entry -> {
 					System.out.println("  " + entry.getItem() + " x" + entry.getQuantity());
 				});
 	}
-	
+
 	private static void displayPlayerData(PlayerData data) {
-		data.stream()//
-				.sorted(comparing(entry -> entry.getItem(), Item.syntaxicComparator()))//
-				.forEach(entry -> {
-					System.out.println("  " + entry.getItem() + " x" + entry.getQuantity());
+		System.out.println(" <MORAS: " + data.getMoras() + ">");
+		System.out.println(" <RESINS: " + data.getResins() + ">");
+		Stream.of(Tab.values())//
+				.flatMap(tab -> {
+					System.out.println(" <" + tab + ">");
+					return tab.on(data)//
+							.streamSlots()//
+							.sorted(comparing(Slot::getItem, ItemState.syntaxicComparator()));
+				})//
+				.forEach(slot -> {
+					System.out.println("  " + slot);
 				});
+		;
 	}
 }

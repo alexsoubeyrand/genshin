@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import java.util.Collection;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum CharacterAscensionMaterial implements ItemType.WithMultipleRarities {
 	VAJRADA, //
@@ -17,8 +17,8 @@ public enum CharacterAscensionMaterial implements ItemType.WithMultipleRarities 
 	}
 
 	@Override
-	public StackableItem<CharacterAscensionMaterial> item(Rarity rarity) {
-		return new StackableItem<>(this, rarity);
+	public ItemState<CharacterAscensionMaterial> itemState(Rarity rarity) {
+		return new ItemState<>(this, rarity);
 	}
 
 }

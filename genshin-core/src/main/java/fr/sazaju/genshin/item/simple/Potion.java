@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum Potion implements ItemType.WithSingleRarity {
 	/********/
@@ -33,7 +33,7 @@ public enum Potion implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<Potion> item() {
-		return new StackableItem<Potion>(this, getRarity());
+	public ItemState<Potion> itemState() {
+		return new ItemState<Potion>(this, getRarity());
 	}
 }

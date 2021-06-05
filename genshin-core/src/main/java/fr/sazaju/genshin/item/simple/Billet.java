@@ -6,8 +6,8 @@ import static fr.sazaju.genshin.item.weapon.WeaponCategory.*;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 import fr.sazaju.genshin.item.weapon.WeaponCategory;
 
 public enum Billet implements ItemType.WithSingleRarity {
@@ -29,8 +29,8 @@ public enum Billet implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<Billet> item() {
-		return new StackableItem<>(this, getRarity());
+	public ItemState<Billet> itemState() {
+		return new ItemState<>(this, getRarity());
 	}
 
 	public static Billet selectFor(WeaponCategory category) {

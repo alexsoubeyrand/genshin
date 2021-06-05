@@ -3,8 +3,8 @@ package fr.sazaju.genshin.item.simple;
 import static fr.sazaju.genshin.Rarity.*;
 
 import fr.sazaju.genshin.Rarity;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
-import fr.sazaju.genshin.item.StackableItem;
 
 public enum EventMaterial implements ItemType.WithSingleRarity {
 	CROWN_OF_INSIGHT;
@@ -15,7 +15,7 @@ public enum EventMaterial implements ItemType.WithSingleRarity {
 	}
 
 	@Override
-	public StackableItem<EventMaterial> item() {
-		return new StackableItem<>(this, getRarity());
+	public ItemState<EventMaterial> itemState() {
+		return new ItemState<>(this, getRarity());
 	}
 }

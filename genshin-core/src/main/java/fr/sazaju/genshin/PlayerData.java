@@ -1,272 +1,88 @@
 package fr.sazaju.genshin;
 
-import static fr.sazaju.genshin.InventoryTab.Definition.*;
 import static fr.sazaju.genshin.item.simple.Mora.*;
 import static fr.sazaju.genshin.item.simple.OriginalResin.*;
 import static java.util.stream.Collectors.*;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import fr.sazaju.genshin.InventoryTab.NotEnoughItemsException;
-import fr.sazaju.genshin.item.Item;
 import fr.sazaju.genshin.item.ItemEntry;
-import fr.sazaju.genshin.item.StackableItem;
-import fr.sazaju.genshin.item.artifact.Artifact;
-import fr.sazaju.genshin.item.simple.Billet;
-import fr.sazaju.genshin.item.simple.BossDrop;
-import fr.sazaju.genshin.item.simple.CharacterAscensionMaterial;
-import fr.sazaju.genshin.item.simple.CommonAscensionMaterial;
-import fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial;
-import fr.sazaju.genshin.item.simple.EnhancementOre;
-import fr.sazaju.genshin.item.simple.EventMaterial;
-import fr.sazaju.genshin.item.simple.Food;
-import fr.sazaju.genshin.item.simple.ForgingMaterial;
-import fr.sazaju.genshin.item.simple.Gadget;
-import fr.sazaju.genshin.item.simple.LocalSpecialty;
-import fr.sazaju.genshin.item.simple.Potion;
-import fr.sazaju.genshin.item.simple.TalentLevelUpMaterial;
-import fr.sazaju.genshin.item.simple.WeaponAscensionMaterial;
-import fr.sazaju.genshin.item.weapon.Weapon;
+import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.recipe.Recipe;
 
-// TODO ItemSlot.stackable(item, quantity)
-// TODO ItemSlot.nonStackable(item)
-// TODO PlayerData.getTab(WEAPONS).streamSlots()
-// TODO Rename Item as ItemState
-// TODO StackableItem <|- NonStackableItem
-// TODO Replace NonStackableItem by StackableItem (reduce complexity everywhere)
-// TODO Remove NonStackableItem
-// TODO Move StackableItem stuff into Item
-// TODO Remove StackableItem
-// TODO Resume testing
+// TODO Test coverage
 public class PlayerData implements Iterable<ItemEntry> {
-	public static enum Tab {
-		WEAPONS(new InventoryTab.Definition(//
-				items(Weapon.class), //
-				stacks(EnhancementOre.class)//
-		)), //
-		ARTIFACTS(new InventoryTab.Definition(//
-				items(Artifact.class)//
-		)), //
-		ASCENSION_MATERIALS(new InventoryTab.Definition(//
-				stacks(BossDrop.class), //
-				stacks(CharacterAscensionMaterial.class), //
-				stacks(CommonAscensionMaterial.class), //
-				stacks(EliteCommonAscensionMaterial.class), //
-				stacks(EventMaterial.class), //
-				stacks(TalentLevelUpMaterial.class), //
-				stacks(WeaponAscensionMaterial.class)//
-		)), //
-		FOOD(new InventoryTab.Definition(//
-				stacks(Food.class), //
-				stacks(Potion.class)//
-		)), //
-		MATERIALS(new InventoryTab.Definition(//
-				stacks(Billet.class), //
-				stacks(ForgingMaterial.class), //
-				stacks(LocalSpecialty.class)//
-		)), //
-		GADGETS(new InventoryTab.Definition(//
-				stacks(Gadget.class)//
-		)), //
-		QUEST_ITEMS(new InventoryTab.Definition(//
-				stacks(null)// TODO
-		)), //
-		PRECIOUS_ITEMS(new InventoryTab.Definition(//
-				stacks(null)// TODO
-		)), //
-		FURNISHINGS(new InventoryTab.Definition(//
-				stacks(null)// TODO
-		)), //
-		;
 
-		private final InventoryTab.Definition definition;
+	private final Map<ItemState<?>, Integer> map;
 
-		private Tab(InventoryTab.Definition definition) {
-			this.definition = definition;
-		}
-	}
-
-	private final int moras;
-	private final int resin;
-	private final Map<Tab, InventoryTab> tabs;
-
-	private PlayerData(int moras, int resin, Map<Tab, InventoryTab> tabs) {
-		this.moras = moras;
-		this.resin = resin;
-		this.tabs = tabs;
+	private PlayerData(Map<ItemState<?>, Integer> items) {
+		this.map = Collections.unmodifiableMap(items);
 	}
 
 	public boolean isEmpty() {
-		return !stream().findFirst().isPresent();
+		return map.isEmpty();
 	}
 
-	public PlayerData add(Item<?> item) {
-		int newMoras = this.moras;
-		int newResin = this.resin;
-		Map<Tab, InventoryTab> newTabs = new HashMap<>(tabs);
-		Optional<Entry<Tab, InventoryTab>> tab = tabs.entrySet().stream().filter(entry -> entry.getValue().accept(item))
-				.findFirst();
-		if (item.getType().equals(MORA)) {
-			newMoras = newMoras + 1;
-		} else if (item.getType().equals(ORIGINAL_RESIN)) {
-			newResin = newResin + 1;
-		} else if (tab.isPresent()) {
-			Entry<Tab, InventoryTab> entry = tab.get();
-			newTabs.put(entry.getKey(), entry.getValue().add(item));
+	public int getQuantity(ItemState<?> item) {
+		return map.getOrDefault(item, 0);
+	}
+
+	public int getMoras() {
+		return getQuantity(MORA.itemState());
+	}
+
+	public int getResins() {
+		return getQuantity(ORIGINAL_RESIN.itemState());
+	}
+
+	public PlayerData update(ItemState<?> item, int quantity) {
+		int currentQuantity = getQuantity(item);
+		int newQuantity = currentQuantity + quantity;
+		if (newQuantity < 0) {
+			throw new NotEnoughItemsException(item, currentQuantity, -quantity);
+		} else if (newQuantity == 0) {
+			Map<ItemState<?>, Integer> newMap = new HashMap<>(this.map);
+			newMap.remove(item);
+			return new PlayerData(newMap);
 		} else {
-			throw new IllegalArgumentException("Unmanaged item: " + item);
+			Map<ItemState<?>, Integer> newMap = new HashMap<>(this.map);
+			newMap.put(item, newQuantity);
+			return new PlayerData(newMap);
 		}
-		return new PlayerData(newMoras, newResin, newTabs);
 	}
 
-	public PlayerData remove(Item<?> item) {
-		int newMoras = this.moras;
-		int newResin = this.resin;
-		Map<Tab, InventoryTab> newTabs = new HashMap<>(tabs);
-		Optional<Entry<Tab, InventoryTab>> tab = tabs.entrySet().stream().filter(entry -> entry.getValue().accept(item))
-				.findFirst();
-		if (item.getType().equals(MORA)) {
-			if (moras < 1) {
-				throw new NotEnoughItemsException(MORA.item(), moras, 1);
+	public PlayerData updateAll(Stream<ItemEntry> updates) {
+		Map<ItemState<?>, Integer> newMap = new HashMap<>(this.map);
+		updates.forEach(entry -> {
+			ItemState<?> item = entry.getItem();
+			int quantity = entry.getQuantity();
+			int currentQuantity = newMap.getOrDefault(item, 0);
+			int newQuantity = currentQuantity + quantity;
+			if (newQuantity < 0) {
+				throw new NotEnoughItemsException(item, currentQuantity, -quantity);
+			} else if (newQuantity == 0) {
+				newMap.remove(item);
 			} else {
-				newMoras = newMoras - 1;
+				newMap.put(item, newQuantity);
 			}
-		} else if (item.getType().equals(ORIGINAL_RESIN)) {
-			if (resin < 1) {
-				throw new NotEnoughItemsException(ORIGINAL_RESIN.item(), resin, 1);
-			} else {
-				newResin = newResin - 1;
-			}
-		} else if (tab.isPresent()) {
-			Entry<Tab, InventoryTab> entry = tab.get();
-			newTabs.put(entry.getKey(), entry.getValue().remove(item));
-		} else {
-			throw new IllegalArgumentException("Unmanaged item: " + item);
-		}
-		return new PlayerData(newMoras, newResin, newTabs);
-	}
-
-	public PlayerData add(StackableItem<?> item, int quantity) {
-		int newMoras = this.moras;
-		int newResin = this.resin;
-		Map<Tab, InventoryTab> newTabs = new HashMap<>(tabs);
-		Optional<Entry<Tab, InventoryTab>> tab = tabs.entrySet().stream().filter(entry -> entry.getValue().accept(item))
-				.findFirst();
-		if (item.getType().equals(MORA)) {
-			newMoras = newMoras + quantity;
-		} else if (item.getType().equals(ORIGINAL_RESIN)) {
-			newResin = newResin + quantity;
-		} else if (tab.isPresent()) {
-			Entry<Tab, InventoryTab> entry = tab.get();
-			newTabs.put(entry.getKey(), entry.getValue().add(item, quantity));
-		} else {
-			throw new IllegalArgumentException("Unmanaged item: " + item);
-		}
-		return new PlayerData(newMoras, newResin, newTabs);
-	}
-
-	public PlayerData remove(StackableItem<?> item, int quantity) {
-		int newMoras = this.moras;
-		int newResin = this.resin;
-		Map<Tab, InventoryTab> newTabs = new HashMap<>(tabs);
-		Optional<Entry<Tab, InventoryTab>> tab = tabs.entrySet().stream().filter(entry -> entry.getValue().accept(item))
-				.findFirst();
-		if (item.getType().equals(MORA)) {
-			if (moras < quantity) {
-				throw new NotEnoughItemsException(MORA.item(), moras, quantity);
-			} else {
-				newMoras = newMoras - quantity;
-			}
-		} else if (item.getType().equals(ORIGINAL_RESIN)) {
-			if (resin < quantity) {
-				throw new NotEnoughItemsException(ORIGINAL_RESIN.item(), resin, quantity);
-			} else {
-				newResin = newResin - quantity;
-			}
-		} else if (tab.isPresent()) {
-			Entry<Tab, InventoryTab> entry = tab.get();
-			newTabs.put(entry.getKey(), entry.getValue().remove(item, quantity));
-		} else {
-			throw new IllegalArgumentException("Unmanaged item: " + item);
-		}
-		return new PlayerData(newMoras, newResin, newTabs);
-	}
-
-	public PlayerData addAll(Iterable<ItemEntry> items) {
-		PlayerData data = this;
-		for (ItemEntry entry : items) {
-			Item<?> item = entry.getItem();
-			if (item instanceof StackableItem<?>) {
-				StackableItem<?> stackableItem = (StackableItem<?>) item;
-				data = data.add(stackableItem, entry.getQuantity());
-			} else if (entry.getQuantity() > 1) {
-				throw new IllegalArgumentException("Cannot add more than one non stackable item: " + item);
-			} else {
-				data = data.add(item);
-			}
-		}
-		return data;
-	}
-
-	public PlayerData removeAll(Iterable<ItemEntry> items) {
-		PlayerData data = this;
-		for (ItemEntry itemEntry : items) {
-			Item<?> item = itemEntry.getItem();
-			if (item instanceof StackableItem<?>) {
-				StackableItem<?> stackableItem = (StackableItem<?>) item;
-				data = data.remove(stackableItem, itemEntry.getQuantity());
-			} else if (itemEntry.getQuantity() > 1) {
-				throw new IllegalArgumentException("Cannot remove more than one non stackable item: " + item);
-			} else {
-				data = data.remove(item);
-			}
-		}
-		return data;
-	}
-
-	public int getQuantity(Item<?> item) {
-		if (item.getType().equals(MORA)) {
-			return moras;
-		} else if (item.getType().equals(ORIGINAL_RESIN)) {
-			return resin;
-		} else {
-			return tabs.values().stream()//
-					.filter(tab -> tab.accept(item))//
-					.findFirst().orElseThrow(() -> new IllegalArgumentException("Item not managed: " + item))//
-					.stream()//
-					.filter(entry -> entry.getItem().equals(item))//
-					.mapToInt(entry -> entry.getQuantity()).findFirst().orElse(0);
-		}
+		});
+		return new PlayerData(newMap);
 	}
 
 	public Stream<ItemEntry> stream() {
-		Collection<Stream<ItemEntry>> streams = new LinkedList<>();
-
-		if (moras != 0) {
-			streams.add(Stream.of(ItemEntry.of(MORA.item(), moras)));
-		}
-		if (resin != 0) {
-			streams.add(Stream.of(ItemEntry.of(ORIGINAL_RESIN.item(), resin)));
-		}
-		streams.add(tabs.values().stream().flatMap(InventoryTab::stream));
-
-		return streams.stream().flatMap(stream -> stream);
+		return map.entrySet().stream().map(entry -> ItemEntry.of(entry.getKey(), entry.getValue()));
 	}
 
 	public PlayerData update(Recipe recipe) {
-		List<ItemEntry> costs = recipe.streamCosts().collect(toList());
-		List<ItemEntry> products = recipe.streamProducts().collect(toList());
-		return this.addAll(products).removeAll(costs);
+		Stream<ItemEntry> costs = recipe.streamCosts().map(ItemEntry::reverse);
+		Stream<ItemEntry> products = recipe.streamProducts();
+		return this.updateAll(Stream.concat(products, costs));
 	}
 
 	@Override
@@ -275,32 +91,49 @@ public class PlayerData implements Iterable<ItemEntry> {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof PlayerData) {
+			PlayerData that = (PlayerData) obj;
+			return Objects.equals(this.map, that.map);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return map.hashCode();
+	}
+
+	@Override
 	public String toString() {
 		return stream().collect(toList()).toString();
 	}
 
 	public static PlayerData empty() {
-		int moras = 0;
-		int resin = 0;
-		Map<Tab, InventoryTab> tabs = Stream.of(Tab.values())//
-				.collect(toMap(//
-						tab -> tab, //
-						tab -> new InventoryTab(tab.definition)//
-				));
-		return new PlayerData(moras, resin, tabs);
+		return fromMap(Map.of());
 	}
 
-	public static PlayerData fromItemEntries(Iterable<ItemEntry> entries) {
-		return PlayerData.empty().addAll(entries);
+	public static PlayerData fromMap(Map<ItemState<?>, Integer> items) {
+		return new PlayerData(items);
 	}
-	
+
 	public static PlayerData fromItemEntries(Stream<ItemEntry> entries) {
-		return fromItemEntries(entries.collect(toList()));
+		return PlayerData.empty().updateAll(entries);
 	}
 
 	public boolean contains(Iterable<ItemEntry> content) {
 		return !StreamSupport.stream(content.spliterator(), false)//
 				.filter(entry -> entry.getQuantity() > getQuantity(entry.getItem()))//
 				.findAny().isPresent();
+	}
+
+	@SuppressWarnings("serial")
+	public static class NotEnoughItemsException extends IllegalArgumentException {
+		public NotEnoughItemsException(ItemState<?> item, int currentQuantity, int quantityToRemove) {
+			super("Cannot remove " + quantityToRemove + " of " + item + " if there is only " + currentQuantity);
+		}
 	}
 }
