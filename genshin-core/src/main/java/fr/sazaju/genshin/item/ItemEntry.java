@@ -1,5 +1,6 @@
 package fr.sazaju.genshin.item;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class ItemEntry {
@@ -60,5 +61,9 @@ public class ItemEntry {
 
 	public static ItemEntry of(ItemState<?> item, int quantity) {
 		return new ItemEntry(item, quantity);
+	}
+
+	public static ItemEntry fromMapEntry(Map.Entry<ItemState<?>, Integer> entry) {
+		return new ItemEntry(entry.getKey(), entry.getValue());
 	}
 }

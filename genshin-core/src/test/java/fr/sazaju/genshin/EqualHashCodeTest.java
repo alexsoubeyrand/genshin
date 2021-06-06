@@ -9,8 +9,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fr.sazaju.genshin.recipe.Recipe;
-
 @TestInstance(Lifecycle.PER_CLASS)
 public interface EqualHashCodeTest<T> {
 	public static class Comparison<T> {
@@ -23,13 +21,18 @@ public interface EqualHashCodeTest<T> {
 			this.compared = compared;
 			this.expected = expected;
 		}
+
+		@Override
+		public String toString() {
+			return String.format("%s equals %s => %s", tested, compared, expected);
+		}
 	}
 
 	Stream<Comparison<T>> equalityComparisons();
 
 	@ParameterizedTest
 	@MethodSource("equalityComparisons")
-	default void testEquals(Comparison<Recipe> c) {
+	default void testEquals(Comparison<?> c) {
 		assertEquals(c.expected, c.tested.equals(c.compared));
 	}
 
@@ -40,7 +43,7 @@ public interface EqualHashCodeTest<T> {
 
 	@ParameterizedTest
 	@MethodSource
-	default void testHashCode(Comparison<Recipe> c) {
+	default void testHashCode(Comparison<?> c) {
 		assertEquals(c.tested.hashCode(), c.compared.hashCode());
 	}
 }

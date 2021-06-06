@@ -34,7 +34,7 @@ public class Recipe {
 	public Stream<ItemEntry> streamProducts() {
 		return map.entrySet().stream()//
 				.filter(entry -> entry.getValue() > 0)//
-				.map(entry -> ItemEntry.of(entry.getKey(), entry.getValue()));
+				.map(ItemEntry::fromMapEntry);
 	}
 
 	public int getProducedQuantity(ItemState<?> item) {
@@ -44,7 +44,8 @@ public class Recipe {
 	public Stream<ItemEntry> streamCosts() {
 		return map.entrySet().stream()//
 				.filter(entry -> entry.getValue() < 0)//
-				.map(entry -> ItemEntry.of(entry.getKey(), -entry.getValue()));
+				.map(ItemEntry::fromMapEntry)//
+				.map(entry -> entry.reverse());
 	}
 
 	public int getConsumedQuantity(ItemState<?> item) {

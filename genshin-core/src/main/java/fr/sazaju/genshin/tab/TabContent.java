@@ -3,15 +3,15 @@ package fr.sazaju.genshin.tab;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.PlayerData;
+import fr.sazaju.genshin.PlayerState;
 import fr.sazaju.genshin.item.ItemState;
 
 public class TabContent {
 
 	private final Tab key;
-	private final PlayerData data;
+	private final PlayerState data;
 
-	TabContent(Tab key, PlayerData data) {
+	TabContent(Tab key, PlayerState data) {
 		this.key = key;
 		this.data = data;
 	}

@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.sazaju.genshin.PlayerData;
+import fr.sazaju.genshin.PlayerState;
 import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
 import fr.sazaju.genshin.item.artifact.Artifact;
@@ -80,7 +80,7 @@ public enum Tab {
 		return stacks.contains(item.getType().getClass());
 	}
 
-	public TabContent on(PlayerData data) {
+	public TabContent on(PlayerState data) {
 		return new TabContent(this, data);
 	}
 

@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
-import fr.sazaju.genshin.PlayerDataHistoryFactory.RecipesProvider;
+import fr.sazaju.genshin.PlayerStateHistoryFactory.RecipesProvider;
 import fr.sazaju.genshin.recipe.Recipe;
 
 class PlayerDataHistoryFactoryTest {
@@ -18,18 +18,18 @@ class PlayerDataHistoryFactoryTest {
 	@Test
 	void testNaiveSearchReturnsOnlyEmptyHistoryForSameTargetThanSource() {
 		// GIVEN
-		PlayerData data = PlayerData.empty();
+		PlayerState data = PlayerState.empty();
 		RecipesProvider recipesProvider = () -> {
 			throw new RuntimeException("It should not be called because not needed");
 		};
-		PlayerDataHistoryFactory factory = new PlayerDataHistoryFactory();
+		PlayerStateHistoryFactory factory = new PlayerStateHistoryFactory();
 		
 		// WHEN
-		List<PlayerDataHistory> histories = factory.naiveSearch(data, data, recipesProvider).collect(toList());
+		List<PlayerStateHistory> histories = factory.naiveSearch(data, data, recipesProvider).collect(toList());
 		
 		// THEN
 		assertEquals(1, histories.size());
-		PlayerDataHistory history = histories.get(0);
+		PlayerStateHistory history = histories.get(0);
 		// TODO Test history to ensure it works as intended
 		assertEquals(0, history.streamRecipes().count());
 	}

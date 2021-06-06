@@ -7,21 +7,21 @@ import java.util.stream.Stream;
 
 import fr.sazaju.genshin.recipe.Recipe;
 
-public class PlayerDataHistoryFactory {
+public class PlayerStateHistoryFactory {
 	public static interface RecipesProvider {
 		Stream<Recipe> streamRecipes();
 	}
 
-	public Stream<PlayerDataHistory> naiveSearch(PlayerData source, PlayerData target,
+	public Stream<PlayerStateHistory> naiveSearch(PlayerState source, PlayerState target,
 			RecipesProvider recipesProvider) {
-		return naiveSearchRecursive(PlayerDataHistory.from(source), target, recipesProvider);
+		return naiveSearchRecursive(PlayerStateHistory.from(source), target, recipesProvider);
 	}
 
-	private Stream<PlayerDataHistory> naiveSearchRecursive(PlayerDataHistory currentHistory, PlayerData target,
+	private Stream<PlayerStateHistory> naiveSearchRecursive(PlayerStateHistory currentHistory, PlayerState target,
 			RecipesProvider recipesProvider) {
-		PlayerData available = currentHistory.getResultingData();
+		PlayerState available = currentHistory.getResultingData();
 
-		PlayerData missing = PlayerData.fromItemEntries(target.stream()//
+		PlayerState missing = PlayerState.fromItemEntries(target.stream()//
 				.map(entry -> entry.removeQuantity(available.getQuantity(entry.getItem())))//
 				.filter(entry -> entry.getQuantity() > 0)//
 		);
@@ -29,10 +29,10 @@ public class PlayerDataHistoryFactory {
 		if (missing.isEmpty()) {
 			return Stream.of(currentHistory);
 		} else {
-			Stream<PlayerDataHistory> partialHistories = missing.stream()//
+			Stream<PlayerStateHistory> partialHistories = missing.stream()//
 					.map(entry -> entry.getItem())//
 					.flatMap(item -> recipesProvider.streamRecipes().filter(recipe -> recipe.getProducedQuantity(item) > 0))//
-					.filter(recipe -> available.contains(recipe.streamCosts().collect(Collectors.toList())))//
+					.filter(recipe -> available.contains(recipe.streamCosts()))//
 					.map(recipe -> currentHistory.appendRecipe(recipe));
 			// Use optimized flatMap for recursive call
 			return flatMap(partialHistories,

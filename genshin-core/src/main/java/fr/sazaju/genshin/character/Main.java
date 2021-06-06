@@ -9,6 +9,7 @@ import static fr.sazaju.genshin.item.simple.EliteCommonAscensionMaterial.*;
 import static fr.sazaju.genshin.item.simple.ForgingMaterial.*;
 import static fr.sazaju.genshin.item.simple.LocalSpecialty.*;
 import static fr.sazaju.genshin.item.simple.Mora.*;
+import static fr.sazaju.genshin.item.simple.OriginalResin.*;
 import static fr.sazaju.genshin.item.simple.TalentLevelUpMaterial.*;
 import static fr.sazaju.genshin.item.simple.WeaponAscensionMaterial.*;
 import static fr.sazaju.genshin.leveling.Levels.Filter.*;
@@ -21,9 +22,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.PlayerData;
-import fr.sazaju.genshin.PlayerDataHistory;
-import fr.sazaju.genshin.PlayerDataHistoryFactory;
+import fr.sazaju.genshin.PlayerState;
+import fr.sazaju.genshin.PlayerStateHistory;
+import fr.sazaju.genshin.PlayerStateHistoryFactory;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemState;
@@ -39,7 +40,7 @@ import fr.sazaju.genshin.tab.Tab;
 public class Main {
 
 	public static void main(String[] args) {
-		PlayerData data = PlayerData.empty();
+		PlayerState data = PlayerState.empty();
 
 		Weapon weapon = WeaponType.LION_S_ROAR.buildInstance()//
 				.withWeaponLevel(1)//
@@ -85,7 +86,7 @@ public class Main {
 		System.out.println("[Total cost]");
 		displayEntries(totalCost.streamCosts());
 
-		data = data.updateAll(Stream.of(//
+		data = data.update(Stream.of(//
 				ItemEntry.of(weapon), //
 				ItemEntry.of(MORA.itemState(), Integer.MAX_VALUE), //
 				ItemEntry.of(LAPIS.itemState(), 200), //
@@ -118,20 +119,20 @@ public class Main {
 			displayRecipe(recipe);
 		});
 
-		PlayerData target = PlayerData.fromItemEntries(totalCost.streamCosts());
-		PlayerDataHistory conversionHistory = new PlayerDataHistoryFactory()
+		PlayerState target = PlayerState.fromItemEntries(totalCost.streamCosts());
+		PlayerStateHistory conversionHistory = new PlayerStateHistoryFactory()
 				.naiveSearch(data, target, Recipes::streamMihoyoRecipes).findFirst().get();
 		System.out.println("[Required Conversions]");
 		conversionHistory.streamRecipes().forEach(Main::displayRecipe);
 
-		PlayerData dataAfterConversion = conversionHistory.getResultingData();
+		PlayerState dataAfterConversion = conversionHistory.getResultingData();
 		System.out.println("[Available After Conversion]");
 		displayPlayerData(dataAfterConversion);
 
 		System.out.println("[Consumed]");
 		displayEntries(totalCost.streamCosts());
 
-		PlayerData dataRemaining = dataAfterConversion.update(totalCost);
+		PlayerState dataRemaining = dataAfterConversion.update(totalCost.getDiff().entrySet().stream().map(ItemEntry::fromMapEntry));
 		System.out.println("[Remaining]");
 		displayPlayerData(dataRemaining);
 
@@ -179,9 +180,9 @@ public class Main {
 				});
 	}
 
-	private static void displayPlayerData(PlayerData data) {
-		System.out.println(" <MORAS: " + data.getMoras() + ">");
-		System.out.println(" <RESINS: " + data.getResins() + ">");
+	private static void displayPlayerData(PlayerState data) {
+		System.out.println(" <MORAS: " + data.getQuantity(MORA.itemState()) + ">");
+		System.out.println(" <RESINS: " + data.getQuantity(ORIGINAL_RESIN.itemState()) + ">");
 		Stream.of(Tab.values())//
 				.flatMap(tab -> {
 					System.out.println(" <" + tab + ">");

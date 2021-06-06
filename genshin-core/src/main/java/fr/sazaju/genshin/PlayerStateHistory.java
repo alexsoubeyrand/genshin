@@ -6,28 +6,29 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.PlayerDataHistory.Internal.AbstractHistory;
+import fr.sazaju.genshin.PlayerStateHistory.Internal.AbstractHistory;
+import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.recipe.Recipe;
 
-public interface PlayerDataHistory {
+public interface PlayerStateHistory {
 
-	PlayerData getInitialData();
+	PlayerState getInitialData();
 
-	PlayerData getResultingData();
+	PlayerState getResultingData();
 
 	Recipe getResultingRecipe();
 
-	Stream<PlayerData> streamData();
+	Stream<PlayerState> streamData();
 
 	Stream<Recipe> streamRecipes();
 
-	default PlayerDataHistory appendData(PlayerData data) {
-		PlayerDataHistory history = this;
+	default PlayerStateHistory appendData(PlayerState data) {
+		PlayerStateHistory history = this;
 		return new AbstractHistory() {
 			private Recipe getRecipe() {
-				PlayerData previousData = history.getResultingData();
+				PlayerState previousData = history.getResultingData();
 				ItemStack previousStack = ItemStack.fromPlayerData(previousData);
 				ItemStack nextStack = ItemStack.fromPlayerData(data);
 				ItemStack diffStack = nextStack.minusStack(previousStack);
@@ -36,19 +37,19 @@ public interface PlayerDataHistory {
 			}
 
 			@Override
-			public PlayerData getInitialData() {
+			public PlayerState getInitialData() {
 				return history.getInitialData();
 			}
 
 			@Override
-			public PlayerData getResultingData() {
+			public PlayerState getResultingData() {
 				return data;
 			}
 
 			@Override
 			public Recipe getResultingRecipe() {
 				ItemStack lastStack = ItemStack.fromPlayerData(data);
-				PlayerData initialData = history.getInitialData();
+				PlayerState initialData = history.getInitialData();
 				ItemStack initialStack = ItemStack.fromPlayerData(initialData);
 				ItemStack diffStack = lastStack.minusStack(initialStack);
 				Map<ItemState<?>, Integer> diffMap = diffStack.getMap();
@@ -56,7 +57,7 @@ public interface PlayerDataHistory {
 			}
 
 			@Override
-			public Stream<PlayerData> streamData() {
+			public Stream<PlayerState> streamData() {
 				return Stream.concat(history.streamData(), Stream.of(getResultingData()));
 			}
 
@@ -67,17 +68,17 @@ public interface PlayerDataHistory {
 		};
 	}
 
-	default PlayerDataHistory appendRecipe(Recipe recipe) {
-		PlayerDataHistory history = this;
+	default PlayerStateHistory appendRecipe(Recipe recipe) {
+		PlayerStateHistory history = this;
 		return new AbstractHistory() {
 			@Override
-			public PlayerData getInitialData() {
+			public PlayerState getInitialData() {
 				return history.getInitialData();
 			}
 
 			@Override
-			public PlayerData getResultingData() {
-				return history.getResultingData().update(recipe);
+			public PlayerState getResultingData() {
+				return history.getResultingData().update(recipe.getDiff().entrySet().stream().map(ItemEntry::fromMapEntry));
 			}
 
 			@Override
@@ -86,7 +87,7 @@ public interface PlayerDataHistory {
 			}
 
 			@Override
-			public Stream<PlayerData> streamData() {
+			public Stream<PlayerState> streamData() {
 				return Stream.concat(history.streamData(), Stream.of(getResultingData()));
 			}
 
@@ -97,15 +98,15 @@ public interface PlayerDataHistory {
 		};
 	}
 
-	public static PlayerDataHistory from(PlayerData data) {
+	public static PlayerStateHistory from(PlayerState data) {
 		return new AbstractHistory() {
 			@Override
-			public PlayerData getInitialData() {
+			public PlayerState getInitialData() {
 				return data;
 			}
 
 			@Override
-			public PlayerData getResultingData() {
+			public PlayerState getResultingData() {
 				return data;
 			}
 
@@ -115,7 +116,7 @@ public interface PlayerDataHistory {
 			}
 
 			@Override
-			public Stream<PlayerData> streamData() {
+			public Stream<PlayerState> streamData() {
 				return Stream.of(data);
 			}
 
@@ -128,14 +129,14 @@ public interface PlayerDataHistory {
 
 	public static class Internal {
 
-		public static abstract class AbstractHistory implements PlayerDataHistory {
+		public static abstract class AbstractHistory implements PlayerStateHistory {
 
 			@Override
 			public boolean equals(Object obj) {
 				if (obj == this) {
 					return true;
-				} else if (obj instanceof PlayerDataHistory) {
-					PlayerDataHistory that = (PlayerDataHistory) obj;
+				} else if (obj instanceof PlayerStateHistory) {
+					PlayerStateHistory that = (PlayerStateHistory) obj;
 					return Objects.equals(this.getResultingData(), that.getResultingData())//
 							&& Objects.equals(collect(this.streamRecipes()), collect(that.streamRecipes()));
 				} else {

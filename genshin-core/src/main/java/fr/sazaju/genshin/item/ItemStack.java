@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.sazaju.genshin.PlayerData;
+import fr.sazaju.genshin.PlayerState;
 
 // TODO Deprecate
 // TODO Remove
@@ -38,7 +38,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
-	public static ItemStack fromPlayerData(PlayerData data) {
+	public static ItemStack fromPlayerData(PlayerState data) {
 		return fromItemsMap(data.stream().collect(toMap(//
 				ItemEntry::getItem, //
 				ItemEntry::getQuantity//
@@ -124,7 +124,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 	
 	@Override
 	public Iterator<ItemEntry> iterator() {
-		return map.entrySet().stream().map(entry -> ItemEntry.of(entry.getKey(), entry.getValue())).iterator();
+		return map.entrySet().stream().map(ItemEntry::fromMapEntry).iterator();
 	}
 
 	public static ItemStack empty() {
