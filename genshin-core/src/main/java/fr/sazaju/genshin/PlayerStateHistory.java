@@ -7,58 +7,57 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.sazaju.genshin.PlayerStateHistory.Internal.AbstractHistory;
-import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemStack;
 import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.recipe.Recipe;
 
 public interface PlayerStateHistory {
 
-	PlayerState getInitialData();
+	PlayerState getInitialState();
 
-	PlayerState getResultingData();
+	PlayerState getResultingState();
 
 	Recipe getResultingRecipe();
 
-	Stream<PlayerState> streamData();
+	Stream<PlayerState> streamStates();
 
 	Stream<Recipe> streamRecipes();
 
-	default PlayerStateHistory appendData(PlayerState data) {
+	default PlayerStateHistory appendState(PlayerState state) {
 		PlayerStateHistory history = this;
 		return new AbstractHistory() {
 			private Recipe getRecipe() {
-				PlayerState previousData = history.getResultingData();
-				ItemStack previousStack = ItemStack.fromPlayerData(previousData);
-				ItemStack nextStack = ItemStack.fromPlayerData(data);
+				PlayerState previousState = history.getResultingState();
+				ItemStack previousStack = ItemStack.fromPlayerState(previousState);
+				ItemStack nextStack = ItemStack.fromPlayerState(state);
 				ItemStack diffStack = nextStack.minusStack(previousStack);
 				Map<ItemState<?>, Integer> diffMap = diffStack.getMap();
 				return Recipe.fromDiff(diffMap);
 			}
 
 			@Override
-			public PlayerState getInitialData() {
-				return history.getInitialData();
+			public PlayerState getInitialState() {
+				return history.getInitialState();
 			}
 
 			@Override
-			public PlayerState getResultingData() {
-				return data;
+			public PlayerState getResultingState() {
+				return state;
 			}
 
 			@Override
 			public Recipe getResultingRecipe() {
-				ItemStack lastStack = ItemStack.fromPlayerData(data);
-				PlayerState initialData = history.getInitialData();
-				ItemStack initialStack = ItemStack.fromPlayerData(initialData);
+				ItemStack lastStack = ItemStack.fromPlayerState(state);
+				PlayerState initialState = history.getInitialState();
+				ItemStack initialStack = ItemStack.fromPlayerState(initialState);
 				ItemStack diffStack = lastStack.minusStack(initialStack);
 				Map<ItemState<?>, Integer> diffMap = diffStack.getMap();
 				return Recipe.fromDiff(diffMap);
 			}
 
 			@Override
-			public Stream<PlayerState> streamData() {
-				return Stream.concat(history.streamData(), Stream.of(getResultingData()));
+			public Stream<PlayerState> streamStates() {
+				return Stream.concat(history.streamStates(), Stream.of(getResultingState()));
 			}
 
 			@Override
@@ -72,13 +71,13 @@ public interface PlayerStateHistory {
 		PlayerStateHistory history = this;
 		return new AbstractHistory() {
 			@Override
-			public PlayerState getInitialData() {
-				return history.getInitialData();
+			public PlayerState getInitialState() {
+				return history.getInitialState();
 			}
 
 			@Override
-			public PlayerState getResultingData() {
-				return history.getResultingData().update(recipe.getDiff().entrySet().stream().map(ItemEntry::fromMapEntry));
+			public PlayerState getResultingState() {
+				return history.getResultingState().update(recipe.stream());
 			}
 
 			@Override
@@ -87,8 +86,8 @@ public interface PlayerStateHistory {
 			}
 
 			@Override
-			public Stream<PlayerState> streamData() {
-				return Stream.concat(history.streamData(), Stream.of(getResultingData()));
+			public Stream<PlayerState> streamStates() {
+				return Stream.concat(history.streamStates(), Stream.of(getResultingState()));
 			}
 
 			@Override
@@ -98,16 +97,16 @@ public interface PlayerStateHistory {
 		};
 	}
 
-	public static PlayerStateHistory from(PlayerState data) {
+	public static PlayerStateHistory fromState(PlayerState state) {
 		return new AbstractHistory() {
 			@Override
-			public PlayerState getInitialData() {
-				return data;
+			public PlayerState getInitialState() {
+				return state;
 			}
 
 			@Override
-			public PlayerState getResultingData() {
-				return data;
+			public PlayerState getResultingState() {
+				return state;
 			}
 
 			@Override
@@ -116,8 +115,8 @@ public interface PlayerStateHistory {
 			}
 
 			@Override
-			public Stream<PlayerState> streamData() {
-				return Stream.of(data);
+			public Stream<PlayerState> streamStates() {
+				return Stream.of(state);
 			}
 
 			@Override
@@ -137,7 +136,7 @@ public interface PlayerStateHistory {
 					return true;
 				} else if (obj instanceof PlayerStateHistory) {
 					PlayerStateHistory that = (PlayerStateHistory) obj;
-					return Objects.equals(this.getResultingData(), that.getResultingData())//
+					return Objects.equals(this.getResultingState(), that.getResultingState())//
 							&& Objects.equals(collect(this.streamRecipes()), collect(that.streamRecipes()));
 				} else {
 					return false;
@@ -146,7 +145,7 @@ public interface PlayerStateHistory {
 
 			@Override
 			public int hashCode() {
-				return Objects.hash(getResultingData(), collect(streamRecipes()));
+				return Objects.hash(getResultingState(), collect(streamRecipes()));
 			}
 
 			private List<Recipe> collect(Stream<Recipe> stream) {

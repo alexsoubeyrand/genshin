@@ -120,19 +120,19 @@ public class Main {
 		});
 
 		PlayerState target = PlayerState.fromItemEntries(totalCost.streamCosts());
-		PlayerStateHistory conversionHistory = new PlayerStateHistoryFactory()
-				.naiveSearch(data, target, Recipes::streamMihoyoRecipes).findFirst().get();
+		PlayerStateHistory conversionHistory = new PlayerStateHistoryFactory(Recipes::streamMihoyoRecipes)
+				.naiveSearch(data, target).findFirst().get();
 		System.out.println("[Required Conversions]");
 		conversionHistory.streamRecipes().forEach(Main::displayRecipe);
 
-		PlayerState dataAfterConversion = conversionHistory.getResultingData();
+		PlayerState dataAfterConversion = conversionHistory.getResultingState();
 		System.out.println("[Available After Conversion]");
 		displayPlayerData(dataAfterConversion);
 
 		System.out.println("[Consumed]");
 		displayEntries(totalCost.streamCosts());
 
-		PlayerState dataRemaining = dataAfterConversion.update(totalCost.getDiff().entrySet().stream().map(ItemEntry::fromMapEntry));
+		PlayerState dataRemaining = dataAfterConversion.update(totalCost.stream());
 		System.out.println("[Remaining]");
 		displayPlayerData(dataRemaining);
 

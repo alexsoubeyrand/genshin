@@ -4,8 +4,14 @@ import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -60,49 +66,72 @@ class RecipeTest implements EqualHashCodeTest<Recipe> {
 		assertFalse(recipe.isEmpty());
 	}
 
-	static Stream<Map<ItemState<?>, Integer>> testGetDiffReturnsContent() {
-		return Stream.of(//
-				// Empty
-				Map.of(), //
-
-				// Products only
-				Map.of(mockItem(), 1), //
-				Map.of(mockItem(), 10), //
-				Map.of(//
-						mockItem(), 1, //
-						mockItem(), 10//
-				), //
-
-				// Costs only
-				Map.of(mockItem(), -1), //
-				Map.of(mockItem(), -10), //
-				Map.of(//
-						mockItem(), -1, //
-						mockItem(), -10//
-				), //
-
-				// Products and costs
-				Map.of(//
-						mockItem(), -1, //
-						mockItem(), -5, //
-						mockItem(), 1, //
-						mockItem(), 10//
-				)//
-		);
-	}
-
 	@ParameterizedTest
-	@MethodSource
-	void testGetDiffReturnsContent(Map<ItemState<?>, Integer> map) {
-		assertTrue(Recipe.fromDiff(map).getDiff().equals(map));
+	@MethodSource("validContents")
+	void testGetDiffReturnsCorrectItemsAndQuantities(Map<ItemState<?>, Integer> content) {
+		assertTrue(Recipe.fromDiff(content).getDiff().equals(content));
 	}
 
 	@Test
 	void testGetDiffDoesNotReturnZeros() {
-		Recipe recipe = Recipe.fromDiff(Map.of(//
-				mockItem(), 0//
+		assertTrue(Recipe.fromDiff(Map.of(mockItem(), 0)).getDiff().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("validContents")
+	void testStreamReturnsCorrectItemsAndQuantities(Map<ItemState<?>, Integer> content) {
+		Stream<ItemEntry> stream = Recipe.fromDiff(content).stream();
+		Map<ItemState<?>, Integer> streamed = stream.collect(Collectors.toMap(//
+				entry -> entry.getItem(), //
+				entry -> entry.getQuantity()//
 		));
-		assertTrue(recipe.getDiff().isEmpty());
+		assertEquals(content, streamed);
+	}
+
+	@ParameterizedTest
+	@MethodSource("validContents")
+	void testStreamDoesNotReturnSameEntryTwice(Map<ItemState<?>, Integer> content) {
+		Recipe recipe = Recipe.fromDiff(content);
+		List<ItemEntry> streamed = recipe.stream().collect(Collectors.toList());
+		Set<ItemEntry> unique = recipe.stream().collect(Collectors.toSet());
+		assertEquals(unique.size(), streamed.size());
+	}
+
+	@Test
+	void testStreamDoesNotReturnZeros() {
+		assertEquals(0, Recipe.fromDiff(Map.of(mockItem(), 0)).stream().count());
+	}
+
+	@ParameterizedTest
+	@MethodSource("validContents")
+	void testIteratorReturnsCorrectItemsAndQuantities(Map<ItemState<?>, Integer> content) {
+		Iterator<ItemEntry> iterator = Recipe.fromDiff(content).iterator();
+		Map<ItemState<?>, Integer> iterated = new HashMap<>();
+		while (iterator.hasNext()) {
+			ItemEntry entry = iterator.next();
+			iterated.put(entry.getItem(), entry.getQuantity());
+		}
+		assertEquals(content, iterated);
+	}
+
+	@ParameterizedTest
+	@MethodSource("validContents")
+	void testIteratorDoesNotReturnSameEntryTwice(Map<ItemState<?>, Integer> map) {
+		Recipe recipe = Recipe.fromDiff(map);
+		Iterator<ItemEntry> iterator = recipe.iterator();
+		List<ItemEntry> iterated = new LinkedList<>();
+		Set<ItemEntry> unique = new HashSet<>();
+		while (iterator.hasNext()) {
+			ItemEntry itemEntry = iterator.next();
+			iterated.add(itemEntry);
+			unique.add(itemEntry);
+		}
+		assertEquals(unique.size(), iterated.size());
+	}
+
+	@Test
+	void testIteratorDoesNotReturnZeros() {
+		assertEquals(0, Recipe.fromDiff(Map.of(mockItem(), 0)).stream().count());
 	}
 
 	@ParameterizedTest
@@ -165,10 +194,6 @@ class RecipeTest implements EqualHashCodeTest<Recipe> {
 	@MethodSource("recipeUpdates")
 	void testProducesAddsProduct(Recipe recipe, ItemState<?> item, int addedCost) {
 		assertEquals(recipe.getQuantity(item) + addedCost, recipe.produces(item, addedCost).getQuantity(item));
-	}
-
-	static Stream<Integer> itemQuantities() {
-		return Stream.of(0, 1, 123);
 	}
 
 	@ParameterizedTest
@@ -317,6 +342,41 @@ class RecipeTest implements EqualHashCodeTest<Recipe> {
 				Recipe.fromDiff(Map.of(item, 0)), //
 				Recipe.empty().consumes(item, quantity).produces(item, quantity)//
 		);
+	}
+
+	static Stream<Map<ItemState<?>, Integer>> validContents() {
+		return Stream.of(//
+				// Empty
+				Map.of(), //
+
+				// Products only
+				Map.of(mockItem(), 1), //
+				Map.of(mockItem(), 10), //
+				Map.of(//
+						mockItem(), 1, //
+						mockItem(), 10//
+				), //
+
+				// Costs only
+				Map.of(mockItem(), -1), //
+				Map.of(mockItem(), -10), //
+				Map.of(//
+						mockItem(), -1, //
+						mockItem(), -10//
+				), //
+
+				// Products and costs
+				Map.of(//
+						mockItem(), -1, //
+						mockItem(), -5, //
+						mockItem(), 1, //
+						mockItem(), 10//
+				)//
+		);
+	}
+
+	static Stream<Integer> itemQuantities() {
+		return Stream.of(0, 1, 123);
 	}
 
 	static Stream<Arguments> recipeUpdates() {

@@ -27,6 +27,7 @@ import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemState;
 import fr.sazaju.genshin.item.ItemType;
 
+// TODO Try test interface per factory method (like PlayerStateHistoryTest) instead of source method
 class PlayerStateTest implements EqualHashCodeTest<PlayerState> {
 
 	@Override

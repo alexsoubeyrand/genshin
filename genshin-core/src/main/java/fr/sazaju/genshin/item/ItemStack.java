@@ -38,7 +38,7 @@ public class ItemStack implements Iterable<ItemEntry> {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
-	public static ItemStack fromPlayerData(PlayerState data) {
+	public static ItemStack fromPlayerState(PlayerState data) {
 		return fromItemsMap(data.stream().collect(toMap(//
 				ItemEntry::getItem, //
 				ItemEntry::getQuantity//

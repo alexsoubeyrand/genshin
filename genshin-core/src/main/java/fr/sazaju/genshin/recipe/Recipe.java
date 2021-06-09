@@ -2,6 +2,7 @@ package fr.sazaju.genshin.recipe;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -11,7 +12,7 @@ import java.util.stream.Stream;
 import fr.sazaju.genshin.item.ItemEntry;
 import fr.sazaju.genshin.item.ItemState;
 
-public class Recipe {
+public class Recipe implements Iterable<ItemEntry> {
 
 	private final Map<ItemState<?>, Integer> map;
 
@@ -25,6 +26,15 @@ public class Recipe {
 
 	public Map<ItemState<?>, Integer> getDiff() {
 		return map;
+	}
+	
+	public Stream<ItemEntry> stream() {
+		return map.entrySet().stream().map(ItemEntry::fromMapEntry);
+	}
+	
+	@Override
+	public Iterator<ItemEntry> iterator() {
+		return stream().iterator();
 	}
 
 	public int getQuantity(ItemState<?> item) {
