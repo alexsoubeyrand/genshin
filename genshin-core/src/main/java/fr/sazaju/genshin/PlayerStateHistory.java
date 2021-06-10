@@ -136,7 +136,7 @@ public interface PlayerStateHistory {
 					return true;
 				} else if (obj instanceof PlayerStateHistory) {
 					PlayerStateHistory that = (PlayerStateHistory) obj;
-					return Objects.equals(this.getResultingState(), that.getResultingState())//
+					return Objects.equals(this.getInitialState(), that.getInitialState())//
 							&& Objects.equals(collect(this.streamRecipes()), collect(that.streamRecipes()));
 				} else {
 					return false;
@@ -145,11 +145,16 @@ public interface PlayerStateHistory {
 
 			@Override
 			public int hashCode() {
-				return Objects.hash(getResultingState(), collect(streamRecipes()));
+				return Objects.hash(getInitialState(), collect(streamRecipes()));
 			}
 
 			private List<Recipe> collect(Stream<Recipe> stream) {
 				return stream.collect(Collectors.toList());
+			}
+
+			@Override
+			public String toString() {
+				return streamStates().map(PlayerState::toString).collect(Collectors.joining(" > "));
 			}
 		}
 	}
