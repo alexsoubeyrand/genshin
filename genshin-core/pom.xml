@@ -17,7 +17,10 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 
+		<!-- VERSIONS -->
 		<junit-jupiter.version>5.6.0</junit-jupiter.version>
+		<maven-compiler.version>3.8.1</maven-compiler.version>
+		<maven-jar.version>3.2.0</maven-jar.version>
 		<mockito.version>3.10.0</mockito.version>
 	</properties>
 
@@ -26,11 +29,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven-compiler.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar.version}</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
