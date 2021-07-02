@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -136,6 +137,7 @@ class PlayerStateHistoryFactoryTest {
 
 	@ParameterizedTest(name = "From {0} to {1} with recipes {2} should provide histories {3}")
 	@MethodSource
+	@Disabled
 	void testNaiveSearchReturnsAllHistoriesWhenSeveralPossibleRecipesSequences(PlayerState source, PlayerState target,
 			RecipesProvider recipesProvider, Set<PlayerStateHistory> possibleHistories) {
 		// GIVEN
