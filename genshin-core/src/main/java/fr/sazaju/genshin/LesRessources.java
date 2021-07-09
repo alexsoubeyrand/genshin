@@ -1,65 +1,78 @@
 package fr.sazaju.genshin;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LesRessources {
-	public static void main(String[] args) {
-		
-		System.out.println("Slime_Cs : " + locate("Slime_Cs"));
-		
-		System.out.println("D_Masks : " + locate("D_Masks"));
-		
-		System.out.println("F_Arrowheads : " + locate("F_Arrowheads"));
-		
-		System.out.println("D_Scrolls : " + locate("D_Scrolls"));
-		
-		System.out.println("TH_Insignia : " + locate("TH_Insignia"));
-		
-		System.out.println("R_Insignia : " + locate("R_Insignia"));
-		
-		System.out.println("W_Nectar : " + locate("W_Nectar"));
-		
-		
-	}
 
-	private static List<String> locate(String resource) {
-		// TODO Auto-generated method stub
-		List<String> locations;
-		switch (resource) {
-		
-			case "Slime_Cs" :
-				locations = List.of("Slimes");
-				break;
+	private static enum Resource {
 
-			case "D_Masks" :
-				locations = List.of("Hillchurls");
-				break;
-				
-			case "F_Arrowheads" :
-				locations = List.of("Hillchurl_Shooters");
-				break;
-				
-			case "D_Scrolls" :
-				locations = List.of("Samachurls");
-				break;
-				
-			case "TH_Insignia" :
-				locations = List.of("Treasure_Hoarders");
-				break;
-				
-			case "R_Insignia" :
-				locations = List.of("Fatuis");
-				break;
-				
-			case "W_Nectar" :
-				locations = List.of("Whopperflowers");
-				break;
-				
-			default :
-				locations = List.of();
-				break;
+		SLIME_CS("Slime Condensates"), //
+		D_MASKS("Damaged Masks"), //
+		F_ARROWHEADS("Firm Arrowheads"), //
+		D_SCROLLS("Divining Scrolls"), //
+		TH_INSIGNIA("Treasure Hoarder Insignia"), //
+		R_INSIGNIA("Recruit's Insignia"), //
+		W_NECTAR("Whopperflower Nectar");
+
+		private final String name;
+
+		Resource(String name) {
+			this.name = name;
 		}
-		return locations;
+
+		@Override
+		public String toString() {
+			return name;
+		}
+
 	}
 
+	private static enum Enemy {
+		SLIMES("Slimes", List.of(Resource.SLIME_CS)), //
+		HILICURLS("Hilicurls", List.of(Resource.D_MASKS)), //
+		SAMACURLS("Samacurls", List.of(Resource.D_MASKS, Resource.D_SCROLLS)), //
+		MITACURLS("Mitacurls", List.of(Resource.D_MASKS)), //
+		LAWACURLS("Lawacurls", List.of(Resource.D_MASKS)), //
+		HILICURL_SHOOTERS("Hilicurl Shooters", List.of(Resource.F_ARROWHEADS)), //
+		TREASURE_HOARDERS("Treasure Hoarders", List.of(Resource.TH_INSIGNIA)), //
+		FATUIS("Fatuis", List.of(Resource.R_INSIGNIA)), //
+		WHOPPERFLOWERS("Whopperflowers", List.of(Resource.W_NECTAR));
+
+		private final String name;
+		private final List<Resource> droppedResources;
+
+		Enemy(String name) {
+			this.name = name;
+			this.droppedResources = List.of();
+		}
+
+		Enemy(String name, List<Resource> droppedResources) {
+			this.name = name;
+			this.droppedResources = droppedResources;
+		}
+
+		public List<Resource> getDroppedResources() {
+			return droppedResources;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
+
+	public static void main(String[] args) {
+		for (Resource resource : Resource.values()) {
+			System.out.println(resource + " : " + locate(resource));
+		}
+	}
+
+	private static List<Enemy> locate(Resource resource) {
+		return Stream.of(Enemy.values())//
+				.filter(enemy -> enemy.getDroppedResources().contains(resource))//
+				.collect(Collectors.toList());
+	}
 }
