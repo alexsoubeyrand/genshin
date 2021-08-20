@@ -1,40 +1,29 @@
 package fr.sazaju.genshin;
 
 import java.util.Map;
-import java.util.Set;
-
+//TODO Prendre en charge les réductions
 public enum Shop {
-	FLORA(), //
-	BLANCHE()
+	FLORA(Map.of(Resource.SWEET_FLOWER, 200, Resource.CECILIA, 1000)), //
+	BLANCHE(Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80)), //
+	DONGSHENG(Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80, Resource.SHRIMP_MEAT, 120)),
+	GOOD_HUNTER(Map.of(Resource.FLOUR, 150, Resource.TEYVAT_FRIED_EGG, 200, Resource.MINT_JELLY_RECIPE, 1250))
 
 	;
 
-	// Comment factoriser "sells" et "getPrice"
-	
+	private Map<Resource, Integer> prices;
+
+	Shop(Map<Resource, Integer> prices) {
+		this.prices = prices;
+	}
+
 	boolean sells(Resource resource) {
-		Set<Resource> resources = Set.of();
-		if (this == FLORA) {
-			resources = Set.of(Resource.SWEET_FLOWER, Resource.CECILIA);
-		} else if (this == BLANCHE) {
-			resources = Set.of(Resource.WHEAT);
-		} else {
-			throw new RuntimeException(this + " isn't supported yet");
-		}
-		return resources.contains(resource);
+		return this.prices.keySet().contains(resource);
 	}
 
 	Integer getPrice(Resource resource) {
-		Map<Resource, Integer> map;
-		if (this == FLORA) {
-			map = Map.of(Resource.SWEET_FLOWER, 200, Resource.CECILIA, 1000);
-		} else if (this == BLANCHE) {
-			map = Map.of(Resource.WHEAT, 100);
-		} else {
-			throw new RuntimeException(this + " isn't supported yet");
-		}
-
-		if (map.containsKey(resource)) {
-			return map.get(resource);
+		
+		if (prices.containsKey(resource)) {
+			return prices.get(resource);
 		} else {
 			throw new IllegalArgumentException(resource + " isn't sold by " + this);
 		}
