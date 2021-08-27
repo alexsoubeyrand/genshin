@@ -50,13 +50,21 @@ class ResourceLocatorTest {
 	
 	@Test
 	void testLocateBlanche() {
-		assertEquals(Set.of(Shop.BLANCHE), new ResourceLocator().locateShops(Resource.WHEAT));
+		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), new ResourceLocator().locateShops(Resource.WHEAT));
 	}
 	
 	@Test
 	void testLocateCookedDishes() {
 		assertEquals(Set.of(Shop.GOOD_HUNTER), new ResourceLocator().locateShops(Resource.Type.COOKED_DISH));
 	}
+	
+	@Test
+	void testLocateEnemiesDrop() {
+		assertEquals(Set.of(), new ResourceLocator().locateShops(Resource.Type.ENEMIES_DROP));
+	}
+	
+	// TODO testLocateShops(Resource.Type type)
+	
 //	arguments(Resource.SWEET_FLOWER, Set.of(Shop.FLORA)),
 //	arguments(Resource.CECILIA, Set.of(Shop.FLORA)),
 //	arguments(Resource.SMALL_LAMP_GRASS, Set.of(Shop.FLORA)),

@@ -19,10 +19,16 @@ public class ResourceLocator {
 				.collect(Collectors.toSet());
 	}
 
-	//Implémenter la méthode pour la valider avec plusieurs tests
+	// Factoriser les deux locateShops
 	public Set<Shop> locateShops(Resource.Type resourceType) {
-		// TODO Auto-generated method stub
-		return null;
+		return Stream.of(Shop.values())//
+				.filter(shop -> {
+					return shop.getItemsSold().stream() //
+							.filter(resource -> resource.getType().equals(resourceType)) //
+							.findFirst().isPresent();
+				})//
+				.collect(Collectors.toSet())//
+		;
 	}
 
 }

@@ -1,6 +1,9 @@
 package fr.sazaju.genshin;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 //TODO Prendre en charge les réductions
 public enum Shop {
 	FLORA(Map.of(Resource.SWEET_FLOWER, 200, Resource.CECILIA, 1000)), //
@@ -21,11 +24,16 @@ public enum Shop {
 	}
 
 	Integer getPrice(Resource resource) {
-		
+
 		if (prices.containsKey(resource)) {
 			return prices.get(resource);
 		} else {
 			throw new IllegalArgumentException(resource + " isn't sold by " + this);
 		}
 	}
+
+	public Set<Resource> getItemsSold() {
+		return this.prices.keySet();
+	}
+
 }
