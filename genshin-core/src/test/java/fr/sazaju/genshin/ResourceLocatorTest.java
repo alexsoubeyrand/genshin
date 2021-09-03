@@ -1,5 +1,13 @@
 package fr.sazaju.genshin;
 
+import static fr.sazaju.genshin.Resource.CECILIA;
+import static fr.sazaju.genshin.Resource.SLIME_CS;
+import static fr.sazaju.genshin.Resource.SWEET_FLOWER;
+import static fr.sazaju.genshin.Resource.WHEAT;
+import static fr.sazaju.genshin.Resource.Type.COOKED_DISH;
+import static fr.sazaju.genshin.Resource.Type.ENEMIES_DROP;
+import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resource;
+import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resourceType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -9,9 +17,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentest4j.AssertionFailedError;
 
-import com.sun.jdi.connect.Connector.Argument;
+import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
 
@@ -24,47 +31,83 @@ class ResourceLocatorTest {
 				arguments(Resource.TH_INSIGNIA, Set.of(Enemy.TREASURE_HOARDERS)), //
 				arguments(Resource.R_INSIGNIA, Set.of(Enemy.FATUIS)), //
 				arguments(Resource.W_NECTAR, Set.of(Enemy.WHOPPERFLOWERS)) //
-				);
+		);
 	}
-	
+
 	@ParameterizedTest
 	@MethodSource
 	void testLocateEnemies(Resource resource, Set<Enemy> expected) {
 		assertEquals(expected, new ResourceLocator().locateEnemies(resource));
 	}
-	
+
 	@Test
 	void testLocateShops() {
-		assertEquals(Set.of(Shop.FLORA), new ResourceLocator().locateShops(Resource.SWEET_FLOWER));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(Shop.FLORA), r.locateShops(resource(SWEET_FLOWER)));
 	}
-	
+
 	@Test
 	void testLocateShops2() {
-		assertEquals(Set.of(), new ResourceLocator().locateShops(Resource.SLIME_CS));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(), r.locateShops(resource(SLIME_CS)));
 	}
-	
+
 	@Test
 	void testLocateShops3() {
-		assertEquals(Set.of(Shop.FLORA), new ResourceLocator().locateShops(Resource.CECILIA));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(Shop.FLORA), r.locateShops(resource(CECILIA)));
 	}
-	
+
 	@Test
 	void testLocateBlanche() {
-		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), new ResourceLocator().locateShops(Resource.WHEAT));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), r.locateShops(resource(WHEAT)));
 	}
-	
+
 	@Test
 	void testLocateCookedDishes() {
-		assertEquals(Set.of(Shop.GOOD_HUNTER), new ResourceLocator().locateShops(Resource.Type.COOKED_DISH));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(Shop.GOOD_HUNTER), r.locateShops(resourceType(COOKED_DISH)));
 	}
-	
+
 	@Test
 	void testLocateEnemiesDrop() {
-		assertEquals(Set.of(), new ResourceLocator().locateShops(Resource.Type.ENEMIES_DROP));
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(), r.locateShops(resourceType(ENEMIES_DROP)));
+	}
+
+	public interface testInterface {
+		public void doSomething();
+	}
+
+	public class testClass implements testInterface {
+		public void doSomething() {
+			System.out.println("Hello World !");
+		}
 	}
 	
+	public class testClass2 implements testInterface {
+
+		@Override
+		public void doSomething() {
+			System.out.println("Bonjour monde !");
+			
+		}
+		
+	}
+
+	@Test
+	void test() {
+		ResourceLocator r = new ResourceLocator();
+		assertEquals(Set.of(Shop.BLANCHE, Shop.FLORA), r.locateShops(numberOfItemsSold(2)));
+	}
+
+	private ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
+		return shop -> shop.getItemsSold().size() == numberOfItemsSold;
+	}
+
 	// TODO testLocateShops(Resource.Type type)
-	
+
 //	arguments(Resource.SWEET_FLOWER, Set.of(Shop.FLORA)),
 //	arguments(Resource.CECILIA, Set.of(Shop.FLORA)),
 //	arguments(Resource.SMALL_LAMP_GRASS, Set.of(Shop.FLORA)),
