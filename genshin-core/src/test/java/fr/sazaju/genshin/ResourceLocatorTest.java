@@ -6,7 +6,6 @@ import static fr.sazaju.genshin.Resource.SWEET_FLOWER;
 import static fr.sazaju.genshin.Resource.WHEAT;
 import static fr.sazaju.genshin.Resource.Type.COOKED_DISH;
 import static fr.sazaju.genshin.Resource.Type.ENEMIES_DROP;
-import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resource;
 import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resourceType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import fr.sazaju.genshin.ResourceLocator.EnemyPredicate;
 import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
@@ -37,31 +37,31 @@ class ResourceLocatorTest {
 	@ParameterizedTest
 	@MethodSource
 	void testLocateEnemies(Resource resource, Set<Enemy> expected) {
-		assertEquals(expected, new ResourceLocator().locateEnemies(resource));
+		assertEquals(expected, new ResourceLocator().locateEnemies(EnemyPredicate.resource(resource)));
 	}
 
 	@Test
 	void testLocateShops() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.FLORA), r.locateShops(resource(SWEET_FLOWER)));
+		assertEquals(Set.of(Shop.FLORA), r.locateShops(ShopPredicate.resource(SWEET_FLOWER)));
 	}
 
 	@Test
 	void testLocateShops2() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(), r.locateShops(resource(SLIME_CS)));
+		assertEquals(Set.of(), r.locateShops(ShopPredicate.resource(SLIME_CS)));
 	}
 
 	@Test
 	void testLocateShops3() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.FLORA), r.locateShops(resource(CECILIA)));
+		assertEquals(Set.of(Shop.FLORA), r.locateShops(ShopPredicate.resource(CECILIA)));
 	}
 
 	@Test
 	void testLocateBlanche() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), r.locateShops(resource(WHEAT)));
+		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), r.locateShops(ShopPredicate.resource(WHEAT)));
 	}
 
 	@Test
@@ -103,7 +103,7 @@ class ResourceLocatorTest {
 	}
 
 	private ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
-		return shop -> shop.getItemsSold().size() == numberOfItemsSold;
+		return shop ->	 shop.getItemsSold().size() == numberOfItemsSold;
 	}
 
 	// TODO testLocateShops(Resource.Type type)

@@ -8,11 +8,31 @@ import java.util.stream.Stream;
 public class ResourceLocator {
 	
 	// locateEnemies(Resource.Type type) et factoriser pour n'avoir qu'une seule méthode
-	public Set<Enemy> locateEnemies(Resource resource) {
+//	public Set<Enemy> locateEnemies(Resource resource) {
+//
+//		return Stream.of(Enemy.values())//
+//				.filter(enemy -> enemy.getDroppedResources().contains(resource))//
+//				.collect(Collectors.toSet());
+//	}
+	
+	public static interface EnemyPredicate extends Predicate<Enemy> {
 
+		public static EnemyPredicate resource(Resource resource) {
+			return enemy -> enemy.drops(resource);
+		}
+
+		public static EnemyPredicate resourceType(Resource.Type resourceType) {
+			return enemy -> enemy.getDroppedResources().stream() //
+					.filter(resource -> resource.getType().equals(resourceType)) //
+					.findFirst().isPresent();
+		}
+	}
+	
+	public Set<Enemy> locateEnemies(EnemyPredicate predicate) {
 		return Stream.of(Enemy.values())//
-				.filter(enemy -> enemy.getDroppedResources().contains(resource))//
-				.collect(Collectors.toSet());
+				.filter(predicate)//
+				.collect(Collectors.toSet())//
+		;
 	}
 
 	public static interface ShopPredicate extends Predicate<Shop> {
