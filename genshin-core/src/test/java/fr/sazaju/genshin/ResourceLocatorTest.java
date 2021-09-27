@@ -4,17 +4,20 @@ import static fr.sazaju.genshin.Resource.CECILIA;
 import static fr.sazaju.genshin.Resource.SLIME_CS;
 import static fr.sazaju.genshin.Resource.SWEET_FLOWER;
 import static fr.sazaju.genshin.Resource.WHEAT;
-import static fr.sazaju.genshin.Resource.Type.COOKED_DISH;
+import static fr.sazaju.genshin.Resource.Type.*;
 import static fr.sazaju.genshin.Resource.Type.ENEMIES_DROP;
 import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resourceType;
+import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import fr.sazaju.genshin.ResourceLocator.EnemyPredicate;
@@ -33,11 +36,27 @@ class ResourceLocatorTest {
 				arguments(Resource.W_NECTAR, Set.of(Enemy.WHOPPERFLOWERS)) //
 		);
 	}
+	
 
 	@ParameterizedTest
 	@MethodSource
 	void testLocateEnemies(Resource resource, Set<Enemy> expected) {
 		assertEquals(expected, new ResourceLocator().locateEnemies(EnemyPredicate.resource(resource)));
+	}
+	
+	//Factoriser LocateEnemies et LocateShops (une seule méthode locate avec Predicate)
+	static List <Arguments> testLocateEnemiesOnResourceType() {
+		List<Arguments> list = new LinkedList<>();
+		for (Resource.Type type : Resource.Type.values()) {
+			list.add(arguments(type, type.equals(ENEMIES_DROP) ? Set.of(Enemy.values()) : emptySet()));
+		}
+		return list;
+	}
+	
+	@ParameterizedTest
+	@MethodSource
+	void testLocateEnemiesOnResourceType(Resource.Type type, Set<Enemy> expected) {
+		assertEquals(expected, new ResourceLocator().locateEnemies(EnemyPredicate.resourceType(type)));
 	}
 
 	@Test
@@ -105,6 +124,8 @@ class ResourceLocatorTest {
 	private ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
 		return shop ->	 shop.getItemsSold().size() == numberOfItemsSold;
 	}
+	
+	
 
 	// TODO testLocateShops(Resource.Type type)
 
