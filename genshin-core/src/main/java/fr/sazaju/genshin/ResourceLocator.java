@@ -17,7 +17,9 @@ public class ResourceLocator {
 	
 	public static interface EnemyPredicate extends Predicate<Enemy> {
 
-		public static EnemyPredicate resource(Resource resource) {
+		
+		
+		public static EnemyPredicate dropping(Resource resource) {
 			return enemy -> enemy.drops(resource);
 		}
 
@@ -28,17 +30,15 @@ public class ResourceLocator {
 		}
 	}
 	
-	public Set<Enemy> locateEnemies(EnemyPredicate predicate) {
-		return Stream.of(Enemy.values())//
-				.filter(predicate)//
-				.collect(Collectors.toSet())//
-		;
-	}
-
 	public static interface ShopPredicate extends Predicate<Shop> {
 
-		public static ShopPredicate resource(Resource resource) {
-			return shop -> shop.sells(resource);
+		public static ShopPredicate selling(Resource resource) {
+			return new ShopPredicate() {
+				@Override
+				public boolean test(Shop shop) {
+					return shop.sells(resource);
+				}
+			};
 		}
 
 		public static ShopPredicate resourceType(Resource.Type resourceType) {
@@ -48,8 +48,8 @@ public class ResourceLocator {
 		}
 	}
 
-	public Set<Shop> locateShops(ShopPredicate predicate) {
-		return Stream.of(Shop.values())//
+	public <T extends Enum<T>> Set<T> locate(Class <T> enumClass, Predicate<T> predicate) {
+		return Stream.of(enumClass.getEnumConstants())//
 				.filter(predicate)//
 				.collect(Collectors.toSet())//
 		;

@@ -6,7 +6,9 @@ import static fr.sazaju.genshin.Resource.SWEET_FLOWER;
 import static fr.sazaju.genshin.Resource.WHEAT;
 import static fr.sazaju.genshin.Resource.Type.*;
 import static fr.sazaju.genshin.Resource.Type.ENEMIES_DROP;
+import static fr.sazaju.genshin.ResourceLocator.EnemyPredicate.dropping;
 import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.resourceType;
+import static fr.sazaju.genshin.ResourceLocator.ShopPredicate.selling;
 import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -25,7 +27,8 @@ import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
 
-	static List<Object> testLocateEnemies() {
+	//Generaliser pour mettre des shops dans les arguments et adapter la méthode "testLocate"
+	static List<Object> testLocate() {
 		return List.of(//
 				arguments(Resource.SLIME_CS, Set.of(Enemy.SLIMES)), //
 				arguments(Resource.D_MASKS, Set.of(Enemy.HILICURLS, Enemy.LAWACURLS, Enemy.MITACURLS, Enemy.SAMACURLS)), //
@@ -37,14 +40,13 @@ class ResourceLocatorTest {
 		);
 	}
 	
-
 	@ParameterizedTest
 	@MethodSource
-	void testLocateEnemies(Resource resource, Set<Enemy> expected) {
-		assertEquals(expected, new ResourceLocator().locateEnemies(EnemyPredicate.resource(resource)));
+	void testLocate(Resource resource, Set<Enemy> expected) {
+		assertEquals(expected, new ResourceLocator().locate(Enemy.class, dropping(resource)));
 	}
 	
-	//Factoriser LocateEnemies et LocateShops (une seule méthode locate avec Predicate)
+	
 	static List <Arguments> testLocateEnemiesOnResourceType() {
 		List<Arguments> list = new LinkedList<>();
 		for (Resource.Type type : Resource.Type.values()) {
@@ -56,43 +58,43 @@ class ResourceLocatorTest {
 	@ParameterizedTest
 	@MethodSource
 	void testLocateEnemiesOnResourceType(Resource.Type type, Set<Enemy> expected) {
-		assertEquals(expected, new ResourceLocator().locateEnemies(EnemyPredicate.resourceType(type)));
+		assertEquals(expected, new ResourceLocator().locate(Enemy.class, EnemyPredicate.resourceType(type)));
 	}
 
 	@Test
 	void testLocateShops() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.FLORA), r.locateShops(ShopPredicate.resource(SWEET_FLOWER)));
+		assertEquals(Set.of(Shop.FLORA), r.locate(Shop.class, selling(SWEET_FLOWER)));
 	}
 
 	@Test
 	void testLocateShops2() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(), r.locateShops(ShopPredicate.resource(SLIME_CS)));
+		assertEquals(Set.of(), r.locate(Shop.class, selling(SLIME_CS)));
 	}
 
 	@Test
 	void testLocateShops3() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.FLORA), r.locateShops(ShopPredicate.resource(CECILIA)));
+		assertEquals(Set.of(Shop.FLORA), r.locate(Shop.class, selling(CECILIA)));
 	}
 
 	@Test
 	void testLocateBlanche() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), r.locateShops(ShopPredicate.resource(WHEAT)));
+		assertEquals(Set.of(Shop.BLANCHE, Shop.DONGSHENG), r.locate(Shop.class, selling(WHEAT)));
 	}
 
 	@Test
 	void testLocateCookedDishes() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.GOOD_HUNTER), r.locateShops(resourceType(COOKED_DISH)));
+		assertEquals(Set.of(Shop.GOOD_HUNTER), r.locate(Shop.class, resourceType(COOKED_DISH)));
 	}
 
 	@Test
 	void testLocateEnemiesDrop() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(), r.locateShops(resourceType(ENEMIES_DROP)));
+		assertEquals(Set.of(), r.locate(Shop.class, resourceType(ENEMIES_DROP)));
 	}
 
 	public interface testInterface {
@@ -118,11 +120,11 @@ class ResourceLocatorTest {
 	@Test
 	void test() {
 		ResourceLocator r = new ResourceLocator();
-		assertEquals(Set.of(Shop.BLANCHE, Shop.FLORA), r.locateShops(numberOfItemsSold(2)));
+		assertEquals(Set.of(Shop.BLANCHE, Shop.FLORA), r.locate(Shop.class, numberOfItemsSold(2)));
 	}
 
 	private ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
-		return shop ->	 shop.getItemsSold().size() == numberOfItemsSold;
+		return shop -> shop.getItemsSold().size() == numberOfItemsSold;
 	}
 	
 	
