@@ -16,6 +16,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,26 +28,26 @@ import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
 
-	//Generaliser pour mettre des shops dans les arguments et adapter la méthode "testLocate"
+// N'avoir plus qu'un seul test dans testLocate
 	static List<Object> testLocate() {
 		return List.of(//
-				arguments(Resource.SLIME_CS, Set.of(Enemy.SLIMES)), //
-				arguments(Resource.D_MASKS, Set.of(Enemy.HILICURLS, Enemy.LAWACURLS, Enemy.MITACURLS, Enemy.SAMACURLS)), //
-				arguments(Resource.F_ARROWHEADS, Set.of(Enemy.HILICURL_SHOOTERS)), //
-				arguments(Resource.D_SCROLLS, Set.of(Enemy.SAMACURLS)), //
-				arguments(Resource.TH_INSIGNIA, Set.of(Enemy.TREASURE_HOARDERS)), //
-				arguments(Resource.R_INSIGNIA, Set.of(Enemy.FATUIS)), //
-				arguments(Resource.W_NECTAR, Set.of(Enemy.WHOPPERFLOWERS)) //
+				arguments(Enemy.class, dropping(Resource.SLIME_CS), Set.of(Enemy.SLIMES)), //
+				arguments(Enemy.class, dropping(Resource.D_MASKS), Set.of(Enemy.HILICURLS, Enemy.LAWACURLS, Enemy.MITACURLS, Enemy.SAMACURLS)), //
+				arguments(Enemy.class, dropping(Resource.F_ARROWHEADS), Set.of(Enemy.HILICURL_SHOOTERS)), //
+				arguments(Enemy.class, dropping(Resource.D_SCROLLS), Set.of(Enemy.SAMACURLS)), //
+				arguments(Enemy.class, dropping(Resource.TH_INSIGNIA), Set.of(Enemy.TREASURE_HOARDERS)), //
+				arguments(Enemy.class, dropping(Resource.R_INSIGNIA), Set.of(Enemy.FATUIS)), //
+				arguments(Enemy.class, dropping(Resource.W_NECTAR), Set.of(Enemy.WHOPPERFLOWERS)), //
+				arguments(Shop.class, selling(SWEET_FLOWER), Set.of(Shop.FLORA))
 		);
 	}
 	
 	@ParameterizedTest
 	@MethodSource
-	void testLocate(Resource resource, Set<Enemy> expected) {
-		assertEquals(expected, new ResourceLocator().locate(Enemy.class, dropping(resource)));
+	<T extends Enum<?>>void testLocate(Class<T> enumClass, Predicate<T> predicate, Set<T> expected) {
+		assertEquals(expected, new ResourceLocator().locate(enumClass, predicate));
 	}
-	
-	
+
 	static List <Arguments> testLocateEnemiesOnResourceType() {
 		List<Arguments> list = new LinkedList<>();
 		for (Resource.Type type : Resource.Type.values()) {
