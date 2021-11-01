@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,7 +43,6 @@ class ResourceLocatorTest {
 				arguments(Shop.class, resourceType(ENEMIES_DROP), Set.of()) //
 		);
 	}
-
 	@ParameterizedTest
 	@MethodSource
 	<T extends Enum<?>> void testLocate(Class<T> enumClass, Predicate<T> predicate, Set<T> expected) {
@@ -67,6 +67,19 @@ class ResourceLocatorTest {
 	private static ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
 		return shop -> shop.getItemsSold().size() == numberOfItemsSold;
 	}
+	
+	@Test
+	void testPredicate() {
+		Predicate<Object> predicate = new Predicate<Object>() {
+			@Override
+			public boolean test(Object enumValue) {
+				return enumValue.toString().startsWith("F");
+			}
+		};
+		assertEquals(Set.of(FLORA), new ResourceLocator().locate(Shop.class, predicate));
+		assertEquals(Set.of(FATUIS), new ResourceLocator().locate(Enemy.class, predicate));
+	}
+	
 
 	// TODO testLocateShops(Resource.Type type)
 

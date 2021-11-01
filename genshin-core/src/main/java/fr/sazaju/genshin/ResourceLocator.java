@@ -48,7 +48,7 @@ public class ResourceLocator {
 		}
 	}
 
-	public <T extends Enum<?>> Set<T> locate(Class <T> enumClass, Predicate<T> predicate) {
+	public <T extends Enum<?>> Set<T> locate(Class <T> enumClass, Predicate<? super T> predicate) {
 		return Stream.of(enumClass.getEnumConstants())//
 				.filter(predicate)//
 				.collect(Collectors.toSet())//

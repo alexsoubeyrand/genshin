@@ -6,17 +6,18 @@ import java.util.stream.Stream;
 
 //TODO Prendre en charge les réductions
 public enum Shop {
-	FLORA(Map.of(Resource.SWEET_FLOWER, 200, Resource.CECILIA, 1000)), //
-	BLANCHE(Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80)), //
-	DONGSHENG(Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80, Resource.SHRIMP_MEAT, 120)),
-	GOOD_HUNTER(Map.of(Resource.FLOUR, 150, Resource.TEYVAT_FRIED_EGG, 200, Resource.MINT_JELLY_RECIPE, 1250))
+	FLORA("Flora", Map.of(Resource.SWEET_FLOWER, 200, Resource.CECILIA, 1000)), //
+	BLANCHE("Blanche", Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80)), //
+	DONGSHENG("Dongsheng", Map.of(Resource.WHEAT, 100, Resource.PEPPER, 80, Resource.SHRIMP_MEAT, 120)),
+	GOOD_HUNTER("Good Hunter", Map.of(Resource.FLOUR, 150, Resource.TEYVAT_FRIED_EGG, 200, Resource.MINT_JELLY_RECIPE, 1250))
 
 	;
-
+	private String name;
 	private Map<Resource, Integer> prices;
 
-	Shop(Map<Resource, Integer> prices) {
+	Shop(String name, Map<Resource, Integer> prices) {
 		this.prices = prices;
+		this.name = name;
 	}
 
 	boolean sells(Resource resource) {
@@ -34,6 +35,11 @@ public enum Shop {
 
 	public Set<Resource> getItemsSold() {
 		return this.prices.keySet();
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }
