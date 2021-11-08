@@ -14,7 +14,8 @@ public class ResourceLocator {
 //				.filter(enemy -> enemy.getDroppedResources().contains(resource))//
 //				.collect(Collectors.toSet());
 //	}
-	
+	//TODO: Generaliser ShopPredicate et EnemyPredicate (ressemblance entre dropping et selling ; et les deux resourceType)
+	//Sortir resourceType
 	public static interface EnemyPredicate extends Predicate<Enemy> {
 
 		
