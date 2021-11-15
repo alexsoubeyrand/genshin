@@ -6,50 +6,40 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ResourceLocator {
-	
-	// locateEnemies(Resource.Type type) et factoriser pour n'avoir qu'une seule méthode
+
+	// locateEnemies(Resource.Type type) et factoriser pour n'avoir qu'une seule
+	// méthode
 //	public Set<Enemy> locateEnemies(Resource resource) {
 //
 //		return Stream.of(Enemy.values())//
 //				.filter(enemy -> enemy.getDroppedResources().contains(resource))//
 //				.collect(Collectors.toSet());
 //	}
-	//TODO: Generaliser ShopPredicate et EnemyPredicate (ressemblance entre dropping et selling ; et les deux resourceType)
-	//Sortir resourceType
 	public static interface EnemyPredicate extends Predicate<Enemy> {
 
-		
-		
 		public static EnemyPredicate dropping(Resource resource) {
 			return enemy -> enemy.drops(resource);
 		}
-
-		public static EnemyPredicate resourceType(Resource.Type resourceType) {
-			return enemy -> enemy.getDroppedResources().stream() //
-					.filter(resource -> resource.getType().equals(resourceType)) //
-					.findFirst().isPresent();
-		}
 	}
-	
+
 	public static interface ShopPredicate extends Predicate<Shop> {
 
 		public static ShopPredicate selling(Resource resource) {
-			return new ShopPredicate() {
-				@Override
-				public boolean test(Shop shop) {
-					return shop.sells(resource);
-				}
-			};
-		}
-
-		public static ShopPredicate resourceType(Resource.Type resourceType) {
-			return shop -> shop.getItemsSold().stream() //
-					.filter(resource -> resource.getType().equals(resourceType)) //
-					.findFirst().isPresent();
+			return shop -> shop.sells(resource);
 		}
 	}
 
-	public <T extends Enum<?>> Set<T> locate(Class <T> enumClass, Predicate<? super T> predicate) {
+	public static interface Browser<T> {
+		Stream<Resource> browse(T source);
+	}
+
+	public static <T> Predicate<T> resourceType(Resource.Type resourceType, Browser<T> browser) {
+		return source -> browser.browse(source) //
+				.filter(resource -> resource.getType().equals(resourceType)) //
+				.findFirst().isPresent();
+	}
+
+	public <T extends Enum<?>> Set<T> locate(Class<T> enumClass, Predicate<? super T> predicate) {
 		return Stream.of(enumClass.getEnumConstants())//
 				.filter(predicate)//
 				.collect(Collectors.toSet())//

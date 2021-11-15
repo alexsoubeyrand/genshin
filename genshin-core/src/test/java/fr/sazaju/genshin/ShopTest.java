@@ -42,7 +42,6 @@ class ShopTest {
 		for (Arguments arguments : supportedPrices) {
 			Object[] valeurs = arguments.get();
 			Shop shop = (Shop) valeurs[0];
-			// TODO : Expliquer la lambda
 			map.computeIfAbsent(shop, s -> new LinkedList<>());
 			map.get(shop).add((Resource) valeurs[1]);
 
