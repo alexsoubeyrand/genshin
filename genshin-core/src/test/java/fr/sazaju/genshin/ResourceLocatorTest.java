@@ -21,10 +21,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import fr.sazaju.genshin.ResourceLocator.Browser;
+import fr.sazaju.genshin.ResourceLocator.EnemyPredicate;
 import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
-	//TODO : Changer l'affichage des rapports de tests
+	//TODO: Adapter le toString du Enemy.class (essayer avec le décorateur)
 	static Stream<Arguments> allTestCases() {
 		return Stream.of(//
 				testsCasesToLocateEnemiesFromResourceTypes(), //
@@ -77,10 +78,11 @@ class ResourceLocatorTest {
 		return Stream.concat(enemiesDrop, otherTypes);
 	}
 
-	@ParameterizedTest
+	@ParameterizedTest(name = "Enemies {1} should be {2}")
 	@MethodSource("allTestCases")
 	<T extends Enum<?>> void testLocate(Class<T> enumClass, Predicate<T> predicate, Set<T> expected) {
 		assertEquals(expected, new ResourceLocator().locate(enumClass, predicate));
+		fail();
 	}
 
 	private static ShopPredicate numberOfItemsSold(int numberOfItemsSold) {

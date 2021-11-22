@@ -18,7 +18,17 @@ public class ResourceLocator {
 	public static interface EnemyPredicate extends Predicate<Enemy> {
 
 		public static EnemyPredicate dropping(Resource resource) {
-			return enemy -> enemy.drops(resource);
+			return new EnemyPredicate() {
+				@Override
+				public boolean test(Enemy enemy) {
+					return enemy.drops(resource);
+				}
+				
+				@Override
+				public String toString() {
+					return "dropping " + resource.toString();
+				}
+			};
 		}
 	}
 
