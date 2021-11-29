@@ -26,7 +26,7 @@ public class ResourceLocator {
 				
 				@Override
 				public String toString() {
-					return "dropping " + resource.toString();
+					return "dropping " + resource;
 				}
 			};
 		}
@@ -35,7 +35,16 @@ public class ResourceLocator {
 	public static interface ShopPredicate extends Predicate<Shop> {
 
 		public static ShopPredicate selling(Resource resource) {
-			return shop -> shop.sells(resource);
+			return new ShopPredicate() {
+				@Override
+				public boolean test(Shop shop) {
+					return shop.sells(resource);
+				}
+				
+				public String toString() {
+					return "selling " + resource;
+				}
+			};
 		}
 	}
 
@@ -44,9 +53,18 @@ public class ResourceLocator {
 	}
 
 	public static <T> Predicate<T> resourceType(Resource.Type resourceType, Browser<T> browser) {
-		return source -> browser.browse(source) //
-				.filter(resource -> resource.getType().equals(resourceType)) //
-				.findFirst().isPresent();
+		return new Predicate<T>() {
+			@Override
+			public boolean test(T source) {
+				return browser.browse(source) //
+						.filter(resource -> resource.getType().equals(resourceType)) //
+						.findFirst().isPresent();
+			}
+			
+			public String toString() {
+				return "that got at least one " + resourceType;
+			}
+		};
 	}
 
 	public <T extends Enum<?>> Set<T> locate(Class<T> enumClass, Predicate<? super T> predicate) {

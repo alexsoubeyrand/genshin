@@ -45,13 +45,15 @@ public enum Resource {
 		CRAFTED_INGREDIENT(), //
 		COOKED_DISH(), //
 		RECIPE() //
-		
 		;
-		
+
 		public Set<Resource> getAllResourcesFromThisType() {
-			return Stream.of(Resource.values())
-					.filter(resource -> resource.getType().equals(this))
+			return Stream.of(Resource.values()).filter(resource -> resource.getType().equals(this))
 					.collect(Collectors.toSet());
+		}
+
+		public String toString() {
+			return this.name().toLowerCase().replace('_', ' ');
 		}
 	}
 
@@ -71,7 +73,5 @@ public enum Resource {
 	public Resource.Type getType() {
 		return type;
 	}
-	
-	
 
 }

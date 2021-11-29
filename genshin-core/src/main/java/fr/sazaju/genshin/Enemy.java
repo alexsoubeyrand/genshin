@@ -28,7 +28,7 @@ public enum Enemy {
 	public Boolean drops(Resource resource) {
 		return droppedResources.contains(resource);
 	}
-
+	
 	@Override
 	public String toString() {
 		return name;
