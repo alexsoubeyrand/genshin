@@ -25,7 +25,8 @@ import fr.sazaju.genshin.ResourceLocator.EnemyPredicate;
 import fr.sazaju.genshin.ResourceLocator.ShopPredicate;
 
 class ResourceLocatorTest {
-	//TODO: Adapter le toString de la class de la methode de test (testLocate) (essayer avec le décorateur)
+	// TODO: Adapter le toString de la class de la methode de test (testLocate)
+	// (essayer avec le décorateur)
 	static Stream<Arguments> allTestCases() {
 		return Stream.of(//
 				testsCasesToLocateEnemiesFromResourceTypes(), //
@@ -37,52 +38,72 @@ class ResourceLocatorTest {
 
 	private static Stream<Arguments> testCasesToLocateShopsFromResourceTypes() {
 		Browser<Shop> browser = shop -> shop.getItemsSold().stream();
+		Decorateur<Shop> decorateur = new Decorateur<>(Shop.class);
 		return Stream.of(//
-				arguments(Shop.class, resourceType(COOKED_DISH, browser), Set.of(GOOD_HUNTER)), //
-				arguments(Shop.class, resourceType(ENEMIES_DROP, browser), Set.of()) //
+				arguments(decorateur, resourceType(COOKED_DISH, browser), Set.of(GOOD_HUNTER)), //
+				arguments(decorateur, resourceType(ENEMIES_DROP, browser), Set.of()) //
 		);
 	}
 
 	private static Stream<Arguments> testCasesToLocateShopsFromSoldItems() {
+		Decorateur<Shop> decorateur = new Decorateur<>(Shop.class);
 		return Stream.of(//
-				arguments(Shop.class, selling(SWEET_FLOWER), Set.of(FLORA)), //
-				arguments(Shop.class, selling(SLIME_CS), Set.of()), //
-				arguments(Shop.class, selling(CECILIA), Set.of(FLORA)), //
-				arguments(Shop.class, selling(WHEAT), Set.of(BLANCHE, DONGSHENG)) //
+				arguments(decorateur, selling(SWEET_FLOWER), Set.of(FLORA)), //
+				arguments(decorateur, selling(SLIME_CS), Set.of()), //
+				arguments(decorateur, selling(CECILIA), Set.of(FLORA)), //
+				arguments(decorateur, selling(WHEAT), Set.of(BLANCHE, DONGSHENG)) //
 		);
 	}
-
+	
+	//TODO : Factoriser les arguments (decorateur, arguments qui se répète)
 	private static Stream<Arguments> testCasesToLocateEnemiesFromDroppedItems() {
+		Decorateur<Enemy> decorateur = new Decorateur<>(Enemy.class);
 		return Stream.of(//
-				arguments(Enemy.class, dropping(SLIME_CS), Set.of(SLIMES)), //
-				arguments(Enemy.class, dropping(D_MASKS), Set.of(HILICURLS, LAWACURLS, MITACURLS, SAMACURLS)), //
-				arguments(Enemy.class, dropping(F_ARROWHEADS), Set.of(HILICURL_SHOOTERS)), //
-				arguments(Enemy.class, dropping(D_SCROLLS), Set.of(SAMACURLS)), //
-				arguments(Enemy.class, dropping(TH_INSIGNIA), Set.of(TREASURE_HOARDERS)), //
-				arguments(Enemy.class, dropping(R_INSIGNIA), Set.of(FATUIS)), //
-				arguments(Enemy.class, dropping(W_NECTAR), Set.of(WHOPPERFLOWERS)) //
+				arguments(decorateur, dropping(SLIME_CS), Set.of(SLIMES)), //
+				arguments(decorateur, dropping(D_MASKS), Set.of(HILICURLS, LAWACURLS, MITACURLS, SAMACURLS)), //
+				arguments(decorateur, dropping(F_ARROWHEADS), Set.of(HILICURL_SHOOTERS)), //
+				arguments(decorateur, dropping(D_SCROLLS), Set.of(SAMACURLS)), //
+				arguments(decorateur, dropping(TH_INSIGNIA), Set.of(TREASURE_HOARDERS)), //
+				arguments(decorateur, dropping(R_INSIGNIA), Set.of(FATUIS)), //
+				arguments(decorateur, dropping(W_NECTAR), Set.of(WHOPPERFLOWERS)) //
 		);
 	}
 
 	static Stream<Arguments> testsCasesToLocateEnemiesFromResourceTypes() {
 
 		Browser<Enemy> browser = enemy -> enemy.getDroppedResources().stream();
+		Decorateur<Enemy> decorateur = new Decorateur<>(Enemy.class);
 		Stream<Arguments> enemiesDrop = Stream.of(//
-				arguments(Enemy.class, resourceType(ENEMIES_DROP, browser), Set.of(Enemy.values())) //
+				arguments(decorateur, resourceType(ENEMIES_DROP, browser), Set.of(Enemy.values())) //
 		);
 
 		Stream<Arguments> otherTypes = Stream.of(Resource.Type.values()) //
 				.filter(type -> !type.equals(ENEMIES_DROP))//
-				.map(type -> arguments(Enemy.class, resourceType(type, browser), emptySet()));
+				.map(type -> arguments(decorateur, resourceType(type, browser), emptySet()));
 
 		return Stream.concat(enemiesDrop, otherTypes);
 	}
 
+	// Composition pour détourner le extends de Class<T>
+	static class Decorateur<T> {
+		final Class<T> myClass;
+
+		public String toString() {
+			return "The instances of type " + myClass.getSimpleName();
+		}
+
+		public Decorateur(Class<T> myClass) {
+			this.myClass = myClass;
+		}
+	}
+
 	@ParameterizedTest(name = "{0} {1} should be {2}")
 	@MethodSource("allTestCases")
-	<T extends Enum<?>> void testLocate(Class<T> enumClass, Predicate<T> predicate, Set<T> expected) {
-		assertEquals(expected, new ResourceLocator().locate(enumClass, predicate));
-		fail();
+	<T extends Enum<?>> void testLocate(Decorateur<T> enumClass, Predicate<T> predicate, Set<T> expected) {
+
+		assertEquals(expected, new ResourceLocator().locate(enumClass.myClass, predicate));
+//		fail();
+
 	}
 
 	private static ShopPredicate numberOfItemsSold(int numberOfItemsSold) {
